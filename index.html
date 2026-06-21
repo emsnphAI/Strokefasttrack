@@ -98,7 +98,7 @@
 
         <form id="interventionForm" class="space-y-3">
             <div class="bg-white p-3 rounded-lg shadow border border-gray-200">
-                <h3 class="font-bold mb-2 text-blue-800">1. Vitals & Neuro Signs แรกรับ</h3>
+                <h3 class="font-bold mb-2 text-blue-800">1. บันทึกสัญญาณชีพแรกรับ (Vitals & Neuro Signs)</h3>
                 <div class="grid grid-cols-2 gap-2 text-sm">
                     <div><label>BP (mmHg)</label><input type="text" id="v_bp" class="w-full border rounded p-1"></div>
                     <div><label>HR (/min)</label><input type="number" id="v_hr" class="w-full border rounded p-1"></div>
@@ -108,13 +108,33 @@
                     <div><label>Pupil L (mm)</label><input type="text" id="v_pupill" class="w-full border rounded p-1"></div>
                     <div><label>Pupil R (mm)</label><input type="text" id="v_pupilr" class="w-full border rounded p-1"></div>
                 </div>
-                <div class="mt-3 text-sm">
-                    <label class="font-bold text-gray-700">Motor Power (0-5)</label>
-                    <div class="grid grid-cols-4 gap-2 mt-1">
-                        <div><label class="text-xs text-gray-500">RA</label><select id="m_ra" class="w-full border rounded p-1"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select></div>
-                        <div><label class="text-xs text-gray-500">LA</label><select id="m_la" class="w-full border rounded p-1"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select></div>
-                        <div><label class="text-xs text-gray-500">RL</label><select id="m_rl" class="w-full border rounded p-1"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select></div>
-                        <div><label class="text-xs text-gray-500">LL</label><select id="m_ll" class="w-full border rounded p-1"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select></div>
+                
+                <div class="mt-4 bg-gray-50 p-3 rounded border border-gray-200">
+                    <label class="font-bold text-gray-700 text-center block mb-2 text-sm">Motor Power (0-5)</label>
+                    <div class="flex justify-center items-center space-x-6">
+                        <div class="flex flex-col space-y-3">
+                            <div class="flex items-center space-x-2">
+                                <label class="text-xs font-bold text-gray-600 w-6 text-right">RA</label>
+                                <select id="m_ra" class="border rounded p-1 w-16 text-center"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <label class="text-xs font-bold text-gray-600 w-6 text-right">RL</label>
+                                <select id="m_rl" class="border rounded p-1 w-16 text-center"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select>
+                            </div>
+                        </div>
+                        
+                        <div class="h-16 w-px bg-gray-300"></div> 
+                        
+                        <div class="flex flex-col space-y-3">
+                            <div class="flex items-center space-x-2">
+                                <select id="m_la" class="border rounded p-1 w-16 text-center"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select>
+                                <label class="text-xs font-bold text-gray-600 w-6">LA</label>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <select id="m_ll" class="border rounded p-1 w-16 text-center"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select>
+                                <label class="text-xs font-bold text-gray-600 w-6">LL</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -136,10 +156,14 @@
                     <input type="checkbox" id="chk_coord" class="w-5 h-5 text-red-600 rounded">
                     <span class="font-bold">5. ประสานส่งต่อ รพ.ปลายทาง</span>
                 </label>
+                <label class="flex items-start space-x-2">
+                    <input type="checkbox" id="chk_other" class="w-5 h-5 text-red-600 rounded mt-1">
+                    <div class="flex-1"><span class="font-bold">6. การรักษาอื่นๆ (โปรดระบุ):</span><input type="text" id="val_other" class="w-full border rounded p-1 mt-1"></div>
+                </label>
             </div>
 
             <div class="bg-indigo-50 p-3 rounded-lg shadow border border-indigo-200">
-                <h3 class="font-bold mb-2 text-indigo-800"><i class="fas fa-stopwatch"></i> 6. เวลาบันทึก KPI ปลายทาง</h3>
+                <h3 class="font-bold mb-2 text-indigo-800"><i class="fas fa-stopwatch"></i> 7. เวลาบันทึก KPI ปลายทาง</h3>
                 <div class="grid grid-cols-2 gap-2 text-sm">
                     <div><label class="font-semibold text-red-600">เวลาถึง รพ. (Door):</label><input type="time" id="v_door" class="w-full border rounded p-1 mt-1 bg-white"></div>
                     <div><label class="font-semibold text-blue-600">เวลาเข้า CT Brain:</label><input type="time" id="v_ct" class="w-full border rounded p-1 mt-1 bg-white"></div>
@@ -313,6 +337,7 @@
             blood: document.getElementById('chk_blood').checked,
             consult: { done: document.getElementById('chk_consult').checked, detail: document.getElementById('val_consult').value || '-' },
             coord: document.getElementById('chk_coord').checked,
+            other: { done: document.getElementById('chk_other').checked, detail: document.getElementById('val_other').value || '-' },
             timeDoor: document.getElementById('v_door').value || '-',
             timeCT: document.getElementById('v_ct').value || '-',
             timeNeedle: document.getElementById('v_needle').value || '-'
@@ -399,7 +424,7 @@
             </div>
 
             <div class="mb-4">
-                <h2 class="font-bold text-lg bg-gray-200 px-2 py-1">3. สัญญาณชีพและอาการทางระบบประสาท</h2>
+                <h2 class="font-bold text-lg bg-gray-200 px-2 py-1">3. บันทึกสัญญาณชีพแรกรับและระบบประสาท</h2>
                 <table class="w-full border-collapse border border-black mt-2 text-center">
                     <tr class="bg-gray-100 border border-black">
                         <th class="border border-black p-1">BP</th>
@@ -418,7 +443,22 @@
                         <td class="border border-black p-1">${v.pupil_l || '-'} / ${v.pupil_r || '-'}</td>
                     </tr>
                 </table>
-                <div class="mt-2 px-2"><b>Motor Power (0-5):</b> RA = ${v.motor?.ra||'-'}, LA = ${v.motor?.la||'-'}, RL = ${v.motor?.rl||'-'}, LL = ${v.motor?.ll||'-'}</div>
+                
+                <div class="mt-4 px-2">
+                    <b>Motor Power (0-5):</b>
+                    <div class="flex justify-center mt-2">
+                        <table class="text-center border-collapse">
+                            <tr>
+                                <td class="border-b border-r border-black p-2 w-16">RA: ${v.motor?.ra||'-'}</td>
+                                <td class="border-b border-black p-2 w-16">LA: ${v.motor?.la||'-'}</td>
+                            </tr>
+                            <tr>
+                                <td class="border-r border-black p-2 w-16">RL: ${v.motor?.rl||'-'}</td>
+                                <td class="p-2 w-16">LL: ${v.motor?.ll||'-'}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
             </div>
 
             <div class="mb-4">
@@ -428,6 +468,7 @@
                     <p>${chk(rec.interventions?.blood)} <b>เจาะเลือด:</b> CBC, Chem, Coag, Clotted</p>
                     <p>${chk(rec.interventions?.consult?.done)} <b>รายงานแพทย์:</b> ${rec.interventions?.consult?.detail || '-'}</p>
                     <p>${chk(rec.interventions?.coord)} <b>ประสานงาน รพ.ปลายทางเรียบร้อย</b></p>
+                    <p>${chk(rec.interventions?.other?.done)} <b>การรักษาอื่นๆ:</b> ${rec.interventions?.other?.detail || '-'}</p>
                 </div>
             </div>
 
