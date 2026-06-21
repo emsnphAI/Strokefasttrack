@@ -484,8 +484,8 @@
 
         const printHtml = `
             <div class="border-b-2 border-black pb-2 mb-4 text-center">
-                <h1 class="text-2xl font-bold">แบบบันทึกการดูแลผู้ป่วยฉุกเฉิน Stroke Fast Track นอกโรงพยาบาล</h1>
-                <p class="text-md">หน่วยปฏิบัติการการแพทย์ฉุกเฉิน รพ.นครปฐม </p>
+                <h1 class="text-2xl font-bold">แบบบันทึกการดูแลผู้ป่วยฉุกเฉิน Stroke Fast Track</h1>
+                <p class="text-md">หน่วยปฏิบัติการการแพทย์ฉุกเฉิน (ตามมาตรฐาน TEMSA)</p>
             </div>
 
             <div class="mb-4">
@@ -590,3 +590,94 @@
             <div class="mt-8 flex justify-between px-10">
                 <div class="text-center">
                     <p>ลงชื่อ..........................................................ผู้ประเมิน</p>
+                    <p class="mt-1">(..........................................................)</p>
+                </div>
+                <div class="text-center">
+                    <p>ลงชื่อ..........................................................แพทย์/พยาบาลรับมอบ</p>
+                    <p class="mt-1">(..........................................................)</p>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('printLayout').innerHTML = printHtml;
+        window.print();
+    }
+
+    window.exportToCSV = function() {
+        if(window.allCases.length === 0) { alert("ยังไม่มีข้อมูลสำหรับ Export"); return; }
+        let csvContent = "\uFEFF";
+        csvContent += "ชื่อ/HN,วันที่ประเมิน,Last Known Well,เวลา Onset,เวลา FMC,เวลา Activate,เวลา Door,เวลา CT,เวลา Needle,FAST-ED Score,BE-FAST (B-E-F-A-S),BP,HR,RR,O2 Sat,DTX,GCS (E-V-M),Motor (RA-LA-RL-LL),A+B Manage,ให้สารน้ำ (rate),เจาะเลือด,ปรึกษาแพทย์,ประสานงาน,การรักษาอื่นๆ,สถานะ\n";
+
+        window.allCases.forEach(rec => {
+            const v = rec.interventions?.vitals || {};
+            const iv = rec.interventions?.iv || {};
+            const ab = rec.interventions?.ab_manage || {};
+            const consult = rec.interventions?.consult || {};
+            const other = rec.interventions?.other || {};
+            
+            const befastStr = `${rec.befast?.b?'Y':'N'}-${rec.befast?.e?'Y':'N'}-${rec.befast?.f?'Y':'N'}-${rec.befast?.a?'Y':'N'}-${rec.befast?.s?'Y':'N'}`;
+            const gcsStr = `${v.gcs?.e||'-'}-${v.gcs?.v||'-'}-${v.gcs?.m||'-'}`;
+            const motorStr = `${v.motor?.ra||'-'}-${v.motor?.la||'-'}-${v.motor?.rl||'-'}-${v.motor?.ll||'-'}`;
+
+            let row = [
+                `"${rec.name || '-'}"`, `"${rec.dateStr || '-'}"`, `"${rec.lkw || '-'}"`, `"${rec.onset || '-'}"`, `"${rec.fmc || '-'}"`, `"${rec.activateTime || '-'}"`,
+                `"${rec.interventions?.timeDoor || '-'}"`, `"${rec.interventions?.timeCT || '-'}"`, `"${rec.interventions?.timeNeedle || '-'}"`, `"${rec.fastedScore || 0}"`, `"${befastStr}"`,
+                `"${v.bp || '-'}"`, `"${v.hr || '-'}"`, `"${v.rr || '-'}"`, `"${v.o2 || '-'}"`, `"${v.dtx || '-'}"`, `"${gcsStr}"`, `"${motorStr}"`,
+                `"${ab.done ? 'Yes: ' + ab.detail : 'No'}"`, `"${iv.done ? 'Yes: ' + iv.rate + ' ml/hr' : 'No'}"`, `"${rec.interventions?.blood ? 'Yes' : 'No'}"`,
+                `"${consult.done ? 'Yes: ' + consult.detail : 'No'}"`, `"${rec.interventions?.coord ? 'Yes' : 'No'}"`, `"${other.done ? 'Yes: ' + other.detail : 'No'}"`,
+                `"${rec.status === 'completed' ? 'ปิดเคส' : (rec.status === 'active' ? 'กำลังดำเนินการ' : 'ไม่เข้าเกณฑ์')}"`
+            ];
+            csvContent += row.join(",") + "\n";
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", `Stroke_Data_Export_${new Date().toISOString().slice(0,10)}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    onSnapshot(query(collection(db, "stroke_patients"), orderBy("createdAt", "desc")), (snapshot) => {
+        const historyList = document.getElementById('historyList');
+        historyList.innerHTML = '';
+        window.allCases = [];
+
+        if (snapshot.empty) { historyList.innerHTML = '<p class="text-center">ยังไม่มีประวัติในระบบ</p>'; return; }
+
+        snapshot.forEach((docSnap) => {
+            const rec = { id: docSnap.id, ...docSnap.data() };
+            window.allCases.push(rec);
+            
+            let btnPrint = '';
+            let statusBadge = '<span class="bg-gray-400 text-white text-[10px] px-2 py-1 rounded">ไม่เข้าเกณฑ์</span>';
+            
+            // 🌟 ปรับเพิ่มเงื่อนไขสำหรับเคสที่ค้างให้สามารถกดแก้ต่อได้ 🌟
+            if(rec.status === 'active') {
+                statusBadge = '<span class="bg-red-600 text-white text-[10px] px-2 py-1 rounded animate-pulse">กำลังดำเนินการ</span>';
+                btnPrint = `<button onclick="window.resumeCase('${rec.id}')" class="mt-2 w-full bg-orange-50 text-orange-700 text-xs py-2 rounded border border-orange-200 hover:bg-orange-100 font-bold"><i class="fas fa-clipboard-list mr-1"></i> ⚡ ดำเนินการต่อ (ทำ Checklist)</button>`;
+            } else if (rec.status === 'completed') {
+                statusBadge = '<span class="bg-green-600 text-white text-[10px] px-2 py-1 rounded">ปิดเคสแล้ว</span>';
+                btnPrint = `<button onclick="window.printCase('${rec.id}')" class="mt-2 w-full bg-blue-50 text-blue-700 text-xs py-2 rounded border border-blue-200 hover:bg-blue-100"><i class="fas fa-print"></i> 🖨️ พิมพ์แบบบันทึก (A4)</button>`;
+            }
+
+            const card = `
+                <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex justify-between items-start mb-2"><span class="font-bold text-gray-800">${rec.name}</span>${statusBadge}</div>
+                    <div class="text-xs text-gray-600 space-y-1">
+                        <p>Onset: ${rec.onset} | FMC: ${rec.fmc}</p>
+                        ${rec.isFastTrack ? `<p class="font-semibold text-red-600">FAST-ED: ${rec.fastedScore} ${rec.isLvo ? '(LVO)' : ''}</p>` : ''}
+                    </div>
+                    ${btnPrint}
+                </div>
+            `;
+            historyList.innerHTML += card;
+        });
+    });
+
+</script>
+</body>
+</html>
