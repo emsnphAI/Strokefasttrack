@@ -459,6 +459,7 @@
     }
 
     // 🌟 ฟังก์ชันสร้าง PDF ฉบับปรับปรุงสำหรับมือถือ/แท็บเล็ต 🌟
+ // 🌟 ฟังก์ชันสร้าง PDF ฉบับแก้ปัญหาหน้าขาวโพลน 🌟
     window.printCase = function(docId, btnElement) {
         const rec = window.allCases.find(c => c.id === docId);
         if(!rec) return;
@@ -482,11 +483,13 @@
 
         const chk = (cond) => cond ? '☑' : '☐';
 
+        // แทรก link font เข้าไปใน HTML string โดยตรง เพื่อให้ PDF รู้จักฟอนต์สารบรรณ
         const printHtml = `
-            <div style="font-family: 'Sarabun', sans-serif; font-size: 14px; color: black; line-height: 1.5;">
+            <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+            <div style="font-family: 'Sarabun', sans-serif; font-size: 14px; color: black; line-height: 1.5; background-color: white; padding: 10px;">
                 <div style="border-bottom: 2px solid black; padding-bottom: 8px; margin-bottom: 16px; text-align: center;">
-                    <h1 style="font-size: 20px; font-weight: bold; margin: 0;">แบบบันทึกการดูแลผู้ป่วยฉุกเฉิน Stroke Fast Track นอกโรงพยาบาล</h1>
-                    <p style="font-size: 14px; margin: 0;">หน่วยปฏิบัติการการแพทย์ฉุกเฉิน รพ.นครปฐม</p>
+                    <h1 style="font-size: 20px; font-weight: bold; margin: 0;">แบบบันทึกการดูแลผู้ป่วยฉุกเฉิน Stroke Fast Track</h1>
+                    <p style="font-size: 14px; margin: 0;">หน่วยปฏิบัติการการแพทย์ฉุกเฉิน (ตามมาตรฐาน TEMSA)</p>
                 </div>
 
                 <div style="margin-bottom: 16px;">
@@ -549,7 +552,7 @@
                     <div style="padding: 0 8px;">
                         <b>Motor Power (0-5):</b>
                         <div style="display: flex; justify-content: center; margin-top: 8px;">
-                            <table style="text-align: center; border-collapse: collapse;">
+                            <table style="text-align: center; border-collapse: collapse; margin: 0 auto;">
                                 <tr>
                                     <td style="border-bottom: 1px solid black; border-right: 1px solid black; padding: 8px; width: 60px;">RA: ${v.motor?.ra||'-'}</td>
                                     <td style="border-bottom: 1px solid black; padding: 8px; width: 60px;">LA: ${v.motor?.la||'-'}</td>
@@ -612,33 +615,20 @@
             </div>
         `;
 
-        // สร้างพื้นที่ซ่อนไว้ให้ html2pdf วาดรูป
-        const container = document.createElement('div');
-        container.style.position = 'absolute';
-        container.style.left = '-9999px';
-        container.style.top = '0';
-        container.style.width = '800px'; 
-        container.style.backgroundColor = 'white';
-        container.innerHTML = printHtml;
-        document.body.appendChild(container);
-
-        // ตั้งค่า PDF
         const opt = {
-            margin:       0.4,
+            margin:       10,
             filename:     `Stroke_Fast_Track_${rec.name}.pdf`,
             image:        { type: 'jpeg', quality: 0.98 },
             html2canvas:  { scale: 2, useCORS: true },
-            jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
-        // สั่งสร้างและดาวน์โหลด/พรีวิว
-        html2pdf().set(opt).from(container).save().then(() => {
-            document.body.removeChild(container);
+        // ใช้ HTML String ตรงๆ เพื่อแก้ปัญหาหน้าขาว
+        html2pdf().set(opt).from(printHtml).save().then(() => {
             btnElement.innerHTML = originalText;
             btnElement.disabled = false;
         }).catch(err => {
             console.error(err);
-            document.body.removeChild(container);
             btnElement.innerHTML = originalText;
             btnElement.disabled = false;
             alert('เกิดข้อผิดพลาดในการสร้าง PDF');
