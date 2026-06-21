@@ -358,7 +358,13 @@
         // ดึงข้อมูลเดิมมาหยอดลงช่องฟอร์ม (ถ้ามี)
         const intv = rec.interventions || {};
         const v = intv.vitals || {};
-        
+        const gcs = v.gcs || {};
+        const motor = v.motor || {};
+        const ab = intv.ab_manage || {};
+        const iv = intv.iv || {};
+        const consult = intv.consult || {};
+        const other = intv.other || {};
+
         document.getElementById('v_bp').value = (v.bp && v.bp !== '-') ? v.bp : '';
         document.getElementById('v_hr').value = (v.hr && v.hr !== '-') ? v.hr : '';
         document.getElementById('v_rr').value = (v.rr && v.rr !== '-') ? v.rr : '';
@@ -366,39 +372,40 @@
         document.getElementById('v_dtx').value = (v.dtx && v.dtx !== '-') ? v.dtx : '';
         document.getElementById('v_pupill').value = (v.pupil_l && v.pupil_l !== '-') ? v.pupil_l : '';
         document.getElementById('v_pupilr').value = (v.pupil_r && v.pupil_r !== '-') ? v.pupil_r : '';
-        
-        document.getElementById('v_gcs_e').value = (v.gcs?.e && v.gcs?.e !== '-') ? v.gcs?.e : '';
-        document.getElementById('v_gcs_v').value = (v.gcs?.v && v.gcs?.v !== '-') ? v.gcs?.v : '';
-        document.getElementById('v_gcs_m').value = (v.gcs?.m && v.gcs?.m !== '-') ? v.gcs?.m : '';
 
-        document.getElementById('m_ra').value = v.motor?.ra || '5';
-        document.getElementById('m_la').value = v.motor?.la || '5';
-        document.getElementById('m_rl').value = v.motor?.rl || '5';
-        document.getElementById('m_ll').value = v.motor?.ll || '5';
+        document.getElementById('v_gcs_e').value = (gcs.e && gcs.e !== '-') ? gcs.e : '';
+        document.getElementById('v_gcs_v').value = (gcs.v && gcs.v !== '-') ? gcs.v : '';
+        document.getElementById('v_gcs_m').value = (gcs.m && gcs.m !== '-') ? gcs.m : '';
 
-        document.getElementById('chk_ab_manage').checked = intv.ab_manage?.done || false;
-        document.getElementById('val_ab_manage').value = (intv.ab_manage?.detail && intv.ab_manage?.detail !== '-') ? intv.ab_manage?.detail : '';
+        document.getElementById('m_ra').value = motor.ra || '5';
+        document.getElementById('m_la').value = motor.la || '5';
+        document.getElementById('m_rl').value = motor.rl || '5';
+        document.getElementById('m_ll').value = motor.ll || '5';
 
-        document.getElementById('chk_iv').checked = intv.iv?.done || false;
+        document.getElementById('chk_ab_manage').checked = ab.done || false;
+        document.getElementById('val_ab_manage').value = (ab.detail && ab.detail !== '-') ? ab.detail : '';
+
+        document.getElementById('chk_iv').checked = iv.done || false;
         document.getElementById('val_iv_rate').value = (iv.rate && iv.rate !== '-') ? iv.rate : '';
 
         document.getElementById('chk_blood').checked = intv.blood || false;
 
-        document.getElementById('chk_consult').checked = intv.consult?.done || false;
-        document.getElementById('val_consult').value = (intv.consult?.detail && intv.consult?.detail !== '-') ? intv.consult?.detail : '';
+        document.getElementById('chk_consult').checked = consult.done || false;
+        document.getElementById('val_consult').value = (consult.detail && consult.detail !== '-') ? consult.detail : '';
 
         document.getElementById('chk_coord').checked = intv.coord || false;
 
-        document.getElementById('chk_other').checked = intv.other?.done || false;
-        document.getElementById('val_other').value = (intv.other?.detail && intv.other?.detail !== '-') ? intv.other?.detail : '';
+        document.getElementById('chk_other').checked = other.done || false;
+        document.getElementById('val_other').value = (other.detail && other.detail !== '-') ? other.detail : '';
 
         document.getElementById('v_door').value = (intv.timeDoor && intv.timeDoor !== '-') ? intv.timeDoor : '';
         document.getElementById('v_ct').value = (intv.timeCT && intv.timeCT !== '-') ? intv.timeCT : '';
         document.getElementById('v_needle').value = (intv.timeNeedle && intv.timeNeedle !== '-') ? intv.timeNeedle : '';
 
-        // เปิดแท็บปฏิบัติการ
+        // เปิดแท็บปฏิบัติการ และเลื่อนไปบนสุดของจอ
         document.getElementById('tab-action').classList.remove('hidden');
         window.switchTab('action');
+        window.scrollTo(0, 0);
     }
 
     window.finishCase = async function() {
@@ -474,7 +481,6 @@
 
         const v = rec.interventions?.vitals || {};
         
-        // คำนวณ GCS Total รวม
         let gcsTotal = '-';
         if (v.gcs && v.gcs.e !== '-' && v.gcs.v !== '-' && v.gcs.m !== '-') {
             gcsTotal = parseInt(v.gcs.e) + parseInt(v.gcs.v) + parseInt(v.gcs.m);
@@ -484,8 +490,8 @@
 
         const printHtml = `
             <div class="border-b-2 border-black pb-2 mb-4 text-center">
-                <h1 class="text-2xl font-bold">แบบบันทึกการดูแลผู้ป่วยฉุกเฉิน Stroke Fast Track</h1>
-                <p class="text-md">หน่วยปฏิบัติการการแพทย์ฉุกเฉิน (ตามมาตรฐาน TEMSA)</p>
+                <h1 class="text-2xl font-bold">แบบบันทึกการดูแลผู้ป่วยฉุกเฉิน Stroke Fast Track นอกโรงพยาบาล</h1>
+                <p class="text-md">หน่วยปฏิบัติการการแพทย์ฉุกเฉิน รพ.นครปฐม</p>
             </div>
 
             <div class="mb-4">
@@ -515,7 +521,7 @@
             </div>
 
             <div class="mb-4">
-                <h2 class="font-bold text-lg bg-gray-200 px-2 py-1">3. บันทึกสัญญาณชีพแรกรับและระบบประสาท</h2>
+                <h2 class="font-bold text-lg bg-gray-200 px-2 py-1">3. บันทึกสัญญาณชีพแรกรับ </h2>
                 <table class="w-full border-collapse border border-black mt-2 text-center">
                     <tr class="bg-gray-100 border border-black">
                         <th class="border border-black p-1">BP</th>
@@ -589,12 +595,12 @@
 
             <div class="mt-8 flex justify-between px-10">
                 <div class="text-center">
-                    <p>ลงชื่อ..........................................................ผู้ประเมิน</p>
-                    <p class="mt-1">(..........................................................)</p>
+                    <p>ลงชื่อ..............................................ผู้ประเมิน</p>
+                    <p class="mt-1">(........................................)</p>
                 </div>
                 <div class="text-center">
-                    <p>ลงชื่อ..........................................................แพทย์/พยาบาลรับมอบ</p>
-                    <p class="mt-1">(..........................................................)</p>
+                    <p>ลงชื่อ..............................................แพทย์/พยาบาลรับมอบ</p>
+                    <p class="mt-1">(.........................................)</p>
                 </div>
             </div>
         `;
@@ -655,7 +661,6 @@
             let btnPrint = '';
             let statusBadge = '<span class="bg-gray-400 text-white text-[10px] px-2 py-1 rounded">ไม่เข้าเกณฑ์</span>';
             
-            // 🌟 ปรับเพิ่มเงื่อนไขสำหรับเคสที่ค้างให้สามารถกดแก้ต่อได้ 🌟
             if(rec.status === 'active') {
                 statusBadge = '<span class="bg-red-600 text-white text-[10px] px-2 py-1 rounded animate-pulse">กำลังดำเนินการ</span>';
                 btnPrint = `<button onclick="window.resumeCase('${rec.id}')" class="mt-2 w-full bg-orange-50 text-orange-700 text-xs py-2 rounded border border-orange-200 hover:bg-orange-100 font-bold"><i class="fas fa-clipboard-list mr-1"></i> ⚡ ดำเนินการต่อ (ทำ Checklist)</button>`;
