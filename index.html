@@ -3,29 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stroke Fast Track & LVO Assessment</title>
+    <title>Stroke Fast Track & CPG Checklist</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
         body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; }
         .tab-btn.active { border-bottom: 2px solid #ef4444; color: #ef4444; font-weight: bold; }
+        /* การตั้งค่าสำหรับการพิมพ์ A4 */
+        @media print {
+            body { background-color: #ffffff; }
+            .print-hidden { display: none !important; }
+            .print-only { display: block !important; }
+            @page { size: A4; margin: 10mm; }
+        }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="text-gray-800 relative">
+<body class="text-gray-800 relative pb-10">
 
-<div class="max-w-md mx-auto bg-white min-h-screen shadow-lg relative">
+<div class="max-w-md mx-auto bg-white min-h-screen shadow-lg relative print-hidden">
     <div class="bg-red-600 text-white p-4 text-center shadow-md">
-        <h1 class="text-xl font-bold"><i class="fas fa-brain mr-2"></i>Stroke Assessment App</h1>
-        <p class="text-sm">BE-FAST & FAST-ED (LVO) Triage (Firebase)</p>
+        <h1 class="text-xl font-bold"><i class="fas fa-ambulance mr-2"></i>Stroke Fast Track</h1>
+        <p class="text-sm">Triage, Checklist & KPI Record</p>
     </div>
 
     <div class="flex justify-around bg-gray-100 border-b">
-        <button id="tab-assess" class="tab-btn active w-1/2 py-3" onclick="window.switchTab('assess')">
-            <i class="fas fa-stethoscope mr-1"></i> ประเมินผู้ป่วย
+        <button id="tab-assess" class="tab-btn active w-1/3 py-3 text-sm" onclick="window.switchTab('assess')">
+            <i class="fas fa-stethoscope"></i> ประเมิน
         </button>
-        <button id="tab-history" class="tab-btn w-1/2 py-3" onclick="window.switchTab('history')">
-            <i class="fas fa-history mr-1"></i> ประวัติย้อนหลัง
+        <button id="tab-action" class="tab-btn w-1/3 py-3 text-sm hidden text-orange-600" onclick="window.switchTab('action')">
+            <i class="fas fa-clipboard-list"></i> ปฏิบัติการ
+        </button>
+        <button id="tab-history" class="tab-btn w-1/3 py-3 text-sm" onclick="window.switchTab('history')">
+            <i class="fas fa-history"></i> ประวัติ
         </button>
     </div>
 
@@ -41,97 +51,112 @@
                     <label class="block text-sm font-medium text-red-600">Last Known Well (เวลาปกติล่าสุด):</label>
                     <input type="datetime-local" id="timeLkw" class="w-full mt-1 p-2 border rounded-md">
                 </div>
-                <div class="mb-2">
-                    <label class="block text-sm font-medium text-red-600">Time of Onset (เวลาที่เริ่มมีอาการ):</label>
-                    <input type="text" id="timeOnset" class="w-full mt-1 p-2 border rounded-md" placeholder="เช่น 08.00 น. หรือ ตื่นมาก็เป็น / ไม่ทราบเวลา">
+                <div class="grid grid-cols-2 gap-2 mb-2">
+                    <div>
+                        <label class="block text-sm font-medium text-red-600">เวลา Onset:</label>
+                        <input type="text" id="timeOnset" class="w-full mt-1 p-2 border rounded-md" placeholder="เช่น 08.00">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-blue-700">เวลาพบผู้ป่วย (FMC):</label>
+                        <input type="time" id="timeFMC" class="w-full mt-1 p-2 border rounded-md bg-blue-100">
+                    </div>
                 </div>
             </div>
 
             <div class="bg-gray-50 p-3 rounded-lg mb-4 border border-gray-200">
                 <h2 class="font-bold text-gray-800 mb-2 border-b pb-1">BE-FAST (Screening)</h2>
-                <label class="flex items-center space-x-2 mb-2">
-                    <input type="checkbox" id="befast_b" class="w-5 h-5 text-red-600 rounded">
-                    <span><b>B</b>alance: เสียการทรงตัว เดินเซ</span>
-                </label>
-                <label class="flex items-center space-x-2 mb-2">
-                    <input type="checkbox" id="befast_e" class="w-5 h-5 text-red-600 rounded">
-                    <span><b>E</b>yes: ตามัว มองไม่เห็นภาพซ้อนทันที</span>
-                </label>
-                <label class="flex items-center space-x-2 mb-2">
-                    <input type="checkbox" id="befast_f" class="w-5 h-5 text-red-600 rounded">
-                    <span><b>F</b>ace: หน้าเบี้ยว มุมปากตก</span>
-                </label>
-                <label class="flex items-center space-x-2 mb-2">
-                    <input type="checkbox" id="befast_a" class="w-5 h-5 text-red-600 rounded">
-                    <span><b>A</b>rms: แขนขาอ่อนแรงครึ่งซีก</span>
-                </label>
-                <label class="flex items-center space-x-2">
-                    <input type="checkbox" id="befast_s" class="w-5 h-5 text-red-600 rounded">
-                    <span><b>S</b>peech: พูดไม่ชัด นึกคำพูดไม่ออก</span>
-                </label>
+                <label class="flex items-center space-x-2 mb-2"><input type="checkbox" id="befast_b" class="w-5 h-5 text-red-600 rounded"><span><b>B</b>alance: เสียการทรงตัว เดินเซ</span></label>
+                <label class="flex items-center space-x-2 mb-2"><input type="checkbox" id="befast_e" class="w-5 h-5 text-red-600 rounded"><span><b>E</b>yes: ตามัว มองไม่เห็นภาพซ้อน</span></label>
+                <label class="flex items-center space-x-2 mb-2"><input type="checkbox" id="befast_f" class="w-5 h-5 text-red-600 rounded"><span><b>F</b>ace: หน้าเบี้ยว มุมปากตก</span></label>
+                <label class="flex items-center space-x-2 mb-2"><input type="checkbox" id="befast_a" class="w-5 h-5 text-red-600 rounded"><span><b>A</b>rms: แขนขาอ่อนแรงครึ่งซีก</span></label>
+                <label class="flex items-center space-x-2"><input type="checkbox" id="befast_s" class="w-5 h-5 text-red-600 rounded"><span><b>S</b>peech: พูดไม่ชัด นึกคำไม่ออก</span></label>
             </div>
 
             <div class="bg-yellow-50 p-3 rounded-lg mb-4 border border-yellow-200">
                 <h2 class="font-bold text-yellow-800 mb-2 border-b pb-1">FAST-ED (LVO Severity)</h2>
-                
-                <div class="mb-3">
-                    <label class="block font-medium mb-1">Facial Palsy (หน้าเบี้ยว)</label>
-                    <select id="fasted_f" class="w-full p-2 border rounded bg-white">
-                        <option value="0">0 - ปกติ หรือเบี้ยวเล็กน้อย</option>
-                        <option value="1">1 - อัมพาตครึ่งซีกชัดเจน (Partial/Complete)</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label class="block font-medium mb-1">Arm Weakness (แขนอ่อนแรง)</label>
-                    <select id="fasted_a" class="w-full p-2 border rounded bg-white">
-                        <option value="0">0 - ไม่มีแขนตก (No drift)</option>
-                        <option value="1">1 - แขนตกลงต้านแรงโน้มถ่วงได้บ้าง (Drift)</option>
-                        <option value="2">2 - ต้านแรงโน้มถ่วงไม่ได้เลย / ไม่ขยับ (No effort)</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label class="block font-medium mb-1">Speech Changes (การพูด)</label>
-                    <select id="fasted_s" class="w-full p-2 border rounded bg-white">
-                        <option value="0">0 - ปกติ</option>
-                        <option value="1">1 - พูดผิดปกติเล็กน้อยถึงปานกลาง</option>
-                        <option value="2">2 - ไม่พูดเลย, ไม่เข้าใจคำสั่ง (Severe/Global aphasia)</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label class="block font-medium mb-1">Eye Deviation (ตากลอก)</label>
-                    <select id="fasted_e" class="w-full p-2 border rounded bg-white">
-                        <option value="0">0 - ปกติ</option>
-                        <option value="1">1 - กรอกตาผิดปกติบางส่วน (Partial)</option>
-                        <option value="2">2 - ตากลอกไปด้านใดด้านหนึ่งชัดเจน ข้ามเส้นกลางไม่ได้ (Forced)</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label class="block font-medium mb-1">Denial / Neglect (การละเลยร่างกาย)</label>
-                    <select id="fasted_d" class="w-full p-2 border rounded bg-white">
-                        <option value="0">0 - ปกติ</option>
-                        <option value="1">1 - ละเลยสัมผัสด้านใดด้านหนึ่ง (Extinction)</option>
-                        <option value="2">2 - ไม่รับรู้แขนขาตัวเอง หรือละเลยครึ่งซีกชัดเจน (Doesn't recognize own hand)</option>
-                    </select>
+                <div class="space-y-3 text-sm">
+                    <div><label class="block font-medium mb-1">Facial Palsy</label><select id="fasted_f" class="w-full p-2 border rounded"><option value="0">0 - ปกติ</option><option value="1">1 - อัมพาตครึ่งซีก</option></select></div>
+                    <div><label class="block font-medium mb-1">Arm Weakness</label><select id="fasted_a" class="w-full p-2 border rounded"><option value="0">0 - ปกติ</option><option value="1">1 - แขนตก (Drift)</option><option value="2">2 - ต้านแรงไม่ได้ (No effort)</option></select></div>
+                    <div><label class="block font-medium mb-1">Speech Changes</label><select id="fasted_s" class="w-full p-2 border rounded"><option value="0">0 - ปกติ</option><option value="1">1 - ผิดปกติเล็กน้อย-ปานกลาง</option><option value="2">2 - ไม่พูดเลย, ไม่เข้าใจคำสั่ง</option></select></div>
+                    <div><label class="block font-medium mb-1">Eye Deviation</label><select id="fasted_e" class="w-full p-2 border rounded"><option value="0">0 - ปกติ</option><option value="1">1 - กรอกตาผิดปกติบางส่วน</option><option value="2">2 - ตากลอกไปด้านใดด้านหนึ่งชัดเจน</option></select></div>
+                    <div><label class="block font-medium mb-1">Denial / Neglect</label><select id="fasted_d" class="w-full p-2 border rounded"><option value="0">0 - ปกติ</option><option value="1">1 - ละเลยสัมผัสด้านใดด้านหนึ่ง</option><option value="2">2 - ไม่รับรู้แขนขาตัวเองชัดเจน</option></select></div>
                 </div>
             </div>
 
-            <button type="button" id="btnEvaluate" onclick="window.evaluatePatient()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg shadow-lg text-lg transition duration-200">
+            <button type="button" id="btnEvaluate" onclick="window.evaluatePatient()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg shadow-lg transition duration-200">
                 ประมวลผล & บันทึก
             </button>
         </form>
+    </div>
 
-        <div id="resultBox" class="mt-4 hidden rounded-lg p-4 text-center shadow-md animate-pulse">
-            <h2 id="resultTitle" class="text-xl font-bold mb-2"></h2>
-            <p id="resultLVO" class="text-md font-semibold"></p>
-            <p id="resultScore" class="text-3xl font-black mt-2"></p>
-            <p id="resultTime" class="text-sm mt-2 font-medium"></p>
+    <div id="action-view" class="p-4 hidden bg-orange-50 min-h-screen">
+        <div class="bg-red-600 text-white p-3 rounded-lg mb-4 shadow text-center">
+            <h2 class="font-bold text-lg"><i class="fas fa-siren-on animate-pulse"></i> STROKE FAST TRACK</h2>
+            <p id="activePatientName" class="font-semibold text-lg mt-1"></p>
+            <p class="text-sm"><i class="far fa-clock"></i> เวลา Activate: <span id="activeTime" class="font-bold"></span></p>
         </div>
+
+        <form id="interventionForm" class="space-y-3">
+            <div class="bg-white p-3 rounded-lg shadow border border-gray-200">
+                <h3 class="font-bold mb-2 text-blue-800">1. Vitals & Neuro Signs แรกรับ</h3>
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                    <div><label>BP (mmHg)</label><input type="text" id="v_bp" class="w-full border rounded p-1"></div>
+                    <div><label>HR (/min)</label><input type="number" id="v_hr" class="w-full border rounded p-1"></div>
+                    <div><label>RR (/min)</label><input type="number" id="v_rr" class="w-full border rounded p-1"></div>
+                    <div><label>O2 Sat (%)</label><input type="number" id="v_o2" class="w-full border rounded p-1"></div>
+                    <div class="col-span-2"><label>DTX (mg/dL)</label><input type="number" id="v_dtx" class="w-full border rounded p-1"></div>
+                    <div><label>Pupil L (mm)</label><input type="text" id="v_pupill" class="w-full border rounded p-1"></div>
+                    <div><label>Pupil R (mm)</label><input type="text" id="v_pupilr" class="w-full border rounded p-1"></div>
+                </div>
+                <div class="mt-3 text-sm">
+                    <label class="font-bold text-gray-700">Motor Power (0-5)</label>
+                    <div class="grid grid-cols-4 gap-2 mt-1">
+                        <div><label class="text-xs text-gray-500">RA</label><select id="m_ra" class="w-full border rounded p-1"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select></div>
+                        <div><label class="text-xs text-gray-500">LA</label><select id="m_la" class="w-full border rounded p-1"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select></div>
+                        <div><label class="text-xs text-gray-500">RL</label><select id="m_rl" class="w-full border rounded p-1"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select></div>
+                        <div><label class="text-xs text-gray-500">LL</label><select id="m_ll" class="w-full border rounded p-1"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-3 rounded-lg shadow border border-gray-200 text-sm space-y-3">
+                <label class="flex items-start space-x-2">
+                    <input type="checkbox" id="chk_iv" class="w-5 h-5 text-red-600 rounded mt-1">
+                    <div class="flex-1"><span class="font-bold">2. สารน้ำ</span> NSS 1,000 ml IV rate: <input type="number" id="val_iv_rate" class="border-b w-12 text-center"> ml/hr</div>
+                </label>
+                <label class="flex items-center space-x-2">
+                    <input type="checkbox" id="chk_blood" class="w-5 h-5 text-red-600 rounded">
+                    <span class="font-bold">3. เจาะเลือด (CBC, Chem, Coag, Clotted)</span>
+                </label>
+                <label class="flex items-start space-x-2">
+                    <input type="checkbox" id="chk_consult" class="w-5 h-5 text-red-600 rounded mt-1">
+                    <div class="flex-1"><span class="font-bold">4. ปรึกษาแพทย์:</span><input type="text" id="val_consult" class="w-full border rounded p-1 mt-1"></div>
+                </label>
+                <label class="flex items-center space-x-2">
+                    <input type="checkbox" id="chk_coord" class="w-5 h-5 text-red-600 rounded">
+                    <span class="font-bold">5. ประสานส่งต่อ รพ.ปลายทาง</span>
+                </label>
+            </div>
+
+            <div class="bg-indigo-50 p-3 rounded-lg shadow border border-indigo-200">
+                <h3 class="font-bold mb-2 text-indigo-800"><i class="fas fa-stopwatch"></i> 6. เวลาบันทึก KPI ปลายทาง</h3>
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                    <div><label class="font-semibold text-red-600">เวลาถึง รพ. (Door):</label><input type="time" id="v_door" class="w-full border rounded p-1 mt-1 bg-white"></div>
+                    <div><label class="font-semibold text-blue-600">เวลาเข้า CT Brain:</label><input type="time" id="v_ct" class="w-full border rounded p-1 mt-1 bg-white"></div>
+                    <div class="col-span-2"><label class="font-semibold text-green-600">เวลาเริ่มยา rt-PA (Needle Time):</label><input type="time" id="v_needle" class="w-full border rounded p-1 mt-1 bg-white"></div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">* หากไม่ทราบเวลา สามารถเว้นว่างไว้เพื่อเขียนเติมในกระดาษภายหลังได้</p>
+            </div>
+
+            <button type="button" id="btnFinish" onclick="window.finishCase()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg shadow-lg text-lg transition duration-200 mt-4">
+                <i class="fas fa-check-circle mr-1"></i> จบงาน & บันทึก
+            </button>
+        </form>
     </div>
 
     <div id="history-view" class="p-4 hidden">
         <div class="flex justify-between items-center mb-4">
-            <h2 class="font-bold text-lg text-gray-800">ประวัติการประเมิน (Real-time)</h2>
-            <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">ออนไลน์</span>
+            <h2 class="font-bold text-lg text-gray-800">ประวัติ (พิมพ์เอกสารได้)</h2>
         </div>
         <div id="historyList" class="space-y-3">
             <p class="text-center text-gray-500 mt-4">กำลังโหลดข้อมูล...</p>
@@ -139,32 +164,26 @@
     </div>
 </div>
 
-<div id="activationModal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50 px-4">
-    <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm text-center transform transition-all">
+<div id="activationModal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50 px-4 print-hidden">
+    <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm text-center">
         <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
             <i class="fas fa-siren-on text-3xl text-red-600 fa-bullhorn"></i>
         </div>
-        <h3 class="text-2xl leading-6 font-bold text-gray-900 mb-2">Activate Stroke Fast Track Team</h3>
-        <p class="text-sm text-gray-500 mb-4">พบความผิดปกติจาก BE-FAST <br>กรุณากดยืนยันเพื่อบันทึกเวลา (Time Stamp)</p>
-        
-        <div id="modalLvoAlert" class="bg-yellow-100 text-yellow-800 px-3 py-2 rounded mb-4 font-semibold text-sm hidden">
-            ⚠️ สงสัย LVO (FAST-ED Score ≥ 4)
-        </div>
-
+        <h3 class="text-2xl font-bold text-gray-900 mb-2">Activate Stroke Fast Track</h3>
+        <p class="text-sm text-gray-500 mb-4">กดยืนยันเพื่อบันทึกเวลา และเข้าสู่หน้า CPG Checklist</p>
         <div class="mt-5 flex flex-col space-y-2">
-            <button onclick="window.confirmActivation()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-3 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm">
-                ยืนยันการ Activate (บันทึกเวลา)
-            </button>
-            <button onclick="window.closeModal()" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-3 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:text-sm">
-                ยกเลิก (บันทึกแบบไม่ Activate)
-            </button>
+            <button onclick="window.confirmActivation()" class="w-full py-3 bg-red-600 text-white font-bold rounded-md shadow-sm hover:bg-red-700">ยืนยัน Activate</button>
+            <button onclick="window.closeModal()" class="w-full py-3 bg-white text-gray-700 font-bold border rounded-md shadow-sm hover:bg-gray-50">ยกเลิก</button>
         </div>
     </div>
 </div>
 
+<div id="printLayout" class="hidden print-only text-black p-6 font-sans text-sm w-full mx-auto" style="max-width: 800px;">
+    </div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
     // 👉 นำ firebaseConfig ของคุณมาวางตรงนี้
     const firebaseConfig = {
@@ -176,69 +195,89 @@
       appId: "1:691025642570:web:7d7f41cb8387017ea792b3"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Set Default Time
     document.getElementById('timeLkw').value = new Date().toISOString().slice(0, 16);
+    
+    // ตั้งค่าเวลา FMC ให้เป็นเวลาปัจจุบันอัตโนมัติ
+    const now = new Date();
+    document.getElementById('timeFMC').value = now.toTimeString().slice(0,5);
 
     let tempEvalData = null; 
+    window.activeDocId = null;
+    window.allCases = []; // เก็บข้อมูลทั้งหมดไว้สำหรับปริ้น
 
-    // --- ควบคุม UI ---
     window.switchTab = function(tab) {
         document.getElementById('tab-assess').classList.remove('active');
+        document.getElementById('tab-action').classList.remove('active');
         document.getElementById('tab-history').classList.remove('active');
+        
         document.getElementById('assess-view').classList.add('hidden');
+        document.getElementById('action-view').classList.add('hidden');
         document.getElementById('history-view').classList.add('hidden');
 
         document.getElementById(`tab-${tab}`).classList.add('active');
         document.getElementById(`${tab}-view`).classList.remove('hidden');
     }
 
-    // --- คำนวณประเมินผล ---
     window.evaluatePatient = function() {
         const name = document.getElementById('patientName').value;
-        if(!name) { alert('กรุณากรอกชื่อผู้ป่วย / HN'); return; }
+        if(!name) { alert('กรุณากรอกชื่อผู้ป่วย'); return; }
 
-        const lkw = document.getElementById('timeLkw').value;
-        const onset = document.getElementById('timeOnset').value || 'ไม่ระบุ/ไม่แน่ชัด';
-
-        const isBeFastPositive = 
-            document.getElementById('befast_b').checked ||
-            document.getElementById('befast_e').checked ||
-            document.getElementById('befast_f').checked ||
-            document.getElementById('befast_a').checked ||
-            document.getElementById('befast_s').checked;
-
-        const fastedScore = 
-            parseInt(document.getElementById('fasted_f').value) +
-            parseInt(document.getElementById('fasted_a').value) +
-            parseInt(document.getElementById('fasted_s').value) +
-            parseInt(document.getElementById('fasted_e').value) +
-            parseInt(document.getElementById('fasted_d').value);
+        const befastPos = ['b','e','f','a','s'].some(id => document.getElementById(`befast_${id}`).checked);
+        const fastedScore = ['f','a','s','e','d'].reduce((sum, id) => sum + parseInt(document.getElementById(`fasted_${id}`).value), 0);
 
         tempEvalData = {
             name: name,
-            lkw: lkw ? new Date(lkw).toLocaleString('th-TH') : 'ไม่ระบุ',
-            onset: onset,
+            lkw: document.getElementById('timeLkw').value ? new Date(document.getElementById('timeLkw').value).toLocaleString('th-TH') : '-',
+            onset: document.getElementById('timeOnset').value || '-',
+            fmc: document.getElementById('timeFMC').value || '-',
             fastedScore: fastedScore,
             isLvo: fastedScore >= 4,
-            isFastTrack: isBeFastPositive
+            isFastTrack: befastPos,
+            status: 'assessed',
+            befast: {
+                b: document.getElementById('befast_b').checked,
+                e: document.getElementById('befast_e').checked,
+                f: document.getElementById('befast_f').checked,
+                a: document.getElementById('befast_a').checked,
+                s: document.getElementById('befast_s').checked
+            }
         };
 
-        if (isBeFastPositive) {
-            document.getElementById('activationModal').classList.remove('hidden');
-            if(fastedScore >= 4) document.getElementById('modalLvoAlert').classList.remove('hidden');
-            else document.getElementById('modalLvoAlert').classList.add('hidden');
-        } else {
-            saveRecordToFirebase(false);
-        }
+        if (befastPos) document.getElementById('activationModal').classList.remove('hidden');
+        else saveRecordToFirebase(false);
     }
 
-    window.confirmActivation = function() {
+    window.confirmActivation = async function() {
         document.getElementById('activationModal').classList.add('hidden');
-        saveRecordToFirebase(true);
+        
+        const now = new Date();
+        const activateTime = now.toTimeString().slice(0,5); // HH:MM
+        
+        const record = {
+            ...tempEvalData,
+            activateTime: activateTime,
+            dateStr: now.toLocaleDateString('th-TH'),
+            status: 'active',
+            createdAt: serverTimestamp()
+        };
+
+        try {
+            const docRef = await addDoc(collection(db, "stroke_patients"), record);
+            window.activeDocId = docRef.id;
+
+            document.getElementById('strokeForm').reset();
+            document.getElementById('timeLkw').value = new Date().toISOString().slice(0, 16);
+            document.getElementById('timeFMC').value = new Date().toTimeString().slice(0,5);
+
+            document.getElementById('activePatientName').innerText = `ผู้ป่วย: ${tempEvalData.name}`;
+            document.getElementById('activeTime').innerText = activateTime + " น.";
+            
+            document.getElementById('tab-action').classList.remove('hidden');
+            window.switchTab('action');
+        } catch (error) { console.error(error); alert("เชื่อมต่อฐานข้อมูลล้มเหลว"); }
     }
 
     window.closeModal = function() {
@@ -246,95 +285,217 @@
         saveRecordToFirebase(false);
     }
 
-    // --- บันทึกข้อมูลลง Firebase ---
     async function saveRecordToFirebase(isActivated) {
         if(!tempEvalData) return;
-        document.getElementById('btnEvaluate').innerText = "กำลังบันทึก...";
-        
         const now = new Date();
-        const timestampStr = now.toLocaleString('th-TH');
+        const record = { ...tempEvalData, activateTime: '-', dateStr: now.toLocaleDateString('th-TH'), createdAt: serverTimestamp() };
+        await addDoc(collection(db, "stroke_patients"), record);
+        document.getElementById('strokeForm').reset();
+        alert("บันทึกเข้าระบบเรียบร้อย (ไม่เข้าเกณฑ์ Stroke)");
+    }
 
-        const record = {
-            ...tempEvalData,
-            timestamp: timestampStr,
-            activationTime: isActivated ? timestampStr : '-',
-            createdAt: serverTimestamp() // ให้ Firebase ประทับเวลาจริงในเซิร์ฟเวอร์
+    window.finishCase = async function() {
+        if(!window.activeDocId) return;
+        document.getElementById('btnFinish').innerText = "กำลังบันทึก...";
+
+        const interventionData = {
+            vitals: {
+                bp: document.getElementById('v_bp').value || '-', hr: document.getElementById('v_hr').value || '-',
+                rr: document.getElementById('v_rr').value || '-', o2: document.getElementById('v_o2').value || '-',
+                dtx: document.getElementById('v_dtx').value || '-',
+                pupil_l: document.getElementById('v_pupill').value || '-', pupil_r: document.getElementById('v_pupilr').value || '-',
+                motor: {
+                    ra: document.getElementById('m_ra').value, la: document.getElementById('m_la').value,
+                    rl: document.getElementById('m_rl').value, ll: document.getElementById('m_ll').value
+                }
+            },
+            iv: { done: document.getElementById('chk_iv').checked, rate: document.getElementById('val_iv_rate').value || '-' },
+            blood: document.getElementById('chk_blood').checked,
+            consult: { done: document.getElementById('chk_consult').checked, detail: document.getElementById('val_consult').value || '-' },
+            coord: document.getElementById('chk_coord').checked,
+            timeDoor: document.getElementById('v_door').value || '-',
+            timeCT: document.getElementById('v_ct').value || '-',
+            timeNeedle: document.getElementById('v_needle').value || '-'
         };
 
         try {
-            // ส่งข้อมูลขึ้น Firebase Collection ที่ชื่อว่า "stroke_patients"
-            await addDoc(collection(db, "stroke_patients"), record);
-            
-            // ปรับ UI ผลลัพธ์
-            showResultUI(isActivated, timestampStr);
-            
-            // รีเซ็ตฟอร์ม
-            document.getElementById('strokeForm').reset();
-            document.getElementById('timeLkw').value = new Date().toISOString().slice(0, 16);
-            document.getElementById('btnEvaluate').innerText = "ประมวลผล & บันทึก";
+            await updateDoc(doc(db, "stroke_patients", window.activeDocId), {
+                interventions: interventionData,
+                status: 'completed',
+                completedAt: serverTimestamp()
+            });
 
-            setTimeout(() => { window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); }, 100);
-
-        } catch (error) {
-            console.error("Error adding document: ", error);
-            alert("ไม่สามารถบันทึกข้อมูลได้ กรุณาตรวจสอบอินเทอร์เน็ต");
-            document.getElementById('btnEvaluate').innerText = "ประมวลผล & บันทึก";
-        }
+            alert("บันทึก Checklist เรียบร้อย!");
+            document.getElementById('interventionForm').reset();
+            window.activeDocId = null;
+            document.getElementById('tab-action').classList.add('hidden');
+            document.getElementById('btnFinish').innerHTML = '<i class="fas fa-check-circle mr-1"></i> จบงาน & บันทึก';
+            window.switchTab('history');
+        } catch (error) { console.error(error); alert("เกิดข้อผิดพลาด"); }
     }
 
-    function showResultUI(isActivated, timestamp) {
-        let action = "ปกติ / ไม่เข้าเกณฑ์ Stroke";
-        let lvoRisk = "ความเสี่ยง LVO ต่ำ";
-        let bgColor = "bg-green-100 text-green-800";
-        let activateTimeStr = "";
-
-        if (tempEvalData.isFastTrack) {
-            action = isActivated ? "🚨 STROKE FAST TRACK ACTIVATED 🚨" : "เกณฑ์เข้า Stroke แต่ข้ามการ Activate";
-            bgColor = isActivated ? "bg-red-100 text-red-800 border border-red-300" : "bg-orange-100 text-orange-800";
-            lvoRisk = tempEvalData.isLvo ? "⚠️ สงสัย Large Vessel Occlusion (LVO) สูง" : "ความน่าจะเป็น LVO ต่ำ";
-            if(isActivated) activateTimeStr = `<br><span class='text-red-600'><i class='fas fa-stopwatch'></i> เวลา Activate: ${timestamp}</span>`;
+    // ฟังก์ชันคำนวณเวลา (นาที)
+    function calcTimeDiff(startStr, endStr) {
+        if(!startStr || !endStr || startStr === '-' || endStr === '-') return '........';
+        
+        // พยายามสกัดตัวเลข HH:MM ออกมาจากข้อความ
+        let startMatch = startStr.match(/(\d{1,2})[:.](\d{2})/);
+        let endMatch = endStr.match(/(\d{1,2})[:.](\d{2})/);
+        
+        if(startMatch && endMatch) {
+            let startMins = parseInt(startMatch[1]) * 60 + parseInt(startMatch[2]);
+            let endMins = parseInt(endMatch[1]) * 60 + parseInt(endMatch[2]);
+            let diff = endMins - startMins;
+            if(diff < 0) diff += 24 * 60; // ข้ามวัน
+            return diff;
         }
-
-        const resultBox = document.getElementById('resultBox');
-        resultBox.className = `mt-4 rounded-lg p-4 text-center shadow-md ${bgColor}`;
-        document.getElementById('resultTitle').innerHTML = action;
-        document.getElementById('resultLVO').innerText = lvoRisk;
-        document.getElementById('resultScore').innerText = `FAST-ED Score: ${tempEvalData.fastedScore}`;
-        document.getElementById('resultTime').innerHTML = activateTimeStr;
-        resultBox.classList.remove('hidden');
+        return '........';
     }
 
-    // --- ดึงประวัติแบบ Real-time จาก Firebase ---
-    const q = query(collection(db, "stroke_patients"), orderBy("createdAt", "desc"));
-    
-    onSnapshot(q, (snapshot) => {
+    window.printCase = function(docId) {
+        const rec = window.allCases.find(c => c.id === docId);
+        if(!rec) return;
+
+        // คำนวณ KPI
+        let onsetFmc = calcTimeDiff(rec.onset, rec.fmc);
+        let onsetAct = calcTimeDiff(rec.onset, rec.activateTime);
+        let actDoor = calcTimeDiff(rec.activateTime, rec.interventions?.timeDoor);
+        let doorCt = calcTimeDiff(rec.interventions?.timeDoor, rec.interventions?.timeCT);
+        let doorNeedle = calcTimeDiff(rec.interventions?.timeDoor, rec.interventions?.timeNeedle);
+
+        const v = rec.interventions?.vitals || {};
+        const chk = (cond) => cond ? '☑' : '☐';
+
+        const printHtml = `
+            <div class="border-b-2 border-black pb-2 mb-4 text-center">
+                <h1 class="text-2xl font-bold">แบบบันทึกการดูแลผู้ป่วยฉุกเฉิน Stroke Fast Track</h1>
+                <p class="text-md">หน่วยปฏิบัติการการแพทย์ฉุกเฉิน (ตามมาตรฐาน TEMSA)</p>
+            </div>
+
+            <div class="mb-4">
+                <h2 class="font-bold text-lg bg-gray-200 px-2 py-1">1. ข้อมูลผู้ป่วยและเวลา</h2>
+                <div class="grid grid-cols-2 gap-4 mt-2 px-2">
+                    <div><b>ชื่อผู้ป่วย/HN:</b> ${rec.name}</div>
+                    <div><b>วันที่ประเมิน:</b> ${rec.dateStr || '-'}</div>
+                    <div><b>Last Known Well:</b> ${rec.lkw}</div>
+                    <div><b>เวลา Onset:</b> ${rec.onset} น.</div>
+                    <div><b class="text-blue-700">เวลาพบผู้ป่วย (FMC):</b> ${rec.fmc} น.</div>
+                    <div><b class="text-red-700">เวลา Activate Fast Track:</b> ${rec.activateTime} น.</div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <h2 class="font-bold text-lg bg-gray-200 px-2 py-1">2. การประเมินอาการ (Assessment)</h2>
+                <div class="px-2 mt-2 flex flex-col space-y-1">
+                    <p><b>BE-FAST Screening:</b> 
+                        ${chk(rec.befast?.b)} Balance &nbsp;&nbsp;
+                        ${chk(rec.befast?.e)} Eyes &nbsp;&nbsp;
+                        ${chk(rec.befast?.f)} Face &nbsp;&nbsp;
+                        ${chk(rec.befast?.a)} Arms &nbsp;&nbsp;
+                        ${chk(rec.befast?.s)} Speech
+                    </p>
+                    <p class="text-red-600 font-bold mt-2">คะแนน FAST-ED Score: ${rec.fastedScore} คะแนน ${rec.isLvo ? '(สงสัย LVO)' : ''}</p>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <h2 class="font-bold text-lg bg-gray-200 px-2 py-1">3. สัญญาณชีพและอาการทางระบบประสาท</h2>
+                <table class="w-full border-collapse border border-black mt-2 text-center">
+                    <tr class="bg-gray-100 border border-black">
+                        <th class="border border-black p-1">BP</th>
+                        <th class="border border-black p-1">HR</th>
+                        <th class="border border-black p-1">RR</th>
+                        <th class="border border-black p-1">O2 Sat</th>
+                        <th class="border border-black p-1">DTX</th>
+                        <th class="border border-black p-1">Pupils (L / R)</th>
+                    </tr>
+                    <tr>
+                        <td class="border border-black p-1">${v.bp || '-'}</td>
+                        <td class="border border-black p-1">${v.hr || '-'}</td>
+                        <td class="border border-black p-1">${v.rr || '-'}</td>
+                        <td class="border border-black p-1">${v.o2 || '-'}%</td>
+                        <td class="border border-black p-1">${v.dtx || '-'}</td>
+                        <td class="border border-black p-1">${v.pupil_l || '-'} / ${v.pupil_r || '-'}</td>
+                    </tr>
+                </table>
+                <div class="mt-2 px-2"><b>Motor Power (0-5):</b> RA = ${v.motor?.ra||'-'}, LA = ${v.motor?.la||'-'}, RL = ${v.motor?.rl||'-'}, LL = ${v.motor?.ll||'-'}</div>
+            </div>
+
+            <div class="mb-4">
+                <h2 class="font-bold text-lg bg-gray-200 px-2 py-1">4. การรักษาพยาบาล (Interventions)</h2>
+                <div class="px-2 mt-2 space-y-2">
+                    <p>${chk(rec.interventions?.iv?.done)} <b>ให้สารน้ำ:</b> NSS 1000 ml IV rate ${rec.interventions?.iv?.rate || '-'} ml/hr</p>
+                    <p>${chk(rec.interventions?.blood)} <b>เจาะเลือด:</b> CBC, Chem, Coag, Clotted</p>
+                    <p>${chk(rec.interventions?.consult?.done)} <b>รายงานแพทย์:</b> ${rec.interventions?.consult?.detail || '-'}</p>
+                    <p>${chk(rec.interventions?.coord)} <b>ประสานงาน รพ.ปลายทางเรียบร้อย</b></p>
+                </div>
+            </div>
+
+            <div class="mb-4 border-2 border-black p-3">
+                <h2 class="font-bold text-lg mb-2 underline">5. สรุปเวลาตัวชี้วัด (Time Indicators KPI)</h2>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>• เวลาถึง รพ. (Door): <b>${rec.interventions?.timeDoor || '........'} น.</b></div>
+                    <div>• Onset -> FMC: <b>${onsetFmc}</b> นาที</div>
+                    
+                    <div>• เวลาเข้า CT Brain: <b>${rec.interventions?.timeCT || '........'} น.</b></div>
+                    <div>• Onset -> Activate: <b>${onsetAct}</b> นาที</div>
+                    
+                    <div>• เวลาให้ยา rt-PA: <b>${rec.interventions?.timeNeedle || '........'} น.</b></div>
+                    <div>• Activate -> Door: <b>${actDoor}</b> นาที</div>
+                    
+                    <div class="col-span-2 mt-2 pt-2 border-t border-gray-400">
+                        <span class="font-bold text-red-600 mr-6">🔥 Door to CT Brain (≤ 25 นาที) = ${doorCt} นาที</span>
+                        <span class="font-bold text-green-600">💉 Door to Needle (≤ 60 นาที) = ${doorNeedle} นาที</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 flex justify-between px-10">
+                <div class="text-center">
+                    <p>ลงชื่อ..........................................................ผู้ประเมิน</p>
+                    <p class="mt-1">(..........................................................)</p>
+                </div>
+                <div class="text-center">
+                    <p>ลงชื่อ..........................................................แพทย์/พยาบาลรับมอบ</p>
+                    <p class="mt-1">(..........................................................)</p>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('printLayout').innerHTML = printHtml;
+        window.print();
+    }
+
+    // ดึงข้อมูล Real-time
+    onSnapshot(query(collection(db, "stroke_patients"), orderBy("createdAt", "desc")), (snapshot) => {
         const historyList = document.getElementById('historyList');
         historyList.innerHTML = '';
+        window.allCases = [];
 
-        if (snapshot.empty) {
-            historyList.innerHTML = '<p class="text-center text-gray-500 mt-4">ยังไม่มีประวัติในระบบ</p>';
-            return;
-        }
+        if (snapshot.empty) { historyList.innerHTML = '<p class="text-center">ยังไม่มีประวัติในระบบ</p>'; return; }
 
-        snapshot.forEach((doc) => {
-            const rec = doc.data();
-            const statusColor = rec.isFastTrack ? (rec.isLvo ? 'bg-red-500' : 'bg-orange-500') : 'bg-gray-400';
-            const statusText = rec.isFastTrack ? (rec.isLvo ? 'FAST TRACK + LVO' : 'FAST TRACK') : 'Negative';
+        snapshot.forEach((docSnap) => {
+            const rec = { id: docSnap.id, ...docSnap.data() };
+            window.allCases.push(rec);
+            
+            let btnPrint = '';
+            let statusBadge = '<span class="bg-gray-400 text-white text-[10px] px-2 py-1 rounded">ไม่เข้าเกณฑ์</span>';
+            
+            if(rec.status === 'active') {
+                statusBadge = '<span class="bg-red-600 text-white text-[10px] px-2 py-1 rounded animate-pulse">กำลังดำเนินการ</span>';
+            } else if (rec.status === 'completed') {
+                statusBadge = '<span class="bg-green-600 text-white text-[10px] px-2 py-1 rounded">ปิดเคสแล้ว</span>';
+                btnPrint = `<button onclick="window.printCase('${rec.id}')" class="mt-2 w-full bg-blue-50 text-blue-700 text-xs py-2 rounded border border-blue-200 hover:bg-blue-100"><i class="fas fa-print"></i> 🖨️ พิมพ์แบบบันทึก (A4)</button>`;
+            }
 
             const card = `
-                <div class="bg-white p-3 rounded shadow border-l-4 ${rec.isLvo ? 'border-red-500' : (rec.isFastTrack ? 'border-orange-500' : 'border-gray-400')} relative">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <span class="font-bold text-lg">${rec.name}</span>
-                            <div class="text-xs text-gray-500 mt-1">Onset: ${rec.onset}</div>
-                        </div>
-                        <span class="text-xs text-white px-2 py-1 rounded shadow-sm ${statusColor}">${statusText}</span>
+                <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex justify-between items-start mb-2"><span class="font-bold text-gray-800">${rec.name}</span>${statusBadge}</div>
+                    <div class="text-xs text-gray-600 space-y-1">
+                        <p>Onset: ${rec.onset} | FMC: ${rec.fmc}</p>
+                        ${rec.isFastTrack ? `<p class="font-semibold text-red-600">FAST-ED: ${rec.fastedScore} ${rec.isLvo ? '(LVO)' : ''}</p>` : ''}
                     </div>
-                    <div class="text-sm text-gray-700 mt-2 bg-gray-50 p-2 rounded">
-                        <p class="flex justify-between"><span>FAST-ED Score:</span> <span class="font-bold text-lg">${rec.fastedScore}</span></p>
-                        ${rec.activationTime && rec.activationTime !== '-' ? `<p class="flex justify-between text-red-600 mt-1 border-t pt-1"><span><i class="fas fa-bell"></i> Activate:</span> <span class="font-semibold">${rec.activationTime}</span></p>` : ''}
-                    </div>
-                    <div class="text-[10px] text-gray-400 mt-2 text-right">บันทึกเมื่อ: ${rec.timestamp}</div>
+                    ${btnPrint}
                 </div>
             `;
             historyList.innerHTML += card;
