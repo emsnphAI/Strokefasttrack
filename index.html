@@ -17,14 +17,14 @@
 <div class="max-w-md mx-auto bg-white min-h-screen shadow-lg relative">
     <div class="bg-red-600 text-white p-4 text-center shadow-md">
         <h1 class="text-xl font-bold"><i class="fas fa-brain mr-2"></i>Stroke Assessment App</h1>
-        <p class="text-sm">BE-FAST & FAST-ED (LVO) Triage</p>
+        <p class="text-sm">BE-FAST & FAST-ED (LVO) Triage (Firebase)</p>
     </div>
 
     <div class="flex justify-around bg-gray-100 border-b">
-        <button id="tab-assess" class="tab-btn active w-1/2 py-3" onclick="switchTab('assess')">
+        <button id="tab-assess" class="tab-btn active w-1/2 py-3" onclick="window.switchTab('assess')">
             <i class="fas fa-stethoscope mr-1"></i> ประเมินผู้ป่วย
         </button>
-        <button id="tab-history" class="tab-btn w-1/2 py-3" onclick="switchTab('history')">
+        <button id="tab-history" class="tab-btn w-1/2 py-3" onclick="window.switchTab('history')">
             <i class="fas fa-history mr-1"></i> ประวัติย้อนหลัง
         </button>
     </div>
@@ -115,7 +115,7 @@
                 </div>
             </div>
 
-            <button type="button" onclick="evaluatePatient()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg shadow-lg text-lg transition duration-200">
+            <button type="button" id="btnEvaluate" onclick="window.evaluatePatient()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg shadow-lg text-lg transition duration-200">
                 ประมวลผล & บันทึก
             </button>
         </form>
@@ -130,11 +130,12 @@
 
     <div id="history-view" class="p-4 hidden">
         <div class="flex justify-between items-center mb-4">
-            <h2 class="font-bold text-lg text-gray-800">ประวัติการประเมิน</h2>
-            <button onclick="clearHistory()" class="text-sm text-red-600 border border-red-600 px-2 py-1 rounded hover:bg-red-50">ล้างข้อมูล</button>
+            <h2 class="font-bold text-lg text-gray-800">ประวัติการประเมิน (Real-time)</h2>
+            <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">ออนไลน์</span>
         </div>
         <div id="historyList" class="space-y-3">
-            </div>
+            <p class="text-center text-gray-500 mt-4">กำลังโหลดข้อมูล...</p>
+        </div>
     </div>
 </div>
 
@@ -151,25 +152,41 @@
         </div>
 
         <div class="mt-5 flex flex-col space-y-2">
-            <button onclick="confirmActivation()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-3 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm">
+            <button onclick="window.confirmActivation()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-3 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm">
                 ยืนยันการ Activate (บันทึกเวลา)
             </button>
-            <button onclick="closeModal()" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-3 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:text-sm">
+            <button onclick="window.closeModal()" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-3 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:text-sm">
                 ยกเลิก (บันทึกแบบไม่ Activate)
             </button>
         </div>
     </div>
 </div>
 
-<script>
-    // Set Default LKW Time to Now (Onset ปล่อยว่างเพราะเป็น Text)
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    // 👉 นำ firebaseConfig ของคุณมาวางตรงนี้
+    const firebaseConfig = {
+      apiKey: "AIzaSyBvqL8Di40e2ETN3NfA_aOW_aW7fPD0HRA",
+      authDomain: "cpg-stroke.firebaseapp.com",
+      projectId: "cpg-stroke",
+      storageBucket: "cpg-stroke.firebasestorage.app",
+      messagingSenderId: "691025642570",
+      appId: "1:691025642570:web:7d7f41cb8387017ea792b3"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Set Default Time
     document.getElementById('timeLkw').value = new Date().toISOString().slice(0, 16);
 
-    // Load History from Local Storage
-    let records = JSON.parse(localStorage.getItem('strokeRecords')) || [];
-    let tempEvalData = null; // เก็บข้อมูลชั่วคราวก่อนกดยืนยันใน Pop-up
+    let tempEvalData = null; 
 
-    function switchTab(tab) {
+    // --- ควบคุม UI ---
+    window.switchTab = function(tab) {
         document.getElementById('tab-assess').classList.remove('active');
         document.getElementById('tab-history').classList.remove('active');
         document.getElementById('assess-view').classList.add('hidden');
@@ -177,18 +194,16 @@
 
         document.getElementById(`tab-${tab}`).classList.add('active');
         document.getElementById(`${tab}-view`).classList.remove('hidden');
-
-        if(tab === 'history') renderHistory();
     }
 
-    function evaluatePatient() {
+    // --- คำนวณประเมินผล ---
+    window.evaluatePatient = function() {
         const name = document.getElementById('patientName').value;
         if(!name) { alert('กรุณากรอกชื่อผู้ป่วย / HN'); return; }
 
         const lkw = document.getElementById('timeLkw').value;
         const onset = document.getElementById('timeOnset').value || 'ไม่ระบุ/ไม่แน่ชัด';
 
-        // Check BE-FAST
         const isBeFastPositive = 
             document.getElementById('befast_b').checked ||
             document.getElementById('befast_e').checked ||
@@ -196,7 +211,6 @@
             document.getElementById('befast_a').checked ||
             document.getElementById('befast_s').checked;
 
-        // Calculate FAST-ED Score
         const fastedScore = 
             parseInt(document.getElementById('fasted_f').value) +
             parseInt(document.getElementById('fasted_a').value) +
@@ -204,7 +218,6 @@
             parseInt(document.getElementById('fasted_e').value) +
             parseInt(document.getElementById('fasted_d').value);
 
-        // เก็บข้อมูลชั่วคราวไว้รอบันทึก
         tempEvalData = {
             name: name,
             lkw: lkw ? new Date(lkw).toLocaleString('th-TH') : 'ไม่ระบุ',
@@ -215,35 +228,61 @@
         };
 
         if (isBeFastPositive) {
-            // แสดง Pop-up Modal
             document.getElementById('activationModal').classList.remove('hidden');
-            if(fastedScore >= 4){
-                document.getElementById('modalLvoAlert').classList.remove('hidden');
-            } else {
-                document.getElementById('modalLvoAlert').classList.add('hidden');
-            }
+            if(fastedScore >= 4) document.getElementById('modalLvoAlert').classList.remove('hidden');
+            else document.getElementById('modalLvoAlert').classList.add('hidden');
         } else {
-            // ถ้าไม่เข้าเกณฑ์ ให้บันทึกเลยโดยไม่มี Timestamp ของการ Activate
-            saveRecord(false);
+            saveRecordToFirebase(false);
         }
     }
 
-    function confirmActivation() {
+    window.confirmActivation = function() {
         document.getElementById('activationModal').classList.add('hidden');
-        saveRecord(true); // true = มีการ Activate Stroke Fast Track
+        saveRecordToFirebase(true);
     }
 
-    function closeModal() {
+    window.closeModal = function() {
         document.getElementById('activationModal').classList.add('hidden');
-        saveRecord(false); // ปิดเฉยๆ ก็บันทึกข้อมูลแต่ถือว่าไม่ได้ลงเวลา Activate
+        saveRecordToFirebase(false);
     }
 
-    function saveRecord(isActivated) {
+    // --- บันทึกข้อมูลลง Firebase ---
+    async function saveRecordToFirebase(isActivated) {
         if(!tempEvalData) return;
-
-        const now = new Date();
-        const timestamp = now.toLocaleString('th-TH');
+        document.getElementById('btnEvaluate').innerText = "กำลังบันทึก...";
         
+        const now = new Date();
+        const timestampStr = now.toLocaleString('th-TH');
+
+        const record = {
+            ...tempEvalData,
+            timestamp: timestampStr,
+            activationTime: isActivated ? timestampStr : '-',
+            createdAt: serverTimestamp() // ให้ Firebase ประทับเวลาจริงในเซิร์ฟเวอร์
+        };
+
+        try {
+            // ส่งข้อมูลขึ้น Firebase Collection ที่ชื่อว่า "stroke_patients"
+            await addDoc(collection(db, "stroke_patients"), record);
+            
+            // ปรับ UI ผลลัพธ์
+            showResultUI(isActivated, timestampStr);
+            
+            // รีเซ็ตฟอร์ม
+            document.getElementById('strokeForm').reset();
+            document.getElementById('timeLkw').value = new Date().toISOString().slice(0, 16);
+            document.getElementById('btnEvaluate').innerText = "ประมวลผล & บันทึก";
+
+            setTimeout(() => { window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); }, 100);
+
+        } catch (error) {
+            console.error("Error adding document: ", error);
+            alert("ไม่สามารถบันทึกข้อมูลได้ กรุณาตรวจสอบอินเทอร์เน็ต");
+            document.getElementById('btnEvaluate').innerText = "ประมวลผล & บันทึก";
+        }
+    }
+
+    function showResultUI(isActivated, timestamp) {
         let action = "ปกติ / ไม่เข้าเกณฑ์ Stroke";
         let lvoRisk = "ความเสี่ยง LVO ต่ำ";
         let bgColor = "bg-green-100 text-green-800";
@@ -252,16 +291,10 @@
         if (tempEvalData.isFastTrack) {
             action = isActivated ? "🚨 STROKE FAST TRACK ACTIVATED 🚨" : "เกณฑ์เข้า Stroke แต่ข้ามการ Activate";
             bgColor = isActivated ? "bg-red-100 text-red-800 border border-red-300" : "bg-orange-100 text-orange-800";
-            
-            if(tempEvalData.isLvo) lvoRisk = "⚠️ สงสัย Large Vessel Occlusion (LVO) สูง";
-            else lvoRisk = "ความน่าจะเป็น LVO ต่ำ";
-
-            if(isActivated) {
-                activateTimeStr = `<br><span class='text-red-600'><i class='fas fa-stopwatch'></i> เวลา Activate: ${timestamp}</span>`;
-            }
+            lvoRisk = tempEvalData.isLvo ? "⚠️ สงสัย Large Vessel Occlusion (LVO) สูง" : "ความน่าจะเป็น LVO ต่ำ";
+            if(isActivated) activateTimeStr = `<br><span class='text-red-600'><i class='fas fa-stopwatch'></i> เวลา Activate: ${timestamp}</span>`;
         }
 
-        // Show Result UI
         const resultBox = document.getElementById('resultBox');
         resultBox.className = `mt-4 rounded-lg p-4 text-center shadow-md ${bgColor}`;
         document.getElementById('resultTitle').innerHTML = action;
@@ -269,39 +302,22 @@
         document.getElementById('resultScore').innerText = `FAST-ED Score: ${tempEvalData.fastedScore}`;
         document.getElementById('resultTime').innerHTML = activateTimeStr;
         resultBox.classList.remove('hidden');
-
-        // Save Data to Array
-        const record = {
-            id: Date.now(),
-            ...tempEvalData,
-            timestamp: timestamp,
-            activationTime: isActivated ? timestamp : '-'
-        };
-
-        records.unshift(record); // Add to top
-        localStorage.setItem('strokeRecords', JSON.stringify(records));
-        
-        // --- รีเซ็ตฟอร์ม (Reset Form) ---
-        document.getElementById('strokeForm').reset();
-        // ตั้งค่าเวลา Last Known Well กลับเป็นเวลาปัจจุบัน
-        document.getElementById('timeLkw').value = new Date().toISOString().slice(0, 16);
-        
-        // เลื่อนหน้าจอลงมาดูผลลัพธ์
-        setTimeout(() => {
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-        }, 100);
     }
 
-    function renderHistory() {
+    // --- ดึงประวัติแบบ Real-time จาก Firebase ---
+    const q = query(collection(db, "stroke_patients"), orderBy("createdAt", "desc"));
+    
+    onSnapshot(q, (snapshot) => {
         const historyList = document.getElementById('historyList');
         historyList.innerHTML = '';
 
-        if(records.length === 0) {
-            historyList.innerHTML = '<p class="text-center text-gray-500 mt-4">ยังไม่มีประวัติการประเมิน</p>';
+        if (snapshot.empty) {
+            historyList.innerHTML = '<p class="text-center text-gray-500 mt-4">ยังไม่มีประวัติในระบบ</p>';
             return;
         }
 
-        records.forEach(rec => {
+        snapshot.forEach((doc) => {
+            const rec = doc.data();
             const statusColor = rec.isFastTrack ? (rec.isLvo ? 'bg-red-500' : 'bg-orange-500') : 'bg-gray-400';
             const statusText = rec.isFastTrack ? (rec.isLvo ? 'FAST TRACK + LVO' : 'FAST TRACK') : 'Negative';
 
@@ -316,23 +332,15 @@
                     </div>
                     <div class="text-sm text-gray-700 mt-2 bg-gray-50 p-2 rounded">
                         <p class="flex justify-between"><span>FAST-ED Score:</span> <span class="font-bold text-lg">${rec.fastedScore}</span></p>
-                        ${rec.activationTime !== '-' ? `<p class="flex justify-between text-red-600 mt-1 border-t pt-1"><span><i class="fas fa-bell"></i> Activate:</span> <span class="font-semibold">${rec.activationTime}</span></p>` : ''}
+                        ${rec.activationTime && rec.activationTime !== '-' ? `<p class="flex justify-between text-red-600 mt-1 border-t pt-1"><span><i class="fas fa-bell"></i> Activate:</span> <span class="font-semibold">${rec.activationTime}</span></p>` : ''}
                     </div>
                     <div class="text-[10px] text-gray-400 mt-2 text-right">บันทึกเมื่อ: ${rec.timestamp}</div>
                 </div>
             `;
             historyList.innerHTML += card;
         });
-    }
+    });
 
-    function clearHistory() {
-        if(confirm("ยืนยันการล้างประวัติทั้งหมด?")) {
-            localStorage.removeItem('strokeRecords');
-            records = [];
-            renderHistory();
-        }
-    }
 </script>
-
 </body>
 </html>
