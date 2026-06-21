@@ -203,6 +203,9 @@
     <div id="history-view" class="p-4 hidden">
         <div class="flex justify-between items-center mb-4">
             <h2 class="font-bold text-lg text-gray-800">ประวัติ (พิมพ์เอกสารได้)</h2>
+            <button onclick="window.exportToCSV()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm shadow flex items-center">
+                <i class="fas fa-file-excel mr-1"></i> Export Excel
+            </button>
         </div>
         <div id="historyList" class="space-y-3">
             <p class="text-center text-gray-500 mt-4">กำลังโหลดข้อมูล...</p>
@@ -225,13 +228,12 @@
 </div>
 
 <div id="printLayout" class="hidden print-only text-black p-6 font-sans text-sm w-full mx-auto" style="max-width: 800px;">
-    </div>
+</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-    // 👉 นำ firebaseConfig ของคุณมาวางตรงนี้
     const firebaseConfig = {
       apiKey: "AIzaSyBvqL8Di40e2ETN3NfA_aOW_aW7fPD0HRA",
       authDomain: "cpg-stroke.firebaseapp.com",
@@ -246,13 +248,12 @@
 
     document.getElementById('timeLkw').value = new Date().toISOString().slice(0, 16);
     
-    // ตั้งค่าเวลา FMC ให้เป็นเวลาปัจจุบันอัตโนมัติ
     const now = new Date();
     document.getElementById('timeFMC').value = now.toTimeString().slice(0,5);
 
     let tempEvalData = null; 
     window.activeDocId = null;
-    window.allCases = []; // เก็บข้อมูลทั้งหมดไว้สำหรับปริ้น
+    window.allCases = [];
 
     window.switchTab = function(tab) {
         document.getElementById('tab-assess').classList.remove('active');
@@ -282,7 +283,7 @@
             fastedScore: fastedScore,
             isLvo: fastedScore >= 4,
             isFastTrack: befastPos,
-            status: 'assessed',
+            status: 'active',
             befast: {
                 b: document.getElementById('befast_b').checked,
                 e: document.getElementById('befast_e').checked,
@@ -293,14 +294,16 @@
         };
 
         if (befastPos) document.getElementById('activationModal').classList.remove('hidden');
-        else saveRecordToFirebase(false);
+        else {
+            tempEvalData.status = 'not_qualify';
+            saveRecordToFirebase();
+        }
     }
 
     window.confirmActivation = async function() {
         document.getElementById('activationModal').classList.add('hidden');
-        
         const now = new Date();
-        const activateTime = now.toTimeString().slice(0,5); // HH:MM
+        const activateTime = now.toTimeString().slice(0,5);
         
         const record = {
             ...tempEvalData,
@@ -328,16 +331,74 @@
 
     window.closeModal = function() {
         document.getElementById('activationModal').classList.add('hidden');
-        saveRecordToFirebase(false);
+        tempEvalData.status = 'not_qualify';
+        saveRecordToFirebase();
     }
 
-    async function saveRecordToFirebase(isActivated) {
+    async function saveRecordToFirebase() {
         if(!tempEvalData) return;
         const now = new Date();
         const record = { ...tempEvalData, activateTime: '-', dateStr: now.toLocaleDateString('th-TH'), createdAt: serverTimestamp() };
         await addDoc(collection(db, "stroke_patients"), record);
         document.getElementById('strokeForm').reset();
         alert("บันทึกเข้าระบบเรียบร้อย (ไม่เข้าเกณฑ์ Stroke)");
+    }
+
+    // ⚡ ฟังก์ชันสำหรับดึงเคสที่ค้างอยู่กลับมาทำต่อ ⚡
+    window.resumeCase = function(docId) {
+        const rec = window.allCases.find(c => c.id === docId);
+        if(!rec) return;
+
+        window.activeDocId = docId;
+
+        // แสดงหัวข้อคนไข้ในหน้าปฏิบัติการ
+        document.getElementById('activePatientName').innerText = `ผู้ป่วย: ${rec.name}`;
+        document.getElementById('activeTime').innerText = (rec.activateTime || '-') + " น.";
+
+        // ดึงข้อมูลเดิมมาหยอดลงช่องฟอร์ม (ถ้ามี)
+        const intv = rec.interventions || {};
+        const v = intv.vitals || {};
+        
+        document.getElementById('v_bp').value = (v.bp && v.bp !== '-') ? v.bp : '';
+        document.getElementById('v_hr').value = (v.hr && v.hr !== '-') ? v.hr : '';
+        document.getElementById('v_rr').value = (v.rr && v.rr !== '-') ? v.rr : '';
+        document.getElementById('v_o2').value = (v.o2 && v.o2 !== '-') ? v.o2 : '';
+        document.getElementById('v_dtx').value = (v.dtx && v.dtx !== '-') ? v.dtx : '';
+        document.getElementById('v_pupill').value = (v.pupil_l && v.pupil_l !== '-') ? v.pupil_l : '';
+        document.getElementById('v_pupilr').value = (v.pupil_r && v.pupil_r !== '-') ? v.pupil_r : '';
+        
+        document.getElementById('v_gcs_e').value = (v.gcs?.e && v.gcs?.e !== '-') ? v.gcs?.e : '';
+        document.getElementById('v_gcs_v').value = (v.gcs?.v && v.gcs?.v !== '-') ? v.gcs?.v : '';
+        document.getElementById('v_gcs_m').value = (v.gcs?.m && v.gcs?.m !== '-') ? v.gcs?.m : '';
+
+        document.getElementById('m_ra').value = v.motor?.ra || '5';
+        document.getElementById('m_la').value = v.motor?.la || '5';
+        document.getElementById('m_rl').value = v.motor?.rl || '5';
+        document.getElementById('m_ll').value = v.motor?.ll || '5';
+
+        document.getElementById('chk_ab_manage').checked = intv.ab_manage?.done || false;
+        document.getElementById('val_ab_manage').value = (intv.ab_manage?.detail && intv.ab_manage?.detail !== '-') ? intv.ab_manage?.detail : '';
+
+        document.getElementById('chk_iv').checked = intv.iv?.done || false;
+        document.getElementById('val_iv_rate').value = (iv.rate && iv.rate !== '-') ? iv.rate : '';
+
+        document.getElementById('chk_blood').checked = intv.blood || false;
+
+        document.getElementById('chk_consult').checked = intv.consult?.done || false;
+        document.getElementById('val_consult').value = (intv.consult?.detail && intv.consult?.detail !== '-') ? intv.consult?.detail : '';
+
+        document.getElementById('chk_coord').checked = intv.coord || false;
+
+        document.getElementById('chk_other').checked = intv.other?.done || false;
+        document.getElementById('val_other').value = (intv.other?.detail && intv.other?.detail !== '-') ? intv.other?.detail : '';
+
+        document.getElementById('v_door').value = (intv.timeDoor && intv.timeDoor !== '-') ? intv.timeDoor : '';
+        document.getElementById('v_ct').value = (intv.timeCT && intv.timeCT !== '-') ? intv.timeCT : '';
+        document.getElementById('v_needle').value = (intv.timeNeedle && intv.timeNeedle !== '-') ? intv.timeNeedle : '';
+
+        // เปิดแท็บปฏิบัติการ
+        document.getElementById('tab-action').classList.remove('hidden');
+        window.switchTab('action');
     }
 
     window.finishCase = async function() {
@@ -378,7 +439,7 @@
                 completedAt: serverTimestamp()
             });
 
-            alert("บันทึก Checklist เรียบร้อย!");
+            alert("บันทึกข้อมูลและปิดงานเรียบร้อย!");
             document.getElementById('interventionForm').reset();
             window.activeDocId = null;
             document.getElementById('tab-action').classList.add('hidden');
@@ -387,19 +448,15 @@
         } catch (error) { console.error(error); alert("เกิดข้อผิดพลาด"); }
     }
 
-    // ฟังก์ชันคำนวณเวลา (นาที)
     function calcTimeDiff(startStr, endStr) {
         if(!startStr || !endStr || startStr === '-' || endStr === '-') return '........';
-        
-        // พยายามสกัดตัวเลข HH:MM ออกมาจากข้อความ
         let startMatch = startStr.match(/(\d{1,2})[:.](\d{2})/);
         let endMatch = endStr.match(/(\d{1,2})[:.](\d{2})/);
-        
         if(startMatch && endMatch) {
             let startMins = parseInt(startMatch[1]) * 60 + parseInt(startMatch[2]);
             let endMins = parseInt(endMatch[1]) * 60 + parseInt(endMatch[2]);
             let diff = endMins - startMins;
-            if(diff < 0) diff += 24 * 60; // ข้ามวัน
+            if(diff < 0) diff += 24 * 60;
             return diff;
         }
         return '........';
@@ -409,7 +466,6 @@
         const rec = window.allCases.find(c => c.id === docId);
         if(!rec) return;
 
-        // คำนวณ KPI
         let onsetFmc = calcTimeDiff(rec.onset, rec.fmc);
         let onsetAct = calcTimeDiff(rec.onset, rec.activateTime);
         let actDoor = calcTimeDiff(rec.activateTime, rec.interventions?.timeDoor);
@@ -418,7 +474,7 @@
 
         const v = rec.interventions?.vitals || {};
         
-        // คำนวณ GCS Total
+        // คำนวณ GCS Total รวม
         let gcsTotal = '-';
         if (v.gcs && v.gcs.e !== '-' && v.gcs.v !== '-' && v.gcs.m !== '-') {
             gcsTotal = parseInt(v.gcs.e) + parseInt(v.gcs.v) + parseInt(v.gcs.m);
@@ -429,7 +485,7 @@
         const printHtml = `
             <div class="border-b-2 border-black pb-2 mb-4 text-center">
                 <h1 class="text-2xl font-bold">แบบบันทึกการดูแลผู้ป่วยฉุกเฉิน Stroke Fast Track นอกโรงพยาบาล</h1>
-                <p class="text-md">หน่วยปฏิบัติการการแพทย์ฉุกเฉิน รพ.นครปฐม</p>
+                <p class="text-md">หน่วยปฏิบัติการการแพทย์ฉุกเฉิน รพ.นครปฐม </p>
             </div>
 
             <div class="mb-4">
@@ -468,6 +524,8 @@
                         <th class="border border-black p-1">O2 Sat</th>
                         <th class="border border-black p-1">DTX</th>
                         <th class="border border-black p-1">Pupils (L / R)</th>
+                        <th class="border border-black p-1">GCS (E,V,M)</th>
+                        <th class="border border-black p-1">GCS Total</th>
                     </tr>
                     <tr>
                         <td class="border border-black p-1">${v.bp || '-'}</td>
@@ -476,28 +534,24 @@
                         <td class="border border-black p-1">${v.o2 || '-'}%</td>
                         <td class="border border-black p-1">${v.dtx || '-'}</td>
                         <td class="border border-black p-1">${v.pupil_l || '-'} / ${v.pupil_r || '-'}</td>
+                        <td class="border border-black p-1">E${v.gcs?.e || '-'} V${v.gcs?.v || '-'} M${v.gcs?.m || '-'}</td>
+                        <td class="border border-black p-1 font-bold">${gcsTotal}</td>
                     </tr>
                 </table>
                 
-                <div class="mt-4 px-2 flex justify-between items-start">
-                    <div>
-                        <b>GCS:</b> E${v.gcs?.e || '-'} V${v.gcs?.v || '-'} M${v.gcs?.m || '-'} 
-                        (Total: ${gcsTotal})
-                    </div>
-                    <div>
-                        <b>Motor Power (0-5):</b>
-                        <div class="flex justify-center mt-2">
-                            <table class="text-center border-collapse">
-                                <tr>
-                                    <td class="border-b border-r border-black p-2 w-16">RA: ${v.motor?.ra||'-'}</td>
-                                    <td class="border-b border-black p-2 w-16">LA: ${v.motor?.la||'-'}</td>
-                                </tr>
-                                <tr>
-                                    <td class="border-r border-black p-2 w-16">RL: ${v.motor?.rl||'-'}</td>
-                                    <td class="p-2 w-16">LL: ${v.motor?.ll||'-'}</td>
-                                </tr>
-                            </table>
-                        </div>
+                <div class="mt-4 px-2">
+                    <b>Motor Power (0-5):</b>
+                    <div class="flex justify-center mt-2">
+                        <table class="text-center border-collapse">
+                            <tr>
+                                <td class="border-b border-r border-black p-2 w-16">RA: ${v.motor?.ra||'-'}</td>
+                                <td class="border-b border-black p-2 w-16">LA: ${v.motor?.la||'-'}</td>
+                            </tr>
+                            <tr>
+                                <td class="border-r border-black p-2 w-16">RL: ${v.motor?.rl||'-'}</td>
+                                <td class="p-2 w-16">LL: ${v.motor?.ll||'-'}</td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -536,55 +590,3 @@
             <div class="mt-8 flex justify-between px-10">
                 <div class="text-center">
                     <p>ลงชื่อ..........................................................ผู้ประเมิน</p>
-                    <p class="mt-1">(..........................................................)</p>
-                </div>
-                <div class="text-center">
-                    <p>ลงชื่อ..........................................................แพทย์/พยาบาลรับมอบ</p>
-                    <p class="mt-1">(..........................................................)</p>
-                </div>
-            </div>
-        `;
-        
-        document.getElementById('printLayout').innerHTML = printHtml;
-        window.print();
-    }
-
-    // ดึงข้อมูล Real-time
-    onSnapshot(query(collection(db, "stroke_patients"), orderBy("createdAt", "desc")), (snapshot) => {
-        const historyList = document.getElementById('historyList');
-        historyList.innerHTML = '';
-        window.allCases = [];
-
-        if (snapshot.empty) { historyList.innerHTML = '<p class="text-center">ยังไม่มีประวัติในระบบ</p>'; return; }
-
-        snapshot.forEach((docSnap) => {
-            const rec = { id: docSnap.id, ...docSnap.data() };
-            window.allCases.push(rec);
-            
-            let btnPrint = '';
-            let statusBadge = '<span class="bg-gray-400 text-white text-[10px] px-2 py-1 rounded">ไม่เข้าเกณฑ์</span>';
-            
-            if(rec.status === 'active') {
-                statusBadge = '<span class="bg-red-600 text-white text-[10px] px-2 py-1 rounded animate-pulse">กำลังดำเนินการ</span>';
-            } else if (rec.status === 'completed') {
-                statusBadge = '<span class="bg-green-600 text-white text-[10px] px-2 py-1 rounded">ปิดเคสแล้ว</span>';
-                btnPrint = `<button onclick="window.printCase('${rec.id}')" class="mt-2 w-full bg-blue-50 text-blue-700 text-xs py-2 rounded border border-blue-200 hover:bg-blue-100"><i class="fas fa-print"></i> 🖨️ พิมพ์แบบบันทึก (A4)</button>`;
-            }
-
-            const card = `
-                <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-                    <div class="flex justify-between items-start mb-2"><span class="font-bold text-gray-800">${rec.name}</span>${statusBadge}</div>
-                    <div class="text-xs text-gray-600 space-y-1">
-                        <p>Onset: ${rec.onset} | FMC: ${rec.fmc}</p>
-                        ${rec.isFastTrack ? `<p class="font-semibold text-red-600">FAST-ED: ${rec.fastedScore} ${rec.isLvo ? '(LVO)' : ''}</p>` : ''}
-                    </div>
-                    ${btnPrint}
-                </div>
-            `;
-            historyList.innerHTML += card;
-        });
-    });
-
-</script>
-</body>
-</html>
