@@ -72,15 +72,42 @@
                 <label class="flex items-center space-x-2"><input type="checkbox" id="befast_s" class="w-5 h-5 text-red-600 rounded"><span><b>S</b>peech: พูดไม่ชัด นึกคำไม่ออก</span></label>
             </div>
 
-            <div class="bg-yellow-50 p-3 rounded-lg mb-4 border border-yellow-200">
-                <h2 class="font-bold text-yellow-800 mb-2 border-b pb-1">FAST-ED (LVO Severity)</h2>
-                <div class="space-y-3 text-sm">
-                    <div><label class="block font-medium mb-1">Facial Palsy</label><select id="fasted_f" class="w-full p-2 border rounded"><option value="0">0 - ปกติ</option><option value="1">1 - อัมพาตครึ่งซีก</option></select></div>
-                    <div><label class="block font-medium mb-1">Arm Weakness</label><select id="fasted_a" class="w-full p-2 border rounded"><option value="0">0 - ปกติ</option><option value="1">1 - แขนตก (Drift)</option><option value="2">2 - ต้านแรงไม่ได้ (No effort)</option></select></div>
-                    <div><label class="block font-medium mb-1">Speech Changes</label><select id="fasted_s" class="w-full p-2 border rounded"><option value="0">0 - ปกติ</option><option value="1">1 - ผิดปกติเล็กน้อย-ปานกลาง</option><option value="2">2 - ไม่พูดเลย, ไม่เข้าใจคำสั่ง</option></select></div>
-                    <div><label class="block font-medium mb-1">Eye Deviation</label><select id="fasted_e" class="w-full p-2 border rounded"><option value="0">0 - ปกติ</option><option value="1">1 - กรอกตาผิดปกติบางส่วน</option><option value="2">2 - ตากลอกไปด้านใดด้านหนึ่งชัดเจน</option></select></div>
-                    <div><label class="block font-medium mb-1">Denial / Neglect</label><select id="fasted_d" class="w-full p-2 border rounded"><option value="0">0 - ปกติ</option><option value="1">1 - ละเลยสัมผัสด้านใดด้านหนึ่ง</option><option value="2">2 - ไม่รับรู้แขนขาตัวเองชัดเจน</option></select></div>
+            <!-- VAN Severity (LVO Assessment) -->
+<div class="bg-yellow-50 p-3 rounded-lg mb-4 border border-yellow-200">
+    <h2 class="font-bold text-yellow-800 mb-2 border-b border-yellow-200 pb-1">VAN (LVO Severity)</h2>
+    <div class="space-y-3 text-sm">
+        <p class="text-xs text-red-600 mb-1">* เงื่อนไข: ผู้ป่วยต้องมีอาการแขนอ่อนแรง จึงจะถือว่า VAN Positive ได้</p>
+        
+        <label class="flex items-center space-x-2 bg-white p-2 rounded border shadow-sm">
+            <input type="checkbox" id="van_arm" class="w-5 h-5 text-yellow-600 rounded">
+            <span class="font-bold">Arm Weakness: แขนตกหรืออ่อนแรง</span>
+        </label>
+        
+        <div class="pl-2 border-l-2 border-yellow-300 space-y-2 mt-2">
+            <label class="flex items-start space-x-2">
+                <input type="checkbox" id="van_v" class="w-5 h-5 text-yellow-600 rounded mt-1">
+                <div>
+                    <span class="font-bold">V - Vision (การมองเห็น):</span><br>
+                    <span class="text-gray-600 text-xs">มองไม่เห็นภาพซีกใดซีกหนึ่ง (Field cut), เห็นภาพซ้อนใหม่, หรือตาบอดใหม่</span>
                 </div>
+            </label>
+            <label class="flex items-start space-x-2">
+                <input type="checkbox" id="van_a" class="w-5 h-5 text-yellow-600 rounded mt-1">
+                <div>
+                    <span class="font-bold">A - Aphasia (การสื่อสาร):</span><br>
+                    <span class="text-gray-600 text-xs">นึกคำพูดไม่ออก, พูดไม่เป็นคำ, หรือไม่เข้าใจคำสั่ง</span>
+                </div>
+            </label>
+            <label class="flex items-start space-x-2">
+                <input type="checkbox" id="van_n" class="w-5 h-5 text-yellow-600 rounded mt-1">
+                <div>
+                    <span class="font-bold">N - Neglect (การละเลยร่างกาย):</span><br>
+                    <span class="text-gray-600 text-xs">ตากลอกไปด้านใดด้านหนึ่งข้ามเส้นกลางไม่ได้, ไม่สนใจร่างกายหรือสิ่งแวดล้อมซีกหนึ่ง</span>
+                </div>
+            </label>
+        </div>
+    </div>
+</div>
             </div>
 
             <button type="button" id="btnEvaluate" onclick="window.evaluatePatient()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg shadow-lg transition duration-200">
@@ -268,35 +295,50 @@
         document.getElementById(`${tab}-view`).classList.remove('hidden');
     }
 
-    window.evaluatePatient = function() {
+   window.evaluatePatient = function() {
         const name = document.getElementById('patientName').value;
-        if(!name) { alert('กรุณากรอกชื่อผู้ป่วย'); return; }
+        if(!name) { alert('กรุณากรอกชื่อผู้ป่วย / HN'); return; }
 
-        const befastPos = ['b','e','f','a','s'].some(id => document.getElementById(`befast_${id}`).checked);
-        const fastedScore = ['f','a','s','e','d'].reduce((sum, id) => sum + parseInt(document.getElementById(`fasted_${id}`).value), 0);
+        const lkw = document.getElementById('timeLkw').value;
+        const onset = document.getElementById('timeOnset').value || 'ไม่ระบุ';
+
+        // เช็ค BE-FAST
+        const isBeFastPositive = 
+            document.getElementById('befast_b').checked ||
+            document.getElementById('befast_e').checked ||
+            document.getElementById('befast_f').checked ||
+            document.getElementById('befast_a').checked ||
+            document.getElementById('befast_s').checked;
+
+        // ประมวลผล VAN Assessment
+        const vanArm = document.getElementById('van_arm').checked;
+        const vanV = document.getElementById('van_v').checked;
+        const vanA = document.getElementById('van_a').checked;
+        const vanN = document.getElementById('van_n').checked;
+
+        // VAN เป็นบวก (สงสัย LVO) ก็ต่อเมื่อมี Arm Weakness + (V หรือ A หรือ N อย่างน้อย 1 อาการ)
+        const isLvo = vanArm && (vanV || vanA || vanN);
 
         tempEvalData = {
             name: name,
-            lkw: document.getElementById('timeLkw').value ? new Date(document.getElementById('timeLkw').value).toLocaleString('th-TH') : '-',
-            onset: document.getElementById('timeOnset').value || '-',
-            fmc: document.getElementById('timeFMC').value || '-',
-            fastedScore: fastedScore,
-            isLvo: fastedScore >= 4,
-            isFastTrack: befastPos,
-            status: 'active',
-            befast: {
-                b: document.getElementById('befast_b').checked,
-                e: document.getElementById('befast_e').checked,
-                f: document.getElementById('befast_f').checked,
-                a: document.getElementById('befast_a').checked,
-                s: document.getElementById('befast_s').checked
-            }
+            lkw: lkw ? new Date(lkw).toLocaleString('th-TH') : 'ไม่ระบุ',
+            onset: onset,
+            isLvo: isLvo,
+            isFastTrack: isBeFastPositive,
+            status: 'assessed'
         };
 
-        if (befastPos) document.getElementById('activationModal').classList.remove('hidden');
-        else {
-            tempEvalData.status = 'not_qualify';
-            saveRecordToFirebase();
+        if (isBeFastPositive) {
+            document.getElementById('activationModal').classList.remove('hidden');
+            // เปลี่ยนแจ้งเตือนใน Modal ให้ตรงกับ VAN
+            if(isLvo) {
+                document.getElementById('modalLvoAlert').innerHTML = "⚠️ VAN Positive: สงสัยหลอดเลือดสมองเส้นใหญ่อุดตัน (LVO)";
+                document.getElementById('modalLvoAlert').classList.remove('hidden');
+            } else {
+                document.getElementById('modalLvoAlert').classList.add('hidden');
+            }
+        } else {
+            saveRecordToFirebase(false);
         }
     }
 
