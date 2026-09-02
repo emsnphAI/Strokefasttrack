@@ -296,51 +296,58 @@
     }
 
    window.evaluatePatient = function() {
-        const name = document.getElementById('patientName').value;
-        if(!name) { alert('กรุณากรอกชื่อผู้ป่วย / HN'); return; }
+    const name = document.getElementById('patientName').value;
+    if(!name) { alert('กรุณากรอกชื่อผู้ป่วย / HN'); return; }
 
-        const lkw = document.getElementById('timeLkw').value;
-        const onset = document.getElementById('timeOnset').value || 'ไม่ระบุ';
+    const lkw = document.getElementById('timeLkw').value;
+    const onset = document.getElementById('timeOnset').value || 'ไม่ระบุ';
 
-        // เช็ค BE-FAST
-        const isBeFastPositive = 
-            document.getElementById('befast_b').checked ||
-            document.getElementById('befast_e').checked ||
-            document.getElementById('befast_f').checked ||
-            document.getElementById('befast_a').checked ||
-            document.getElementById('befast_s').checked;
+    // เช็ค BE-FAST
+    const isBeFastPositive = 
+        document.getElementById('befast_b').checked ||
+        document.getElementById('befast_e').checked ||
+        document.getElementById('befast_f').checked ||
+        document.getElementById('befast_a').checked ||
+        document.getElementById('befast_s').checked;
 
-        // ประมวลผล VAN Assessment
-        const vanArm = document.getElementById('van_arm').checked;
-        const vanV = document.getElementById('van_v').checked;
-        const vanA = document.getElementById('van_a').checked;
-        const vanN = document.getElementById('van_n').checked;
+    // ประมวลผล VAN Assessment
+    const vanArm = document.getElementById('van_arm').checked;
+    const vanV = document.getElementById('van_v').checked;
+    const vanA = document.getElementById('van_a').checked;
+    const vanN = document.getElementById('van_n').checked;
 
-        // VAN เป็นบวก (สงสัย LVO) ก็ต่อเมื่อมี Arm Weakness + (V หรือ A หรือ N อย่างน้อย 1 อาการ)
-        const isLvo = vanArm && (vanV || vanA || vanN);
+    // VAN เป็นบวก (สงสัย LVO) ก็ต่อเมื่อมี Arm Weakness + (V หรือ A หรือ N อย่างน้อย 1 อาการ)
+    const isLvo = vanArm && (vanV || vanA || vanN);
 
-        tempEvalData = {
-            name: name,
-            lkw: lkw ? new Date(lkw).toLocaleString('th-TH') : 'ไม่ระบุ',
-            onset: onset,
-            isLvo: isLvo,
-            isFastTrack: isBeFastPositive,
-            status: 'assessed'
-        };
+    tempEvalData = {
+        name: name,
+        lkw: lkw ? new Date(lkw).toLocaleString('th-TH') : 'ไม่ระบุ',
+        onset: onset,
+        fmc: document.getElementById('timeFMC').value || '-', // ดึงข้อมูลเวลาพบผู้ป่วยกลับมา
+        befast: { // ดึงข้อมูลอาการกลับมาเพื่อให้หน้า PDF และ Excel นำไปแสดงผลได้
+            b: document.getElementById('befast_b').checked,
+            e: document.getElementById('befast_e').checked,
+            f: document.getElementById('befast_f').checked,
+            a: document.getElementById('befast_a').checked,
+            s: document.getElementById('befast_s').checked
+        },
+        isLvo: isLvo,
+        isFastTrack: isBeFastPositive,
+        status: 'assessed'
+    };
 
-        if (isBeFastPositive) {
-            document.getElementById('activationModal').classList.remove('hidden');
-            // เปลี่ยนแจ้งเตือนใน Modal ให้ตรงกับ VAN
-            if(isLvo) {
-                document.getElementById('modalLvoAlert').innerHTML = "⚠️ VAN Positive: สงสัยหลอดเลือดสมองเส้นใหญ่อุดตัน (LVO)";
-                document.getElementById('modalLvoAlert').classList.remove('hidden');
-            } else {
-                document.getElementById('modalLvoAlert').classList.add('hidden');
-            }
+    if (isBeFastPositive) {
+        document.getElementById('activationModal').classList.remove('hidden');
+        if(isLvo) {
+            document.getElementById('modalLvoAlert').innerHTML = "⚠️ VAN Positive: สงสัยหลอดเลือดสมองเส้นใหญ่อุดตัน (LVO)";
+            document.getElementById('modalLvoAlert').classList.remove('hidden');
         } else {
-            saveRecordToFirebase(false);
+            document.getElementById('modalLvoAlert').classList.add('hidden');
         }
+    } else {
+        saveRecordToFirebase();
     }
+}
 
     window.confirmActivation = async function() {
         document.getElementById('activationModal').classList.add('hidden');
