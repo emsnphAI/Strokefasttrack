@@ -39,8 +39,10 @@
         </button>
     </div>
 
+   <!-- ================= เริ่มต้นแท็บประเมิน ================= -->
     <div id="assess-view" class="p-4">
         <form id="strokeForm">
+            <!-- ข้อมูลเวลา (Time & Onset) -->
             <div class="bg-blue-50 p-3 rounded-lg mb-4 border border-blue-200">
                 <h2 class="font-bold text-blue-800 mb-2 border-b border-blue-200 pb-1">ข้อมูลเวลา (Time & Onset)</h2>
                 <div class="mb-2">
@@ -63,6 +65,7 @@
                 </div>
             </div>
 
+            <!-- BE-FAST (Screening) -->
             <div class="bg-gray-50 p-3 rounded-lg mb-4 border border-gray-200">
                 <h2 class="font-bold text-gray-800 mb-2 border-b pb-1">BE-FAST (Screening)</h2>
                 <label class="flex items-center space-x-2 mb-2"><input type="checkbox" id="befast_b" class="w-5 h-5 text-red-600 rounded"><span><b>B</b>alance: เสียการทรงตัว เดินเซ</span></label>
@@ -73,47 +76,51 @@
             </div>
 
             <!-- VAN Severity (LVO Assessment) -->
-<div class="bg-yellow-50 p-3 rounded-lg mb-4 border border-yellow-200">
-    <h2 class="font-bold text-yellow-800 mb-2 border-b border-yellow-200 pb-1">VAN (LVO Severity)</h2>
-    <div class="space-y-3 text-sm">
-        <p class="text-xs text-red-600 mb-1">* เงื่อนไข: ผู้ป่วยต้องมีอาการแขนอ่อนแรง จึงจะถือว่า VAN Positive ได้</p>
-        
-        <label class="flex items-center space-x-2 bg-white p-2 rounded border shadow-sm">
-            <input type="checkbox" id="van_arm" class="w-5 h-5 text-yellow-600 rounded">
-            <span class="font-bold">Arm Weakness: แขนตกหรืออ่อนแรง</span>
-        </label>
-        
-        <div class="pl-2 border-l-2 border-yellow-300 space-y-2 mt-2">
-            <label class="flex items-start space-x-2">
-                <input type="checkbox" id="van_v" class="w-5 h-5 text-yellow-600 rounded mt-1">
-                <div>
-                    <span class="font-bold">V - Vision (การมองเห็น):</span><br>
-                    <span class="text-gray-600 text-xs">มองไม่เห็นภาพซีกใดซีกหนึ่ง (Field cut), เห็นภาพซ้อนใหม่, หรือตาบอดใหม่</span>
+            <div class="bg-yellow-50 p-3 rounded-lg mb-4 border border-yellow-200">
+                <h2 class="font-bold text-yellow-800 mb-2 border-b border-yellow-200 pb-1">VAN (LVO Severity)</h2>
+                <div class="space-y-3 text-sm">
+                    <p class="text-xs text-red-600 mb-1">* เงื่อนไข: ผู้ป่วยต้องมีอาการแขนอ่อนแรง จึงจะถือว่า VAN Positive ได้</p>
+                    
+                    <label class="flex items-center space-x-2 bg-white p-2 rounded border shadow-sm">
+                        <input type="checkbox" id="van_arm" class="w-5 h-5 text-yellow-600 rounded">
+                        <span class="font-bold">Arm Weakness: แขนตกหรืออ่อนแรง</span>
+                    </label>
+                    
+                    <div class="pl-2 border-l-2 border-yellow-300 space-y-2 mt-2">
+                        <label class="flex items-start space-x-2">
+                            <input type="checkbox" id="van_v" class="w-5 h-5 text-yellow-600 rounded mt-1">
+                            <div>
+                                <span class="font-bold">V - Vision (การมองเห็น):</span><br>
+                                <span class="text-gray-600 text-xs">มองไม่เห็นภาพซีกใดซีกหนึ่ง (Field cut), เห็นภาพซ้อนใหม่, หรือตาบอดใหม่</span>
+                            </div>
+                        </label>
+                        <label class="flex items-start space-x-2">
+                            <input type="checkbox" id="van_a" class="w-5 h-5 text-yellow-600 rounded mt-1">
+                            <div>
+                                <span class="font-bold">A - Aphasia (การสื่อสาร):</span><br>
+                                <span class="text-gray-600 text-xs">นึกคำพูดไม่ออก, พูดไม่เป็นคำ, หรือไม่เข้าใจคำสั่ง</span>
+                            </div>
+                        </label>
+                        <label class="flex items-start space-x-2">
+                            <input type="checkbox" id="van_n" class="w-5 h-5 text-yellow-600 rounded mt-1">
+                            <div>
+                                <span class="font-bold">N - Neglect (การละเลยร่างกาย):</span><br>
+                                <span class="text-gray-600 text-xs">ตากลอกไปด้านใดด้านหนึ่งข้ามเส้นกลางไม่ได้, ไม่สนใจร่างกายหรือสิ่งแวดล้อมซีกหนึ่ง</span>
+                            </div>
+                        </label>
+                    </div>
                 </div>
-            </label>
-            <label class="flex items-start space-x-2">
-                <input type="checkbox" id="van_a" class="w-5 h-5 text-yellow-600 rounded mt-1">
-                <div>
-                    <span class="font-bold">A - Aphasia (การสื่อสาร):</span><br>
-                    <span class="text-gray-600 text-xs">นึกคำพูดไม่ออก, พูดไม่เป็นคำ, หรือไม่เข้าใจคำสั่ง</span>
-                </div>
-            </label>
-            <label class="flex items-start space-x-2">
-                <input type="checkbox" id="van_n" class="w-5 h-5 text-yellow-600 rounded mt-1">
-                <div>
-                    <span class="font-bold">N - Neglect (การละเลยร่างกาย):</span><br>
-                    <span class="text-gray-600 text-xs">ตากลอกไปด้านใดด้านหนึ่งข้ามเส้นกลางไม่ได้, ไม่สนใจร่างกายหรือสิ่งแวดล้อมซีกหนึ่ง</span>
-                </div>
-            </label>
-        </div>
-    </div>
-</div>
+            </div>
 
-            <button type="button" id="btnEvaluate" onclick="window.evaluatePatient()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg shadow-lg transition duration-200">
+            <!-- ปุ่มประมวลผล ต้องอยู่ก่อนปิด </form> และ </div> -->
+            <button type="button" id="btnEvaluate" onclick="window.evaluatePatient()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg shadow-lg transition duration-200 mt-2">
                 ประมวลผล & บันทึก
             </button>
         </form>
     </div>
+    <!-- ================= สิ้นสุดแท็บประเมิน ================= -->
+
+    <!-- ================= เริ่มต้นแท็บปฏิบัติการ (Action View) ================= -->
 
     <div id="action-view" class="p-4 hidden bg-orange-50 min-h-screen">
         <div class="bg-red-600 text-white p-3 rounded-lg mb-4 shadow text-center">
@@ -521,6 +528,21 @@
         const rec = window.allCases.find(c => c.id === docId);
         if(!rec) return;
 
+        // คำนวณเวลา KPI
+        function calcTimeDiff(startStr, endStr) {
+            if(!startStr || !endStr || startStr === '-' || endStr === '-') return '........';
+            let startMatch = startStr.match(/(\d{1,2})[:.](\d{2})/);
+            let endMatch = endStr.match(/(\d{1,2})[:.](\d{2})/);
+            if(startMatch && endMatch) {
+                let startMins = parseInt(startMatch[1]) * 60 + parseInt(startMatch[2]);
+                let endMins = parseInt(endMatch[1]) * 60 + parseInt(endMatch[2]);
+                let diff = endMins - startMins;
+                if(diff < 0) diff += 24 * 60;
+                return diff;
+            }
+            return '........';
+        }
+
         let onsetFmc = calcTimeDiff(rec.onset, rec.fmc);
         let onsetAct = calcTimeDiff(rec.onset, rec.activateTime);
         let actDoor = calcTimeDiff(rec.activateTime, rec.interventions?.timeDoor);
@@ -539,7 +561,7 @@
         const printHtml = `
             <div class="border-b-2 border-black pb-2 mb-4 text-center">
                 <h1 class="text-2xl font-bold">แบบบันทึกการดูแลผู้ป่วยฉุกเฉิน Stroke Fast Track นอกโรงพยาบาล</h1>
-                <p class="text-md">หน่วยปฏิบัติการการแพทย์ฉุกเฉิน รพ.นครปฐม</p>
+                <p class="text-md">หน่วยปฏิบัติการการแพทย์ฉุกเฉิน</p>
             </div>
 
             <div class="mb-4">
@@ -564,7 +586,7 @@
                         ${chk(rec.befast?.a)} Arms &nbsp;&nbsp;
                         ${chk(rec.befast?.s)} Speech
                     </p>
-                    <p class="text-red-600 font-bold mt-2">คะแนน FAST-ED Score: ${rec.fastedScore} คะแนน ${rec.isLvo ? '(สงสัย LVO)' : ''}</p>
+                    <p class="text-red-600 font-bold mt-2">คะแนน VAN / FAST-ED Score: ${rec.fastedScore || 0} คะแนน ${rec.isLvo ? '(สงสัย LVO)' : ''}</p>
                 </div>
             </div>
 
@@ -653,24 +675,29 @@
             </div>
         `;
         
-        document.getElementById('printLayout').innerHTML = printHtml;
-
-        // 1. ดึง Element ของหน้าจอหลัก และ หน้าสำหรับพิมพ์
-        const mainApp = document.querySelector('.print-hidden'); 
         const printContainer = document.getElementById('printLayout');
+        const mainApp = document.querySelector('.print-hidden');
 
-        // 2. ซ่อนหน้าจอแอปพลิเคชันหลัก และโชว์เฉพาะกระดาษ A4
+        // 1. นำข้อมูลไปใส่ในหน้ากระดาษพิมพ์
+        printContainer.innerHTML = printHtml;
+
+        // 2. ซ่อนหน้าแอปพลิเคชันหลัก และโชว์เฉพาะกระดาษ
         if (mainApp) mainApp.style.display = 'none';
         printContainer.classList.remove('hidden');
         printContainer.style.display = 'block';
 
-        // 3. สั่งเรียกหน้าต่างปรินต์ 
-        window.print();
+        // 3. กุญแจสำคัญ: หน่วงเวลา 0.5 วินาที ให้มือถือวาดหน้า PDF ให้เสร็จก่อนสั่งพิมพ์
+        setTimeout(() => {
+            window.print();
 
-        // 4. เมื่อพิมพ์เสร็จ (หรือกดยกเลิก) ให้แสดงหน้าแอปหลักกลับคืนมา
-        if (mainApp) mainApp.style.display = ''; 
-        printContainer.style.display = 'none';
-        printContainer.classList.add('hidden');
+            // 4. เมื่อพิมพ์เสร็จ (หรือกดยกเลิก) ให้รออีก 1 วินาที ค่อยคืนค่าหน้าจอแอปกลับมา (แก้บั๊กหน้าขาว 100%)
+            setTimeout(() => {
+                if (mainApp) mainApp.style.display = '';
+                printContainer.style.display = 'none';
+                printContainer.classList.add('hidden');
+            }, 1000);
+
+        }, 500); 
     }
 
     window.exportToCSV = function() {
