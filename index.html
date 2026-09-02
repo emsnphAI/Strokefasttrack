@@ -560,7 +560,7 @@
 
         const printHtml = `
             <div class="border-b-2 border-black pb-2 mb-4 text-center">
-                <h1 class="text-2xl font-bold">แบบบันทึกการดูแลผู้ป่วยฉุกเฉิน Stroke Fast Track นอกโรงพยาบาล</h1>
+                <h1 class="text-xl font-bold">แบบบันทึกการดูแลผู้ป่วยฉุกเฉิน Stroke Fast Track นอกโรงพยาบาล</h1>
                 <p class="text-md">หน่วยปฏิบัติการการแพทย์ฉุกเฉิน</p>
             </div>
 
@@ -586,7 +586,7 @@
                         ${chk(rec.befast?.a)} Arms &nbsp;&nbsp;
                         ${chk(rec.befast?.s)} Speech
                     </p>
-                    <p class="text-red-600 font-bold mt-2">คะแนน VAN / FAST-ED Score: ${rec.fastedScore || 0} คะแนน ${rec.isLvo ? '(สงสัย LVO)' : ''}</p>
+                    <p class="text-red-600 font-bold mt-2">คะแนน VAN : ${rec.isLvo ? '(สงสัย LVO)' : ''}</p>
                 </div>
             </div>
 
@@ -637,8 +637,8 @@
                 <div class="px-2 mt-2 space-y-2">
                     <p>${chk(rec.interventions?.ab_manage?.done)} <b>A+B management:</b> ${rec.interventions?.ab_manage?.detail || '-'}</p>
                     <p>${chk(rec.interventions?.iv?.done)} <b>ให้สารน้ำ:</b> NSS 1000 ml IV rate ${rec.interventions?.iv?.rate || '-'} ml/hr</p>
-                    <p>${chk(rec.interventions?.blood)} <b>เจาะเลือด:</b> CBC, Chem, Coag, Clotted</p>
-                    <p>${chk(rec.interventions?.consult?.done)} <b>รายงานแพทย์:</b> ${rec.interventions?.consult?.detail || '-'}</p>
+                    <p>${chk(rec.interventions?.blood)} <b>เจาะเลือด:</b> CBC, ฺBlood Chem, Coag, Blood Clotted</p>
+                    <p>${chk(rec.interventions?.consult?.done)} <b>ปรึกษา/รายงานแพทย์:</b> ${rec.interventions?.consult?.detail || '-'}</p>
                     <p>${chk(rec.interventions?.coord)} <b>ประสานงาน รพ.ปลายทางเรียบร้อย</b></p>
                     <p>${chk(rec.interventions?.other?.done)} <b>การรักษาอื่นๆ:</b> ${rec.interventions?.other?.detail || '-'}</p>
                 </div>
@@ -647,13 +647,13 @@
             <div class="mb-4 border-2 border-black p-3">
                 <h2 class="font-bold text-lg mb-2 underline">5. สรุปเวลาตัวชี้วัด (Time Indicators KPI)</h2>
                 <div class="grid grid-cols-2 gap-2">
-                    <div>• เวลาถึง รพ. (Door): <b>${rec.interventions?.timeDoor || '........'} น.</b></div>
+                    <div>• เวลาถึง รพ. (Door): <b>${rec.interventions?.timeDoor || '........'} ....... </b></div>
                     <div>• Onset -> FMC: <b>${onsetFmc}</b> นาที</div>
                     
-                    <div>• เวลาเข้า CT Brain: <b>${rec.interventions?.timeCT || '........'} น.</b></div>
+                    <div>• เวลาเข้า CT Brain: <b>${rec.interventions?.timeCT || '........'} ....... </b></div>
                     <div>• Onset -> Activate: <b>${onsetAct}</b> นาที</div>
                     
-                    <div>• เวลาให้ยา rt-PA: <b>${rec.interventions?.timeNeedle || '........'} น.</b></div>
+                    <div>• เวลาให้ยา rt-PA: <b>${rec.interventions?.timeNeedle || '........'} ....... </b></div>
                     <div>• Activate -> Door: <b>${actDoor}</b> นาที</div>
                     
                     <div class="col-span-2 mt-2 pt-2 border-t border-gray-400">
