@@ -655,7 +655,23 @@
         `;
         
         document.getElementById('printLayout').innerHTML = printHtml;
+
+        // 1. ดึง Element ของหน้าจอหลัก และ หน้าสำหรับพิมพ์
+        const mainApp = document.querySelector('.print-hidden'); 
+        const printContainer = document.getElementById('printLayout');
+
+        // 2. ซ่อนหน้าจอแอปพลิเคชันหลัก และโชว์เฉพาะกระดาษ A4
+        if (mainApp) mainApp.style.display = 'none';
+        printContainer.classList.remove('hidden');
+        printContainer.style.display = 'block';
+
+        // 3. สั่งเรียกหน้าต่างปรินต์ 
         window.print();
+
+        // 4. เมื่อพิมพ์เสร็จ (หรือกดยกเลิก) ให้แสดงหน้าแอปหลักกลับคืนมา
+        if (mainApp) mainApp.style.display = ''; 
+        printContainer.style.display = 'none';
+        printContainer.classList.add('hidden');
     }
 
     window.exportToCSV = function() {
