@@ -68,7 +68,7 @@
         </div>
 
         <h2 class="text-2xl md:text-3xl font-black text-white tracking-wide mb-1">STROKE FAST TRACK</h2>
-        <p class="text-xs md:text-sm text-slate-400 mb-6 font-light">CPG & Decision Support System </p>
+        <p class="text-xs md:text-sm text-slate-400 mb-6 font-light">CPG & Decision Support System • นครปฐม</p>
 
         <div id="loginError" class="hidden mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-xl text-xs text-red-300 font-medium"></div>
 
@@ -139,7 +139,7 @@
 
     <!-- ================= 0. หน้าศูนย์สั่งการ (Night Mode Dashboard) ================= -->
     <div id="dashboard-view" class="p-4 md:p-6 bg-slate-900 min-h-screen">
-        <button onclick="window.switchTab('assess')" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-4 rounded-xl shadow-[0_0_15px_rgba(37,99,235,0.4)] mb-6 transition duration-300 text-lg border border-blue-400/30">
+        <button onclick="window.openNewCase()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-4 rounded-xl shadow-[0_0_15px_rgba(37,99,235,0.4)] mb-6 transition duration-300 text-lg border border-blue-400/30">
             <i class="fas fa-plus-circle mr-2"></i> เพิ่มเคสฉุกเฉินใหม่ (New Case)
         </button>
 
@@ -172,32 +172,32 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            <!-- Leaflet GPS Tracking -->
-            <div class="bg-slate-800 p-4 md:p-6 rounded-2xl shadow-xl border border-slate-700/50 flex flex-col">
+        <div class="grid grid-cols-1 gap-4 md:gap-6">
+            <!-- Leaflet GPS Tracking เต็มจอ -->
+            <div class="bg-slate-800 p-4 md:p-6 rounded-2xl shadow-xl border border-slate-700/50 flex flex-col w-full">
                 <h3 class="font-bold text-slate-200 mb-4 border-b border-slate-700 pb-2 text-base md:text-lg"><i class="fas fa-map-marked-alt text-red-500 mr-2"></i> GPS Tracking & ควบคุมเคส</h3>
                 
-                <div id="mainMap" class="w-full h-40 md:h-56 rounded-xl border border-slate-700 mb-4 shadow-inner z-10 relative bg-slate-900">
+                <div id="mainMap" class="w-full h-64 md:h-[450px] rounded-xl border border-slate-700 mb-4 shadow-inner z-10 relative bg-slate-900">
                     <div class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 text-xs z-0" id="map-placeholder">
                         <i class="fas fa-spinner fa-spin text-2xl mb-2 opacity-50"></i> กำลังโหลดแผนที่...
                     </div>
                 </div>
 
-                <div id="activeCasesList" class="space-y-3 flex-1 overflow-y-auto pr-2 custom-scrollbar max-h-48 md:max-h-64">
+                <div id="activeCasesList" class="space-y-3 w-full max-h-48 md:max-h-64 overflow-y-auto pr-2 custom-scrollbar">
                     <p class="text-center text-sm text-slate-500 py-4 italic">ไม่มีเคสที่กำลังดำเนินการ</p>
                 </div>
             </div>
 
-            <!-- ER Outcomes -->
-            <div class="bg-slate-800 p-4 md:p-6 rounded-2xl shadow-xl border border-slate-700/50">
+            <!-- ER Outcomes เต็มจอ -->
+            <div class="bg-slate-800 p-4 md:p-6 rounded-2xl shadow-xl border border-slate-700/50 w-full">
                 <h3 class="font-bold text-slate-200 mb-4 border-b border-slate-700 pb-2 text-base md:text-lg"><i class="fas fa-hospital-user text-blue-400 mr-2"></i> สรุปผลการรักษา (ER Outcomes)</h3>
-                <ul class="text-sm md:text-base space-y-3 md:space-y-4 text-slate-300 mt-2">
+                <ul class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm md:text-base text-slate-300 mt-2">
                     <li class="flex justify-between border-b border-slate-700/50 pb-2 items-center"><span><i class="fas fa-syringe text-blue-500 w-5"></i> ให้ยา rt-PA</span> <b id="out-rtpa" class="text-blue-400 text-xl md:text-2xl font-black">0</b></li>
                     <li class="flex justify-between border-b border-slate-700/50 pb-2 items-center"><span><i class="fas fa-brain text-indigo-500 w-5"></i> ลากลิ่มเลือด (MT)</span> <b id="out-mt" class="text-indigo-400 text-xl md:text-2xl font-black">0</b></li>
                     <li class="flex justify-between border-b border-slate-700/50 pb-2 items-center"><span><i class="fas fa-bed text-green-500 w-5"></i> รับไว้รักษา (Admit)</span> <b id="out-admit" class="text-green-400 text-xl md:text-2xl font-black">0</b></li>
                     <li class="flex justify-between border-b border-slate-700/50 pb-2 items-center"><span><i class="fas fa-ambulance text-orange-500 w-5"></i> ส่งต่อ รพ.อื่น (Refer)</span> <b id="out-refer" class="text-orange-400 text-xl md:text-2xl font-black">0</b></li>
                     <li class="flex justify-between border-b border-slate-700/50 pb-2 items-center"><span><i class="fas fa-times-circle text-slate-500 w-5"></i> ปฏิเสธการรักษา</span> <b id="out-refused" class="text-slate-400 text-xl md:text-2xl font-black">0</b></li>
-                    <li class="flex justify-between items-center"><span><i class="fas fa-skull text-red-500 w-5"></i> เสียชีวิตที่ ER (Dead)</span> <b id="out-dead" class="text-red-400 text-xl md:text-2xl font-black">0</b></li>
+                    <li class="flex justify-between border-b border-slate-700/50 pb-2 items-center"><span><i class="fas fa-skull text-red-500 w-5"></i> เสียชีวิตที่ ER (Dead)</span> <b id="out-dead" class="text-red-400 text-xl md:text-2xl font-black">0</b></li>
                 </ul>
             </div>
         </div>
@@ -247,16 +247,35 @@
                             <input type="checkbox" id="van_arm" class="w-6 h-6 text-yellow-600 rounded focus:ring-yellow-500"><span class="font-bold text-gray-800">Arm Weakness: แขนตก/อ่อนแรง</span>
                         </label>
                         <div class="pl-4 border-l-4 border-yellow-400 space-y-3 mt-3 ml-2">
-                            <label class="flex items-start space-x-3 cursor-pointer hover:bg-white p-2 rounded-lg transition"><input type="checkbox" id="van_v" class="w-5 h-5 text-yellow-600 rounded mt-1 focus:ring-yellow-500"><div><span class="font-bold text-gray-700">V - Vision (การมองเห็น)</span></div></label>
-                            <label class="flex items-start space-x-3 cursor-pointer hover:bg-white p-2 rounded-lg transition"><input type="checkbox" id="van_a" class="w-5 h-5 text-yellow-600 rounded mt-1 focus:ring-yellow-500"><div><span class="font-bold text-gray-700">A - Aphasia (การสื่อสาร)</span></div></label>
-                            <label class="flex items-start space-x-3 cursor-pointer hover:bg-white p-2 rounded-lg transition"><input type="checkbox" id="van_n" class="w-5 h-5 text-yellow-600 rounded mt-1 focus:ring-yellow-500"><div><span class="font-bold text-gray-700">N - Neglect (ละเลยร่างกาย)</span></div></label>
+                            <!-- เพิ่มคำอธิบาย VAN ย่อยให้เข้าใจง่ายขึ้น -->
+                            <label class="flex items-start space-x-3 cursor-pointer hover:bg-white p-2 rounded-lg transition">
+                                <input type="checkbox" id="van_v" class="w-5 h-5 text-yellow-600 rounded mt-1 focus:ring-yellow-500">
+                                <div>
+                                    <span class="font-bold text-gray-700 block">V - Vision (การมองเห็น)</span>
+                                    <span class="text-xs text-gray-500">มองไม่เห็นด้านข้าง, ตากลอกไปข้างใดข้างหนึ่ง, เห็นภาพซ้อน</span>
+                                </div>
+                            </label>
+                            <label class="flex items-start space-x-3 cursor-pointer hover:bg-white p-2 rounded-lg transition">
+                                <input type="checkbox" id="van_a" class="w-5 h-5 text-yellow-600 rounded mt-1 focus:ring-yellow-500">
+                                <div>
+                                    <span class="font-bold text-gray-700 block">A - Aphasia (การสื่อสาร)</span>
+                                    <span class="text-xs text-gray-500">ไม่เข้าใจคำสั่ง, พูดไม่เป็นคำ, นึกคำไม่ออก, เรียกชื่อสิ่งของไม่ถูก</span>
+                                </div>
+                            </label>
+                            <label class="flex items-start space-x-3 cursor-pointer hover:bg-white p-2 rounded-lg transition">
+                                <input type="checkbox" id="van_n" class="w-5 h-5 text-yellow-600 rounded mt-1 focus:ring-yellow-500">
+                                <div>
+                                    <span class="font-bold text-gray-700 block">N - Neglect (ละเลยร่างกาย)</span>
+                                    <span class="text-xs text-gray-500">ไม่สนใจร่างกายครึ่งซีก, มองข้ามสิ่งของหรือบุคคลด้านใดด้านหนึ่ง</span>
+                                </div>
+                            </label>
                         </div>
                     </div>
                 </div>
             </div>
 
             <button type="button" id="btnEvaluate" onclick="window.evaluatePatient()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl shadow-[0_4px_14px_0_rgba(220,38,38,0.39)] transition duration-300 text-lg md:text-xl">
-                <i class="fas fa-bolt mr-2"></i> ประมวลผล & Activate
+                <i class="fas fa-save mr-2"></i> ประมวลผล & บันทึก
             </button>
         </form>
     </div>
@@ -386,7 +405,7 @@
     </div>
 </div>
 
-<!-- Modal สรุปผลการรักษา (ปิดเคส) -->
+<!-- Modal สรุปผลการรักษา (ปิดเคส) แบบ Checkbox -->
 <div id="outcomeModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center z-50 px-4">
     <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-8 w-full max-w-lg max-h-[90vh] overflow-y-auto custom-scrollbar">
         <h3 class="text-xl md:text-2xl font-black text-slate-800 mb-2 text-center border-b border-slate-100 pb-4"><i class="fas fa-flag-checkered text-blue-600 mr-2"></i> ปิดเคส & สรุปผลห้องฉุกเฉิน</h3>
@@ -398,18 +417,18 @@
             </div>
         </div>
 
-        <p class="text-base md:text-lg font-bold text-slate-800 mb-3">ผลการรักษาที่ ER:</p>
+        <p class="text-base md:text-lg font-bold text-slate-800 mb-3">ผลการรักษาที่ ER (เลือกได้หลายข้อ):</p>
         <div class="space-y-3 mb-6 text-sm md:text-base font-medium text-slate-600">
-            <label class="flex items-center space-x-3 p-3 border border-slate-200 rounded-xl hover:bg-blue-50 hover:border-blue-200 cursor-pointer transition"><input type="radio" name="er_outcome" value="rtpa" class="w-5 h-5 md:w-6 md:h-6 text-blue-600 focus:ring-blue-500" onchange="window.toggleNeedleTime()"><span class="flex-1 font-bold text-slate-700">💉 ให้ยาละลายลิ่มเลือด (rt-PA)</span></label>
+            <label class="flex items-center space-x-3 p-3 border border-slate-200 rounded-xl hover:bg-blue-50 hover:border-blue-200 cursor-pointer transition"><input type="checkbox" name="er_outcome" value="rtpa" class="w-5 h-5 md:w-6 md:h-6 text-blue-600 focus:ring-blue-500 rounded" onchange="window.toggleNeedleTime()"><span class="flex-1 font-bold text-slate-700">💉 ให้ยาละลายลิ่มเลือด (rt-PA)</span></label>
             <div id="needleTimeDiv" class="hidden pl-11 pr-2 pb-3 pt-1">
                 <label class="font-bold text-emerald-700 text-sm md:text-base block mb-1">เวลาเริ่มยา rt-PA (Needle Time):</label>
                 <input type="time" id="m_needle" class="w-full border-2 border-emerald-300 rounded-lg p-2.5 bg-emerald-50 shadow-inner focus:ring-2 focus:ring-emerald-400 outline-none">
             </div>
-            <label class="flex items-center space-x-3 p-3 border border-slate-200 rounded-xl hover:bg-indigo-50 hover:border-indigo-200 cursor-pointer transition"><input type="radio" name="er_outcome" value="mt" class="w-5 h-5 md:w-6 md:h-6 text-indigo-600 focus:ring-indigo-500" onchange="window.toggleNeedleTime()"><span class="flex-1 font-bold text-slate-700">🧠 ทำหัตถการลากลิ่มเลือด (MT)</span></label>
-            <label class="flex items-center space-x-3 p-3 border border-slate-200 rounded-xl hover:bg-emerald-50 hover:border-emerald-200 cursor-pointer transition"><input type="radio" name="er_outcome" value="admit" class="w-5 h-5 md:w-6 md:h-6 text-emerald-600 focus:ring-emerald-500" onchange="window.toggleNeedleTime()"><span class="flex-1 font-bold text-slate-700">🛏️ รับไว้รักษาใน รพ. (Admit)</span></label>
-            <label class="flex items-center space-x-3 p-3 border border-slate-200 rounded-xl hover:bg-orange-50 hover:border-orange-200 cursor-pointer transition"><input type="radio" name="er_outcome" value="refer" class="w-5 h-5 md:w-6 md:h-6 text-orange-600 focus:ring-orange-500" onchange="window.toggleNeedleTime()"><span class="flex-1 font-bold text-slate-700">🚑 ส่งต่อโรงพยาบาลอื่น (Refer)</span></label>
-            <label class="flex items-center space-x-3 p-3 border border-slate-200 rounded-xl hover:bg-gray-100 cursor-pointer transition"><input type="radio" name="er_outcome" value="refused" class="w-5 h-5 md:w-6 md:h-6 text-gray-500 focus:ring-gray-500" onchange="window.toggleNeedleTime()"><span class="flex-1 font-bold text-slate-700">❌ ปฏิเสธการรักษา</span></label>
-            <label class="flex items-center space-x-3 p-3 border border-slate-200 rounded-xl hover:bg-red-50 hover:border-red-200 cursor-pointer transition"><input type="radio" name="er_outcome" value="dead" class="w-5 h-5 md:w-6 md:h-6 text-red-600 focus:ring-red-500" onchange="window.toggleNeedleTime()"><span class="flex-1 font-bold text-slate-700">⚫ เสียชีวิต (Dead at ER)</span></label>
+            <label class="flex items-center space-x-3 p-3 border border-slate-200 rounded-xl hover:bg-indigo-50 hover:border-indigo-200 cursor-pointer transition"><input type="checkbox" name="er_outcome" value="mt" class="w-5 h-5 md:w-6 md:h-6 text-indigo-600 focus:ring-indigo-500 rounded" onchange="window.toggleNeedleTime()"><span class="flex-1 font-bold text-slate-700">🧠 ทำหัตถการลากลิ่มเลือด (MT)</span></label>
+            <label class="flex items-center space-x-3 p-3 border border-slate-200 rounded-xl hover:bg-emerald-50 hover:border-emerald-200 cursor-pointer transition"><input type="checkbox" name="er_outcome" value="admit" class="w-5 h-5 md:w-6 md:h-6 text-emerald-600 focus:ring-emerald-500 rounded" onchange="window.toggleNeedleTime()"><span class="flex-1 font-bold text-slate-700">🛏️ รับไว้รักษาใน รพ. (Admit)</span></label>
+            <label class="flex items-center space-x-3 p-3 border border-slate-200 rounded-xl hover:bg-orange-50 hover:border-orange-200 cursor-pointer transition"><input type="checkbox" name="er_outcome" value="refer" class="w-5 h-5 md:w-6 md:h-6 text-orange-600 focus:ring-orange-500 rounded" onchange="window.toggleNeedleTime()"><span class="flex-1 font-bold text-slate-700">🚑 ส่งต่อโรงพยาบาลอื่น (Refer)</span></label>
+            <label class="flex items-center space-x-3 p-3 border border-slate-200 rounded-xl hover:bg-gray-100 cursor-pointer transition"><input type="checkbox" name="er_outcome" value="refused" class="w-5 h-5 md:w-6 md:h-6 text-gray-500 focus:ring-gray-500 rounded" onchange="window.toggleNeedleTime()"><span class="flex-1 font-bold text-slate-700">❌ ปฏิเสธการรักษา</span></label>
+            <label class="flex items-center space-x-3 p-3 border border-slate-200 rounded-xl hover:bg-red-50 hover:border-red-200 cursor-pointer transition"><input type="checkbox" name="er_outcome" value="dead" class="w-5 h-5 md:w-6 md:h-6 text-red-600 focus:ring-red-500 rounded" onchange="window.toggleNeedleTime()"><span class="flex-1 font-bold text-slate-700">⚫ เสียชีวิต (Dead at ER)</span></label>
         </div>
         
         <div class="flex space-x-3">
@@ -438,6 +457,9 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
+
+    // เก็บ Email เพื่อตรวจสอบสิทธิ์
+    window.currentUserEmail = "";
 
     document.getElementById('timeLkw').value = new Date().toISOString().slice(0, 16);
     document.getElementById('timeFMC').value = new Date().toTimeString().slice(0,5);
@@ -492,9 +514,10 @@
     }
 
     window.toggleNeedleTime = function() {
-        const outcome = document.querySelector('input[name="er_outcome"]:checked');
+        const checkboxes = document.querySelectorAll('input[name="er_outcome"]:checked');
+        const hasRtpa = Array.from(checkboxes).some(cb => cb.value === 'rtpa');
         const needleDiv = document.getElementById('needleTimeDiv');
-        if(outcome && outcome.value === 'rtpa') {
+        if(hasRtpa) {
             needleDiv.classList.remove('hidden');
         } else {
             needleDiv.classList.add('hidden');
@@ -539,12 +562,14 @@
         const btn = document.getElementById('btnLoginSubmit');
 
         if (user) {
+            window.currentUserEmail = user.email;
             loginView.classList.add('hidden');
             mainApp.classList.remove('hidden');
             const displayUser = user.email.replace('@nkp-als.local', '');
             if(userBadge) userBadge.innerHTML = `<i class="fas fa-user-circle mr-1 text-emerald-400"></i> ${displayUser}`;
             window.switchTab('dashboard');
         } else {
+            window.currentUserEmail = "";
             loginView.classList.remove('hidden');
             mainApp.classList.add('hidden');
             document.getElementById('loginForm').reset();
@@ -554,6 +579,13 @@
     });
 
     // ================= 🩺 CLINICAL FLOW =================
+    window.openNewCase = function() {
+        window.activeDocId = null;
+        document.getElementById('strokeForm').reset();
+        document.getElementById('interventionForm').reset();
+        window.switchTab('assess');
+    }
+
     window.evaluatePatient = function() {
         const name = document.getElementById('patientName').value;
         if(!name) { alert('กรุณากรอกชื่อผู้ป่วย'); return; }
@@ -562,6 +594,7 @@
         const piInput = document.getElementById('patientPI').value || '';
         const lkwInput = document.getElementById('timeLkw').value;
         const onset = document.getElementById('timeOnset').value || 'ไม่ระบุ';
+        const fmcInput = document.getElementById('timeFMC').value; // ดึงค่า FMC มาใช้
 
         const isBeFastPositive = ['b','e','f','a','s'].some(id => document.getElementById(`befast_${id}`).checked);
         const isLvo = document.getElementById('van_arm').checked && (document.getElementById('van_v').checked || document.getElementById('van_a').checked || document.getElementById('van_n').checked);
@@ -569,8 +602,10 @@
         tempEvalData = {
             name: name, cc: ccInput, pi: piInput,
             lkw: lkwInput ? new Date(lkwInput).toLocaleString('th-TH') : 'ไม่ระบุ',
-            onset: onset, fmc: document.getElementById('timeFMC').value || '-', 
+            rawLkw: lkwInput,
+            onset: onset, fmc: fmcInput || '-', 
             befast: { b: document.getElementById('befast_b').checked, e: document.getElementById('befast_e').checked, f: document.getElementById('befast_f').checked, a: document.getElementById('befast_a').checked, s: document.getElementById('befast_s').checked },
+            van: { arm: document.getElementById('van_arm').checked, v: document.getElementById('van_v').checked, a: document.getElementById('van_a').checked, n: document.getElementById('van_n').checked },
             isLvo: isLvo, isFastTrack: isBeFastPositive, status: 'assessed'
         };
 
@@ -579,8 +614,25 @@
 
         let lkwTime = new Date(lkwInput);
         if (lkwTime.getFullYear() > 2400) lkwTime.setFullYear(lkwTime.getFullYear() - 543);
-        const diffHours = (new Date() - lkwTime) / (1000 * 60 * 60);
-        if (diffHours < 0) { alert("เวลา Last Known Well อยู่ในอนาคต กรุณาตรวจสอบใหม่"); return; }
+        
+        // --- ส่วนที่แก้ไข: คำนวณเวลาโดยใช้ FMC เป็นหลัก ---
+        let evalEndTime = new Date(); // ค่าเริ่มต้นคือเวลาปัจจุบัน (กรณีไม่ได้กรอก FMC)
+        if (fmcInput) {
+            evalEndTime = new Date(lkwTime); // ยึดวันที่จาก LKW เป็นหลักก่อน
+            let [fmcHr, fmcMin] = fmcInput.split(':');
+            evalEndTime.setHours(parseInt(fmcHr), parseInt(fmcMin), 0, 0);
+            
+            // กรณีเวลา FMC มีค่าน้อยกว่าเวลา LKW (เช่น LKW 23:00 แต่ FMC 01:00) แปลว่าข้ามไปอีกวัน
+            if (evalEndTime < lkwTime) {
+                evalEndTime.setDate(evalEndTime.getDate() + 1);
+            }
+        }
+
+        // หาผลต่างเวลาเป็นชั่วโมง
+        const diffHours = (evalEndTime - lkwTime) / (1000 * 60 * 60);
+        // ------------------------------------------
+
+        if (diffHours < 0) { alert("เวลาผิดพลาด: Last Known Well อยู่หลังเวลา FMC กรุณาตรวจสอบเวลาใหม่"); return; }
 
         let shouldActivate = false, alertMsg = "", alertClass = "bg-yellow-50 text-yellow-800 px-4 py-3 rounded-xl mb-4 font-semibold text-sm md:text-base border border-yellow-200 shadow-sm";
         if (diffHours <= 4.5) {
@@ -591,45 +643,136 @@
         }
 
         if (shouldActivate) {
-            document.getElementById('activationModal').classList.remove('hidden');
-            const alertBox = document.getElementById('modalLvoAlert');
-            alertBox.innerHTML = alertMsg; alertBox.className = alertClass; alertBox.classList.remove('hidden');
+            if(window.activeDocId) {
+                updateExistingAssessment();
+            } else {
+                document.getElementById('activationModal').classList.remove('hidden');
+                const alertBox = document.getElementById('modalLvoAlert');
+                alertBox.innerHTML = alertMsg; alertBox.className = alertClass; alertBox.classList.remove('hidden');
+            }
         } else {
             alert("เกินเวลาที่กำหนดและไม่เข้าเกณฑ์ LVO");
             tempEvalData.status = 'not_qualify'; saveRecordToFirebase();
         }
     }
 
+    async function updateExistingAssessment() {
+        try {
+            await updateDoc(doc(db, "stroke_patients", window.activeDocId), tempEvalData);
+            alert("อัปเดตข้อมูลการประเมินสำเร็จ!");
+            window.switchTab('action');
+        } catch (error) { alert("เกิดข้อผิดพลาดในการอัปเดตประเมิน"); }
+    }
+
     window.confirmActivation = async function() {
         document.getElementById('activationModal').classList.add('hidden');
         const activateTime = new Date().toTimeString().slice(0,5);
-        const record = { ...tempEvalData, activateTime: activateTime, dateStr: new Date().toLocaleDateString('th-TH'), status: 'active', createdAt: serverTimestamp() };
+        const record = { ...tempEvalData, activateTime: activateTime, dateStr: new Date().toLocaleDateString('th-TH'), status: 'active', createdBy: window.currentUserEmail };
 
         try {
-            await addDoc(collection(db, "stroke_patients"), record);
-            document.getElementById('strokeForm').reset();
-            alert("🚨 แจ้งศูนย์สั่งการเรียบร้อย!\n(สามารถบันทึกการรักษาและแชร์พิกัดต่อได้ที่แท็บ 'ประวัติ' ครับ)");
-            window.switchTab('dashboard');
+            record.createdAt = serverTimestamp();
+            const docRef = await addDoc(collection(db, "stroke_patients"), record);
+            window.activeDocId = docRef.id;
+            alert("🚨 แจ้งศูนย์สั่งการเรียบร้อย!\n(สามารถบันทึกการรักษาและแชร์พิกัดต่อได้เลยครับ)");
+            
+            document.getElementById('activePatientName').innerText = `ผู้ป่วย: ${record.name}`;
+            document.getElementById('activeTime').innerText = (record.activateTime || '-') + " น.";
+            window.switchTab('action');
         } catch (error) { alert("เชื่อมต่อล้มเหลว"); }
     }
 
     async function saveRecordToFirebase() {
-        const record = { ...tempEvalData, activateTime: '-', dateStr: new Date().toLocaleDateString('th-TH'), createdAt: serverTimestamp() };
-        await addDoc(collection(db, "stroke_patients"), record);
+        const record = { ...tempEvalData, activateTime: '-', dateStr: new Date().toLocaleDateString('th-TH') };
+        if(window.activeDocId) {
+            await updateDoc(doc(db, "stroke_patients", window.activeDocId), record);
+            alert("อัปเดตข้อมูลเรียบร้อย (ไม่เข้าเกณฑ์)");
+        } else {
+            record.createdAt = serverTimestamp();
+            record.createdBy = window.currentUserEmail;
+            await addDoc(collection(db, "stroke_patients"), record);
+            alert("บันทึกเรียบร้อย (ไม่เข้าเกณฑ์)"); 
+        }
         document.getElementById('strokeForm').reset();
-        alert("บันทึกเรียบร้อย (ไม่เข้าเกณฑ์)"); window.switchTab('dashboard');
+        window.switchTab('dashboard');
     }
 
+    // ฟังก์ชันสำหรับเปิดดูและแก้ไขเคสที่มีอยู่
     window.resumeCase = function(docId) {
         const rec = window.allCases.find(c => c.id === docId);
         if(!rec) return;
         window.activeDocId = docId;
-        document.getElementById('activePatientName').innerText = `ผู้ป่วย: ${rec.name}`;
         
+        // --- 1. เติมข้อมูลลงฟอร์มประเมิน (Assess Tab) ---
+        document.getElementById('patientName').value = rec.name || '';
+        if(rec.rawLkw) document.getElementById('timeLkw').value = rec.rawLkw;
+        document.getElementById('patientCC').value = rec.cc || '';
+        document.getElementById('patientPI').value = rec.pi || '';
+        document.getElementById('timeOnset').value = rec.onset || '';
+        document.getElementById('timeFMC').value = rec.fmc || '';
+        
+        if(rec.befast) {
+            document.getElementById('befast_b').checked = rec.befast.b;
+            document.getElementById('befast_e').checked = rec.befast.e;
+            document.getElementById('befast_f').checked = rec.befast.f;
+            document.getElementById('befast_a').checked = rec.befast.a;
+            document.getElementById('befast_s').checked = rec.befast.s;
+        }
+        if(rec.van) {
+            document.getElementById('van_arm').checked = rec.van.arm;
+            document.getElementById('van_v').checked = rec.van.v;
+            document.getElementById('van_a').checked = rec.van.a;
+            document.getElementById('van_n').checked = rec.van.n;
+        }
+
+        // --- 2. เติมข้อมูลลงฟอร์มการปฏิบัติการ (Action Tab) ---
+        if(rec.interventions) {
+            const v = rec.interventions.vitals;
+            if(v) {
+                document.getElementById('v_bp').value = v.bp !== '-' ? v.bp : '';
+                document.getElementById('v_hr').value = v.hr !== '-' ? v.hr : '';
+                document.getElementById('v_rr').value = v.rr !== '-' ? v.rr : '';
+                document.getElementById('v_o2').value = v.o2 !== '-' ? v.o2 : '';
+                document.getElementById('v_dtx').value = v.dtx !== '-' ? v.dtx : '';
+                document.getElementById('v_pupill').value = v.pupil_l !== '-' ? v.pupil_l : '';
+                document.getElementById('v_pupilr').value = v.pupil_r !== '-' ? v.pupil_r : '';
+                
+                document.getElementById('v_gcs_e').value = v.gcs?.e !== '-' ? v.gcs.e : '';
+                document.getElementById('v_gcs_v').value = v.gcs?.v !== '-' ? v.gcs.v : '';
+                document.getElementById('v_gcs_m').value = v.gcs?.m !== '-' ? v.gcs.m : '';
+            }
+            if(rec.interventions.motor) {
+                const m = rec.interventions.motor;
+                document.getElementById('m_ra').value = m.ra || '5';
+                document.getElementById('m_la').value = m.la || '5';
+                document.getElementById('m_rl').value = m.rl || '5';
+                document.getElementById('m_ll').value = m.ll || '5';
+            }
+            const intv = rec.interventions;
+            if(intv.ab_manage) {
+                document.getElementById('chk_ab_manage').checked = intv.ab_manage.done;
+                document.getElementById('val_ab_manage').value = intv.ab_manage.detail !== '-' ? intv.ab_manage.detail : '';
+            }
+            if(intv.iv) {
+                document.getElementById('chk_iv').checked = intv.iv.done;
+                document.getElementById('val_iv_rate').value = intv.iv.rate !== '-' ? intv.iv.rate : '';
+            }
+            if(intv.consult) {
+                document.getElementById('chk_consult').checked = intv.consult.done;
+                document.getElementById('val_consult').value = intv.consult.detail !== '-' ? intv.consult.detail : '';
+            }
+            if(intv.other) {
+                document.getElementById('chk_other').checked = intv.other.done;
+                document.getElementById('val_other').value = intv.other.detail !== '-' ? intv.other.detail : '';
+            }
+        } else {
+            document.getElementById('interventionForm').reset();
+        }
+
+        document.getElementById('activePatientName').innerText = `ผู้ป่วย: ${rec.name}`;
         const activeTimeEl = document.getElementById('activeTime');
         if(activeTimeEl) activeTimeEl.innerText = (rec.activateTime || '-') + " น.";
         
-        window.switchTab('action');
+        window.switchTab('assess');
     }
 
     window.saveAndShareLocation = async function() {
@@ -642,6 +785,7 @@
         };
         const intvData = {
             vitals: v,
+            motor: v.motor,
             ab_manage: { done: document.getElementById('chk_ab_manage').checked, detail: document.getElementById('val_ab_manage').value || '-' },
             iv: { done: document.getElementById('chk_iv').checked, rate: document.getElementById('val_iv_rate').value || '-' },
             consult: { done: document.getElementById('chk_consult').checked, detail: document.getElementById('val_consult').value || '-' },
@@ -694,8 +838,8 @@
         document.getElementById('m_ct').value = '';
         document.getElementById('m_needle').value = '';
         
-        const radios = document.querySelectorAll('input[name="er_outcome"]');
-        radios.forEach(r => r.checked = false);
+        const checkboxes = document.querySelectorAll('input[name="er_outcome"]');
+        checkboxes.forEach(cb => cb.checked = false);
         window.toggleNeedleTime();
 
         document.getElementById('outcomeModal').classList.remove('hidden');
@@ -704,17 +848,19 @@
     window.confirmFinishCase = async function() {
         if(!window.selectedCaseToClose) return;
         
-        const outcomeElement = document.querySelector('input[name="er_outcome"]:checked');
-        if(!outcomeElement) { alert("กรุณาเลือกผลการรักษาที่ ER ก่อนปิดเคส"); return; }
+        const checkboxes = document.querySelectorAll('input[name="er_outcome"]:checked');
+        if(checkboxes.length === 0) { alert("กรุณาเลือกผลการรักษาที่ ER อย่างน้อย 1 รายการก่อนปิดเคส"); return; }
+        
+        const selectedOutcomes = Array.from(checkboxes).map(cb => cb.value);
         
         const doorTime = document.getElementById('m_door').value || '-';
         const ctTime = document.getElementById('m_ct').value || '-';
-        const needleTime = outcomeElement.value === 'rtpa' ? (document.getElementById('m_needle').value || '-') : '-';
+        const needleTime = selectedOutcomes.includes('rtpa') ? (document.getElementById('m_needle').value || '-') : '-';
 
         try {
             await updateDoc(doc(db, "stroke_patients", window.selectedCaseToClose), { 
                 status: 'completed', 
-                er_outcome: outcomeElement.value,
+                er_outcomes: selectedOutcomes,
                 timeDoor: doorTime,
                 timeCT: ctTime,
                 timeNeedle: needleTime,
@@ -868,11 +1014,15 @@
 
     window.exportToCSV = function() {
         if(window.allCases.length === 0) { alert("ไม่มีข้อมูล"); return; }
-        let csv = "\uFEFFชื่อ,CC,PI,Onset,FMC,Activate,Door,CT,Needle,สถานะ\n";
+        // เพิ่มคอลัมน์ผลการรักษาเข้าไปใน Excel
+        let csv = "\uFEFFชื่อ,CC,PI,Onset,FMC,Activate,Door,CT,Needle,ผลการรักษา,สถานะ\n";
         window.allCases.forEach(r => {
             let safeCC = r.cc ? r.cc.replace(/"/g, '""') : '';
             let safePI = r.pi ? r.pi.replace(/"/g, '""').replace(/\n/g, ' ') : '';
-            csv += `"${r.name}","${safeCC}","${safePI}","${r.onset}","${r.fmc}","${r.activateTime}","${r.timeDoor||'-'}","${r.timeCT||'-'}","${r.timeNeedle||'-'}", "${r.status}"\n`;
+            // ประมวลผลจากอาร์เรย์ที่บันทึกไว้ในตอนปิดเคส หรือถ้าเป็นข้อมูลเก่าก็ใช้ตัวแปรเดิม
+            let erOut = r.er_outcomes ? r.er_outcomes.join(' + ') : (r.er_outcome || '');
+            
+            csv += `"${r.name}","${safeCC}","${safePI}","${r.onset}","${r.fmc}","${r.activateTime}","${r.timeDoor||'-'}","${r.timeCT||'-'}","${r.timeNeedle||'-'}","${erOut}","${r.status}"\n`;
         });
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
@@ -894,6 +1044,9 @@
         let outs = { rtpa: 0, mt: 0, admit: 0, refer: 0, refused: 0, dead: 0, pending: 0 };
         let activeMarkerIds = [];
 
+        // เช็คว่า User ที่ใช้อยู่ตอนนี้เป็น admin หรือไม่
+        let isAdmin = window.currentUserEmail && window.currentUserEmail.startsWith('admin');
+
         if (snapshot.empty) { 
             historyList.innerHTML = '<p class="text-center text-gray-500 py-4">ยังไม่มีประวัติในระบบ</p>'; 
             activeList.innerHTML = '<p class="text-center text-sm text-slate-500 py-6 italic">ไม่มีเคสที่กำลังดำเนินการ</p>';
@@ -904,60 +1057,71 @@
             const rec = { id: docSnap.id, ...docSnap.data() };
             window.allCases.push(rec);
             
-            if (rec.dateStr === todayStr) {
+            // เงื่อนไขสิทธิ์การเข้าถึงข้อมูล
+            let canView = isAdmin || (rec.createdBy === window.currentUserEmail);
+
+            // เก็บสถิติ Dashboard เฉพาะเคสที่ตัวเองมีสิทธิ์ดู
+            if (rec.dateStr === todayStr && canView) {
                 dTotal++;
                 if (rec.isFastTrack) dStroke++;
                 if (rec.isLvo) dLvo++;
                 if (rec.status === 'active') dActive++;
-                if (rec.status === 'completed' && rec.er_outcome && outs[rec.er_outcome] !== undefined) {
-                    outs[rec.er_outcome]++;
+                
+                // คำนวณสถิติ ER Outcomes แบบเลือกได้หลายคำตอบ
+                if (rec.status === 'completed' && rec.er_outcomes) {
+                    rec.er_outcomes.forEach(out => {
+                        if(outs[out] !== undefined) outs[out]++;
+                    });
                 }
             }
             
-            let badgeHistory = '<span class="bg-gray-400 text-white text-[10px] md:text-xs px-2 py-1 rounded">ไม่เข้าเกณฑ์</span>';
-            let btnHistory = '';
-            if(rec.status === 'active') {
-                badgeHistory = '<span class="bg-red-600 text-white text-[10px] md:text-xs px-2 py-1 rounded animate-pulse">กำลังดำเนินการ</span>';
-                btnHistory = `<button onclick="window.resumeCase('${rec.id}')" class="mt-3 w-full bg-blue-50 text-blue-700 text-xs md:text-sm py-2.5 md:py-3 rounded-lg border border-blue-200 font-bold transition hover:bg-blue-100"><i class="fas fa-edit mr-1"></i> บันทึกการรักษาเพิ่มเติม</button>`;
-            } else if (rec.status === 'completed') {
-                badgeHistory = '<span class="bg-emerald-600 text-white text-[10px] md:text-xs px-2 py-1 rounded shadow-sm">ปิดเคสแล้ว</span>';
-                btnHistory = `<button onclick="window.viewCase('${rec.id}')" class="mt-3 w-full bg-gray-50 text-gray-700 text-xs md:text-sm py-2.5 md:py-3 rounded-lg border border-gray-200 font-bold transition hover:bg-gray-100"><i class="fas fa-print mr-1"></i> 📄 พิมพ์เอกสาร A4</button>`;
-            }
+            // นำไปแสดงผลเฉพาะเคสที่ตัวเองมีสิทธิ์
+            if(canView) {
+                let badgeHistory = '<span class="bg-gray-400 text-white text-[10px] md:text-xs px-2 py-1 rounded">ไม่เข้าเกณฑ์</span>';
+                let btnHistory = '';
+                if(rec.status === 'active') {
+                    badgeHistory = '<span class="bg-red-600 text-white text-[10px] md:text-xs px-2 py-1 rounded animate-pulse">กำลังดำเนินการ</span>';
+                    btnHistory = `<button onclick="window.resumeCase('${rec.id}')" class="mt-3 w-full bg-blue-50 text-blue-700 text-xs md:text-sm py-2.5 md:py-3 rounded-lg border border-blue-200 font-bold transition hover:bg-blue-100"><i class="fas fa-edit mr-1"></i> ดูประเมิน / บันทึกการรักษาเพิ่มเติม</button>`;
+                } else if (rec.status === 'completed') {
+                    badgeHistory = '<span class="bg-emerald-600 text-white text-[10px] md:text-xs px-2 py-1 rounded shadow-sm">ปิดเคสแล้ว</span>';
+                    btnHistory = `<button onclick="window.viewCase('${rec.id}')" class="mt-3 w-full bg-gray-50 text-gray-700 text-xs md:text-sm py-2.5 md:py-3 rounded-lg border border-gray-200 font-bold transition hover:bg-gray-100"><i class="fas fa-print mr-1"></i> 📄 พิมพ์เอกสาร A4</button>`;
+                }
 
-            historyList.innerHTML += `
-                <div class="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-gray-200 hover:shadow-md transition">
-                    <div class="flex justify-between items-start mb-3"><span class="font-bold text-gray-800 text-sm md:text-base">${rec.name}</span>${badgeHistory}</div>
-                    <div class="text-xs md:text-sm text-gray-500 space-y-1"><p>Onset: <span class="font-medium text-gray-700">${rec.onset}</span> | FMC: <span class="font-medium text-gray-700">${rec.fmc}</span></p></div>
-                    ${btnHistory}
-                </div>
-            `;
-
-            if(rec.status === 'active') {
-                const locStatus = rec.locationShared ? `<span class="text-green-400 text-xs md:text-sm font-medium"><i class="fas fa-map-marker-alt animate-bounce mr-1"></i> กำลังแชร์พิกัดรถ</span>` : `<span class="text-slate-500 text-xs md:text-sm italic">รอกู้ชีพแชร์พิกัด...</span>`;
-                
-                activeList.innerHTML += `
-                <div class="bg-slate-700/50 p-4 rounded-xl border-l-4 border-red-500 shadow-md flex flex-col justify-between items-start hover:bg-slate-700 transition">
-                    <div class="w-full flex justify-between items-center mb-2">
-                        <span class="font-bold text-sm md:text-base text-slate-100">${rec.name}</span>
-                        <span class="text-[10px] md:text-xs font-bold text-red-200 bg-red-900/50 px-2 py-1 rounded border border-red-700/50">Act: ${rec.activateTime} น.</span>
+                historyList.innerHTML += `
+                    <div class="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-gray-200 hover:shadow-md transition">
+                        <div class="flex justify-between items-start mb-3"><span class="font-bold text-gray-800 text-sm md:text-base">${rec.name}</span>${badgeHistory}</div>
+                        <div class="text-xs md:text-sm text-gray-500 space-y-1"><p>Onset: <span class="font-medium text-gray-700">${rec.onset}</span> | FMC: <span class="font-medium text-gray-700">${rec.fmc}</span></p></div>
+                        ${btnHistory}
                     </div>
-                    <div class="w-full flex justify-between items-center mt-2 border-t border-slate-600/50 pt-3">
-                        ${locStatus}
-                        <button onclick="window.openFinishModal('${rec.id}')" class="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white text-xs md:text-sm px-4 py-2 rounded-lg hover:from-emerald-500 hover:to-emerald-400 transition font-bold shadow-lg border border-emerald-400/30">
-                            <i class="fas fa-flag-checkered mr-1"></i> จบงาน
-                        </button>
-                    </div>
-                </div>`;
+                `;
 
-                if(rec.locationShared && rec.lat && rec.lng) {
-                    activeMarkerIds.push(rec.id);
-                    if(map) {
-                        if(markers[rec.id]) {
-                            markers[rec.id].setLatLng([rec.lat, rec.lng]);
-                        } else {
-                            markers[rec.id] = L.marker([rec.lat, rec.lng], {icon: ambIcon})
-                                .addTo(map)
-                                .bindPopup(`<div class="text-center font-bold text-slate-800">${rec.name}<br><span class="text-xs text-red-600">Activate: ${rec.activateTime} น.</span></div>`);
+                if(rec.status === 'active') {
+                    const locStatus = rec.locationShared ? `<span class="text-green-400 text-xs md:text-sm font-medium"><i class="fas fa-map-marker-alt animate-bounce mr-1"></i> กำลังแชร์พิกัดรถ</span>` : `<span class="text-slate-500 text-xs md:text-sm italic">รอกู้ชีพแชร์พิกัด...</span>`;
+                    
+                    activeList.innerHTML += `
+                    <div class="bg-slate-700/50 p-4 rounded-xl border-l-4 border-red-500 shadow-md flex flex-col justify-between items-start hover:bg-slate-700 transition">
+                        <div class="w-full flex justify-between items-center mb-2">
+                            <span class="font-bold text-sm md:text-base text-slate-100">${rec.name}</span>
+                            <span class="text-[10px] md:text-xs font-bold text-red-200 bg-red-900/50 px-2 py-1 rounded border border-red-700/50">Act: ${rec.activateTime} น.</span>
+                        </div>
+                        <div class="w-full flex justify-between items-center mt-2 border-t border-slate-600/50 pt-3">
+                            ${locStatus}
+                            <button onclick="window.openFinishModal('${rec.id}')" class="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white text-xs md:text-sm px-4 py-2 rounded-lg hover:from-emerald-500 hover:to-emerald-400 transition font-bold shadow-lg border border-emerald-400/30">
+                                <i class="fas fa-flag-checkered mr-1"></i> จบงาน
+                            </button>
+                        </div>
+                    </div>`;
+
+                    if(rec.locationShared && rec.lat && rec.lng) {
+                        activeMarkerIds.push(rec.id);
+                        if(map) {
+                            if(markers[rec.id]) {
+                                markers[rec.id].setLatLng([rec.lat, rec.lng]);
+                            } else {
+                                markers[rec.id] = L.marker([rec.lat, rec.lng], {icon: ambIcon})
+                                    .addTo(map)
+                                    .bindPopup(`<div class="text-center font-bold text-slate-800">${rec.name}<br><span class="text-xs text-red-600">Activate: ${rec.activateTime} น.</span></div>`);
+                            }
                         }
                     }
                 }
