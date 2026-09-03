@@ -449,6 +449,7 @@
     }
 
     // ⚡ ฟังก์ชันดูประวัติในหน้า A4 (บนจอมือถือ) ⚡
+ // ⚡ ฟังก์ชันดูประวัติในหน้า A4 (บนจอมือถือ) ⚡
     window.viewCase = function(docId) {
         const rec = window.allCases.find(c => c.id === docId);
         if(!rec) return;
@@ -465,8 +466,8 @@
         const chk = (c) => c ? '☑' : '☐';
 
         const html = `
-            <div style="padding: 30px; font-family: 'Sarabun', sans-serif; color: black; line-height: 1.5;">
-                <div style="border-bottom: 2px solid black; padding-bottom: 10px; margin-bottom: 20px; text-align: center;">
+            <div style="padding: 20px 30px; font-family: 'Sarabun', sans-serif; color: black; line-height: 1.5;">
+                <div style="border-bottom: 2px solid black; padding-bottom: 10px; margin-bottom: 15px; text-align: center;">
                     <h1 style="font-size: 20px; font-weight: bold; margin: 0;">แบบบันทึกการดูแลผู้ป่วยฉุกเฉิน Stroke Fast Track</h1>
                     <p style="font-size: 14px; margin: 5px 0 0 0;">หน่วยปฏิบัติการการแพทย์ฉุกเฉิน</p>
                 </div>
@@ -478,14 +479,36 @@
                     <tr><td style="color: #2563eb; padding: 4px 0;"><b>เวลาพบผู้ป่วย (FMC):</b> ${rec.fmc} น.</td><td style="color: #dc2626;"><b>เวลา Activate:</b> ${rec.activateTime} น.</td></tr>
                 </table>
 
-                <h2 style="font-weight: bold; font-size: 16px; background: #f3f4f6; padding: 5px; border-left: 4px solid #374151; margin-bottom: 10px;">2. การประเมินอาการ (Assessment)</h2>
-                <div style="font-size: 14px; margin-bottom: 15px; padding-left: 5px;">
-                    <p><b>BE-FAST:</b> ${chk(rec.befast?.b)} Balance &nbsp; ${chk(rec.befast?.e)} Eyes &nbsp; ${chk(rec.befast?.f)} Face &nbsp; ${chk(rec.befast?.a)} Arms &nbsp; ${chk(rec.befast?.s)} Speech</p>
-                    <p style="color: #dc2626; font-weight: bold; margin-top: 5px;">สถานะ: ${rec.isLvo ? 'VAN Positive (สงสัย LVO)' : 'VAN Negative'}</p>
+                <h2 style="font-weight: bold; font-size: 16px; background: #f3f4f6; padding: 5px; border-left: 4px solid #374151; margin-bottom: 10px;">2. การประเมินอาการ (Assessment) & Motor Power</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-left: 5px; margin-bottom: 15px;">
+                    <!-- ด้านซ้าย: อาการ BE-FAST -->
+                    <div style="font-size: 14px; width: 65%;">
+                        <p><b>BE-FAST:</b> ${chk(rec.befast?.b)} Balance &nbsp; ${chk(rec.befast?.e)} Eyes &nbsp; ${chk(rec.befast?.f)} Face<br>${chk(rec.befast?.a)} Arms &nbsp; ${chk(rec.befast?.s)} Speech</p>
+                        <p style="color: #dc2626; font-weight: bold; margin-top: 5px;">สถานะ: ${rec.isLvo ? 'VAN Positive (สงสัย LVO)' : 'VAN Negative'}</p>
+                    </div>
+                    
+                    <!-- ด้านขวา: ตาราง Motor Power ทรงกากบาท -->
+                    <div style="width: 35%; display: flex; flex-direction: column; align-items: center;">
+                        <b style="font-size: 13px; margin-bottom: 5px;">Motor Power (0-5)</b>
+                        <table style="border-collapse: collapse; text-align: center; font-weight: bold; font-size: 14px;">
+                            <tr>
+                                <td style="padding: 0 10px 2px 10px; color: #1d4ed8;">Rt.</td>
+                                <td style="padding: 0 10px 2px 10px; color: #be185d;">Lt.</td>
+                            </tr>
+                            <tr>
+                                <td style="border-bottom: 2px solid black; border-right: 2px solid black; padding: 5px 15px;">${v.motor?.ra||'-'}</td>
+                                <td style="border-bottom: 2px solid black; padding: 5px 15px;">${v.motor?.la||'-'}</td>
+                            </tr>
+                            <tr>
+                                <td style="border-right: 2px solid black; padding: 5px 15px;">${v.motor?.rl||'-'}</td>
+                                <td style="padding: 5px 15px;">${v.motor?.ll||'-'}</td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
 
                 <h2 style="font-weight: bold; font-size: 16px; background: #f3f4f6; padding: 5px; border-left: 4px solid #374151; margin-bottom: 10px;">3. สัญญาณชีพแรกรับ</h2>
-                <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 13px; margin-bottom: 10px;">
+                <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 13px; margin-bottom: 15px;">
                     <tr style="background: #e5e7eb;">
                         <th style="border: 1px solid black; padding: 4px;">BP</th><th style="border: 1px solid black; padding: 4px;">HR</th>
                         <th style="border: 1px solid black; padding: 4px;">RR</th><th style="border: 1px solid black; padding: 4px;">O2 Sat</th>
@@ -499,25 +522,6 @@
                         <td style="border: 1px solid black; padding: 4px;">E${v.gcs?.e||'-'}V${v.gcs?.v||'-'}M${v.gcs?.m||'-'}</td><td style="border: 1px solid black; padding: 4px; font-weight: bold;">${gcsTotal}</td>
                     </tr>
                 </table>
-                <div style="font-size: 14px; padding-left: 5px; margin-bottom: 20px;">
-                    <div style="display: flex; flex-direction: column; align-items: center;">
-                        <b style="margin-bottom: 5px;">Motor Power (0-5)</b>
-                        <table style="border-collapse: collapse; text-align: center; font-weight: bold; font-size: 16px;">
-                            <tr>
-                                <td style="padding: 0 15px 5px 15px; color: #1d4ed8;">Rt.</td>
-                                <td style="padding: 0 15px 5px 15px; color: #be185d;">Lt.</td>
-                            </tr>
-                            <tr>
-                                <td style="border-bottom: 2px solid black; border-right: 2px solid black; padding: 10px 25px;">${v.motor?.ra||'-'}</td>
-                                <td style="border-bottom: 2px solid black; padding: 10px 25px;">${v.motor?.la||'-'}</td>
-                            </tr>
-                            <tr>
-                                <td style="border-right: 2px solid black; padding: 10px 25px;">${v.motor?.rl||'-'}</td>
-                                <td style="padding: 10px 25px;">${v.motor?.ll||'-'}</td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
 
                 <h2 style="font-weight: bold; font-size: 16px; background: #f3f4f6; padding: 5px; border-left: 4px solid #374151; margin-bottom: 10px;">4. การรักษาพยาบาล (Interventions)</h2>
                 <div style="font-size: 14px; margin-bottom: 15px; padding-left: 5px; line-height: 1.8;">
@@ -526,9 +530,10 @@
                     <p>${chk(rec.interventions?.blood)} <b>เจาะเลือด:</b> CBC, Chem, Coag, Clotted</p>
                     <p>${chk(rec.interventions?.consult?.done)} <b>รายงานแพทย์:</b> ${rec.interventions?.consult?.detail||'-'}</p>
                     <p>${chk(rec.interventions?.coord)} <b>ประสานงาน รพ.ปลายทางเรียบร้อย</b></p>
+                    <p>${chk(rec.interventions?.other?.done)} <b>การรักษาอื่นๆ:</b> ${rec.interventions?.other?.detail || '-'}</p>
                 </div>
 
-                <div style="border: 2px solid black; padding: 10px; margin-bottom: 20px;">
+                <div style="border: 2px solid black; padding: 10px; margin-bottom: 10px;">
                     <h2 style="font-weight: bold; font-size: 16px; text-decoration: underline; margin-top: 0;">5. สรุปเวลาตัวชี้วัด (KPI)</h2>
                     <table style="width: 100%; font-size: 14px; margin-bottom: 10px;">
                         <tr><td style="width: 50%; padding: 4px 0;">• Door: <b>${rec.interventions?.timeDoor||'........'} น.</b></td><td>• Onset->FMC: <b>${calcDiff(rec.onset, rec.fmc)}</b> นาที</td></tr>
@@ -541,7 +546,7 @@
                     </div>
                 </div>
 
-                <table style="width: 100%; text-align: center; margin-top: 30px; font-size: 14px;">
+                <table style="width: 100%; text-align: center; margin-top: 20px; font-size: 14px;">
                     <tr>
                         <td style="width: 50%;"><p>ลงชื่อ.........................................ผู้ประเมิน</p><p class="mt-2">(.........................................)</p></td>
                         <td style="width: 50%;"><p>ลงชื่อ.........................................ผู้รับมอบ</p><p class="mt-2">(.........................................)</p></td>
@@ -553,57 +558,6 @@
         document.getElementById('documentContent').innerHTML = html;
         window.switchTab('document');
     }
-
-    // ฟังก์ชันสั่งพิมพ์จากหน้า Document
-    window.printDocument = function() {
-        const docHtml = document.getElementById('documentContent').innerHTML;
-        const originalContent = document.body.innerHTML;
-        document.body.innerHTML = docHtml;
-        window.print();
-        document.body.innerHTML = originalContent;
-        window.location.reload(); 
-    }
-
-    window.exportToCSV = function() {
-        if(window.allCases.length === 0) { alert("ไม่มีข้อมูล"); return; }
-        let csv = "\uFEFFชื่อ,Onset,FMC,Activate,Door,CT,Needle,สถานะ\n";
-        window.allCases.forEach(r => {
-            csv += `"${r.name}","${r.onset}","${r.fmc}","${r.activateTime}","${r.interventions?.timeDoor||'-'}","${r.interventions?.timeCT||'-'}","${r.interventions?.timeNeedle||'-'}","${r.status}"\n`;
-        });
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = `Stroke_Data.csv`;
-        document.body.appendChild(link); link.click(); document.body.removeChild(link);
-    }
-
-    onSnapshot(query(collection(db, "stroke_patients"), orderBy("createdAt", "desc")), (snapshot) => {
-        const historyList = document.getElementById('historyList');
-        historyList.innerHTML = ''; window.allCases = [];
-
-        if (snapshot.empty) { historyList.innerHTML = '<p class="text-center">ยังไม่มีประวัติในระบบ</p>'; return; }
-
-        snapshot.forEach((docSnap) => {
-            const rec = { id: docSnap.id, ...docSnap.data() };
-            window.allCases.push(rec);
-            
-            let btnAction = ''; let badge = '<span class="bg-gray-400 text-white text-[10px] px-2 py-1 rounded">ไม่เข้าเกณฑ์</span>';
-            if(rec.status === 'active') {
-                badge = '<span class="bg-red-600 text-white text-[10px] px-2 py-1 rounded animate-pulse">กำลังดำเนินการ</span>';
-                btnAction = `<button onclick="window.resumeCase('${rec.id}')" class="mt-2 w-full bg-orange-50 text-orange-700 text-xs py-2 rounded border border-orange-200 font-bold"><i class="fas fa-clipboard-list mr-1"></i> ดำเนินการต่อ (ทำ Checklist)</button>`;
-            } else if (rec.status === 'completed') {
-                badge = '<span class="bg-green-600 text-white text-[10px] px-2 py-1 rounded">ปิดเคสแล้ว</span>';
-                btnAction = `<button onclick="window.viewCase('${rec.id}')" class="mt-2 w-full bg-blue-50 text-blue-700 text-xs py-2 rounded border border-blue-200 font-bold"><i class="fas fa-file-alt"></i> 📄 ดูแบบบันทึก (A4)</button>`;
-            }
-
-            historyList.innerHTML += `
-                <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-                    <div class="flex justify-between items-start mb-2"><span class="font-bold text-gray-800">${rec.name}</span>${badge}</div>
-                    <div class="text-xs text-gray-600 space-y-1"><p>Onset: ${rec.onset} | FMC: ${rec.fmc}</p></div>
-                    ${btnAction}
-                </div>
-            `;
-        });
     });
 </script>
 </body>
