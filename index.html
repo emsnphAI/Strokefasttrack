@@ -20,27 +20,78 @@
         <p class="text-sm">แนวทางปฏิบัติกลุ่มอาการโรคหลอดเลือดสมอง</p>
     </div>
 
+    <!-- แถบเมนูนำทาง -->
     <div class="flex justify-around bg-gray-100 border-b">
-        <button id="tab-assess" class="tab-btn active w-1/3 py-3 text-sm" onclick="window.switchTab('assess')">
+        <button id="tab-dashboard" class="tab-btn active w-1/4 py-3 text-sm" onclick="window.switchTab('dashboard')">
+            <i class="fas fa-chart-pie"></i> ศูนย์สั่งการ
+        </button>
+        <button id="tab-assess" class="tab-btn w-1/4 py-3 text-sm" onclick="window.switchTab('assess')">
             <i class="fas fa-stethoscope"></i> ประเมิน
         </button>
-        <button id="tab-action" class="tab-btn w-1/3 py-3 text-sm hidden text-orange-600" onclick="window.switchTab('action')">
+        <button id="tab-action" class="tab-btn w-1/4 py-3 text-sm hidden text-orange-600" onclick="window.switchTab('action')">
             <i class="fas fa-clipboard-list"></i> ปฏิบัติการ
         </button>
-        <button id="tab-history" class="tab-btn w-1/3 py-3 text-sm" onclick="window.switchTab('history')">
+        <button id="tab-history" class="tab-btn w-1/4 py-3 text-sm" onclick="window.switchTab('history')">
             <i class="fas fa-history"></i> ประวัติ
         </button>
     </div>
 
+    <!-- ================= 0. หน้าศูนย์สั่งการ (Dashboard View) ================= -->
+    <div id="dashboard-view" class="p-4 bg-gray-200 min-h-screen">
+        <div class="bg-gray-800 text-white p-4 rounded-xl shadow-lg mb-4">
+            <h2 class="font-bold text-lg text-center mb-1"><i class="fas fa-tv mr-2"></i> COMMAND CENTER</h2>
+            <p class="text-center text-xs text-gray-400">สถานการณ์ประจำวัน: <span id="dash-date"></span></p>
+            
+            <div class="grid grid-cols-2 gap-3 mt-4">
+                <div class="bg-gray-700 p-3 rounded-lg text-center border-l-4 border-blue-500">
+                    <p class="text-xs text-gray-300">เคสทั้งหมด</p>
+                    <p id="dash-total" class="text-2xl font-bold text-blue-400">0</p>
+                </div>
+                <div class="bg-gray-700 p-3 rounded-lg text-center border-l-4 border-red-500">
+                    <p class="text-xs text-gray-300">Stroke Activate</p>
+                    <p id="dash-stroke" class="text-2xl font-bold text-red-400">0</p>
+                </div>
+                <div class="bg-gray-700 p-3 rounded-lg text-center border-l-4 border-orange-500">
+                    <p class="text-xs text-gray-300">LVO Suspected</p>
+                    <p id="dash-lvo" class="text-2xl font-bold text-orange-400">0</p>
+                </div>
+                <div class="bg-gray-700 p-3 rounded-lg text-center border-l-4 border-green-500 animate-pulse">
+                    <p class="text-xs text-gray-300">กำลังดำเนินการ</p>
+                    <p id="dash-active" class="text-2xl font-bold text-green-400">0</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl shadow-md mb-4 border border-gray-200">
+            <h3 class="font-bold text-gray-800 mb-3 border-b pb-1"><i class="fas fa-hospital-user text-blue-600 mr-1"></i> สรุปผลการรักษา (ER Outcomes)</h3>
+            <ul class="text-sm space-y-2 text-gray-600">
+                <li class="flex justify-between border-b border-dashed pb-1"><span>💉 ให้ยาละลายลิ่มเลือด (rt-PA):</span> <b id="out-rtpa" class="text-blue-600">0</b></li>
+                <li class="flex justify-between border-b border-dashed pb-1"><span>🧠 ลากลิ่มเลือด (MT / EVT):</span> <b id="out-mt" class="text-indigo-600">0</b></li>
+                <li class="flex justify-between border-b border-dashed pb-1"><span>🛏️ รับไว้รักษา (Admit):</span> <b id="out-admit" class="text-green-600">0</b></li>
+                <li class="flex justify-between border-b border-dashed pb-1"><span>🚑 ส่งต่อ รพ.อื่น (Refer):</span> <b id="out-refer" class="text-orange-600">0</b></li>
+                <li class="flex justify-between border-b border-dashed pb-1"><span>❌ ปฏิเสธการรักษา:</span> <b id="out-refused" class="text-gray-500">0</b></li>
+                <li class="flex justify-between"><span>⚫ เสียชีวิตที่ ER (Dead):</span> <b id="out-dead" class="text-red-600">0</b></li>
+            </ul>
+        </div>
+    </div>
+
     <!-- ================= 1. แท็บประเมิน (Assess View) ================= -->
-    <div id="assess-view" class="p-4">
+    <div id="assess-view" class="p-4 hidden">
         <form id="strokeForm">
-            <!-- แก้ไข UI ให้รองรับมือถือ (ซ้อนกันเมื่อจอแคบ) -->
             <div class="bg-blue-50 p-3 rounded-lg mb-4 border border-blue-200">
-                <h2 class="font-bold text-blue-800 mb-2 border-b border-blue-200 pb-1">ข้อมูลเวลา (Time & Onset)</h2>
+                <h2 class="font-bold text-blue-800 mb-2 border-b border-blue-200 pb-1">ข้อมูลผู้ป่วยและเวลา</h2>
                 <div class="mb-2">
                     <label class="block text-sm font-medium">ชื่อผู้ป่วย / รหัส (HN):</label>
                     <input type="text" id="patientName" required class="w-full mt-1 p-2 border rounded-md bg-white appearance-none" placeholder="เช่น นายสมชาย หรือ HN12345">
+                </div>
+                <!-- ช่องกรอก CC และ PI -->
+                <div class="mb-2">
+                    <label class="block text-sm font-medium">อาการสำคัญ (CC):</label>
+                    <input type="text" id="patientCC" class="w-full mt-1 p-2 border rounded-md bg-white appearance-none" placeholder="อาการที่ทำให้มา รพ.">
+                </div>
+                <div class="mb-2">
+                    <label class="block text-sm font-medium">ประวัติปัจจุบัน (PI):</label>
+                    <textarea id="patientPI" rows="2" class="w-full mt-1 p-2 border rounded-md bg-white appearance-none" placeholder="ประวัติการเจ็บป่วยปัจจุบัน"></textarea>
                 </div>
                 <div class="mb-2">
                     <label class="block text-sm font-medium text-red-600">Last Known Well (เวลาปกติล่าสุด):</label>
@@ -196,7 +247,7 @@
                 </div>
             </div>
 
-            <button type="button" id="btnFinish" onclick="window.finishCase()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg shadow-lg text-lg transition duration-200 mt-4">
+            <button type="button" id="btnFinish" onclick="document.getElementById('outcomeModal').classList.remove('hidden')" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg shadow-lg text-lg transition duration-200 mt-4">
                 <i class="fas fa-check-circle mr-1"></i> จบงาน & บันทึก
             </button>
         </form>
@@ -222,15 +273,37 @@
             <span class="font-bold text-sm">แบบบันทึก A4</span>
             <button onclick="window.printDocument()" class="bg-blue-600 hover:bg-blue-500 px-3 py-2 rounded text-sm"><i class="fas fa-print"></i> พิมพ์</button>
         </div>
-        <!-- กระดาษ A4 -->
         <div id="documentContent" class="bg-white shadow-xl mx-auto mt-4 overflow-hidden" style="width: 210mm; min-height: 297mm; max-width: 100%; transform-origin: top left; font-size: 14px;">
-            <!-- ข้อมูลจะถูกดึงมาใส่ตรงนี้ -->
+            <!-- Content will be injected here -->
         </div>
     </div>
 </div>
 
-<!-- Modal Pop-up -->
-<div id="activationModal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50 px-4">
+<!-- Modal ถามผลการรักษาจาก ER -->
+<div id="outcomeModal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50 px-4 print-hidden">
+    <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm">
+        <h3 class="text-xl font-bold text-gray-900 mb-4 text-center border-b pb-2">ผลการรักษาที่ห้องฉุกเฉิน</h3>
+        <p class="text-xs text-gray-500 text-center mb-4">กรุณาระบุผลลัพธ์สุดท้ายที่ ER ก่อนปิดเคส</p>
+        
+        <div class="space-y-2 mb-5 text-sm font-medium text-gray-700">
+            <label class="flex items-center space-x-3 p-2 border rounded-lg hover:bg-blue-50 cursor-pointer transition"><input type="radio" name="er_outcome" value="rtpa" class="w-5 h-5 text-blue-600"><span>💉 ให้ยาละลายลิ่มเลือด (rt-PA)</span></label>
+            <label class="flex items-center space-x-3 p-2 border rounded-lg hover:bg-indigo-50 cursor-pointer transition"><input type="radio" name="er_outcome" value="mt" class="w-5 h-5 text-indigo-600"><span>🧠 ทำหัตถการลากลิ่มเลือด (MT)</span></label>
+            <label class="flex items-center space-x-3 p-2 border rounded-lg hover:bg-green-50 cursor-pointer transition"><input type="radio" name="er_outcome" value="admit" class="w-5 h-5 text-green-600"><span>🛏️ รับไว้รักษาใน รพ. (Admit)</span></label>
+            <label class="flex items-center space-x-3 p-2 border rounded-lg hover:bg-orange-50 cursor-pointer transition"><input type="radio" name="er_outcome" value="refer" class="w-5 h-5 text-orange-600"><span>🚑 ส่งต่อโรงพยาบาลอื่น (Refer)</span></label>
+            <label class="flex items-center space-x-3 p-2 border rounded-lg hover:bg-gray-100 cursor-pointer transition"><input type="radio" name="er_outcome" value="refused" class="w-5 h-5 text-gray-600"><span>❌ ปฏิเสธการรักษา</span></label>
+            <label class="flex items-center space-x-3 p-2 border rounded-lg hover:bg-red-50 cursor-pointer transition"><input type="radio" name="er_outcome" value="dead" class="w-5 h-5 text-red-600"><span>⚫ เสียชีวิต (Dead at ER)</span></label>
+            <label class="flex items-center space-x-3 p-2 border rounded-lg hover:bg-gray-100 cursor-pointer transition bg-gray-50"><input type="radio" name="er_outcome" value="pending" class="w-5 h-5 text-gray-600" checked><span>⏳ ยังไม่ทราบผล / รอติดตาม</span></label>
+        </div>
+        
+        <button onclick="window.confirmFinishCase()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg shadow transition">
+            <i class="fas fa-save mr-1"></i> ยืนยันการปิดเคส
+        </button>
+        <button onclick="document.getElementById('outcomeModal').classList.add('hidden')" class="w-full mt-2 bg-white text-gray-600 font-bold py-3 rounded-lg border hover:bg-gray-50 transition">ยกเลิก</button>
+    </div>
+</div>
+
+<!-- Modal Pop-up Activation -->
+<div id="activationModal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50 px-4 print-hidden">
     <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm text-center">
         <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
             <i class="fas fa-siren-on text-3xl text-red-600 fa-bullhorn"></i>
@@ -266,14 +339,15 @@
 
     document.getElementById('timeLkw').value = new Date().toISOString().slice(0, 16);
     document.getElementById('timeFMC').value = new Date().toTimeString().slice(0,5);
+    document.getElementById('dash-date').innerText = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
 
     let tempEvalData = null; 
     window.activeDocId = null;
     window.allCases = [];
 
-    // ฟังก์ชันเปลี่ยนหน้าจอ 
+    // ฟังก์ชันเปลี่ยนแท็บ
     window.switchTab = function(tab) {
-        ['assess', 'action', 'history', 'document'].forEach(t => {
+        ['dashboard', 'assess', 'action', 'history', 'document'].forEach(t => {
             const el = document.getElementById(`${t}-view`);
             const btn = document.getElementById(`tab-${t}`);
             if(el) el.classList.add('hidden');
@@ -288,11 +362,16 @@
         window.scrollTo(0, 0);
     }
 
-    // ================= ฟังก์ชันที่หายไป (เพิ่มกลับมาแล้ว) =================
+    // เริ่มต้นแอปให้เปิดหน้า Dashboard
+    window.switchTab('dashboard');
+
     window.evaluatePatient = function() {
         const name = document.getElementById('patientName').value;
         if(!name) { alert('กรุณากรอกชื่อผู้ป่วย / HN'); return; }
 
+        // รับค่า CC และ PI
+        const ccInput = document.getElementById('patientCC').value || '';
+        const piInput = document.getElementById('patientPI').value || '';
         const lkwInput = document.getElementById('timeLkw').value;
         const onset = document.getElementById('timeOnset').value || 'ไม่ระบุ';
 
@@ -312,6 +391,8 @@
 
         tempEvalData = {
             name: name,
+            cc: ccInput,
+            pi: piInput,
             lkw: lkwInput ? new Date(lkwInput).toLocaleString('th-TH') : 'ไม่ระบุ',
             onset: onset,
             fmc: document.getElementById('timeFMC').value || '-', 
@@ -338,9 +419,18 @@
             return;
         }
 
-        const lkwTime = new Date(lkwInput);
+        let lkwTime = new Date(lkwInput);
+        if (lkwTime.getFullYear() > 2400) {
+            lkwTime.setFullYear(lkwTime.getFullYear() - 543);
+        }
+
         const now = new Date();
         const diffHours = (now - lkwTime) / (1000 * 60 * 60);
+
+        if (diffHours < 0) {
+            alert("ตรวจพบข้อผิดพลาด: เวลา Last Known Well อยู่ในอนาคต กรุณาตรวจสอบใหม่อีกครั้งครับ");
+            return;
+        }
 
         let shouldActivate = false;
         let alertMsg = "";
@@ -408,7 +498,6 @@
         document.getElementById('strokeForm').reset();
         alert("บันทึกเข้าระบบเรียบร้อย (ไม่เข้าเกณฑ์ Stroke)");
     }
-    // ==========================================================
 
     window.resumeCase = function(docId) {
         const rec = window.allCases.find(c => c.id === docId);
@@ -419,9 +508,13 @@
         window.switchTab('action');
     }
 
-    window.finishCase = async function() {
+    window.confirmFinishCase = async function() {
         if(!window.activeDocId) return;
-        document.getElementById('btnFinish').innerText = "กำลังบันทึก...";
+        
+        const selectedOutcomeElement = document.querySelector('input[name="er_outcome"]:checked');
+        const selectedOutcome = selectedOutcomeElement ? selectedOutcomeElement.value : 'pending';
+        
+        document.getElementById('outcomeModal').classList.add('hidden');
         
         const v = {
             bp: document.getElementById('v_bp').value || '-', hr: document.getElementById('v_hr').value || '-', rr: document.getElementById('v_rr').value || '-', o2: document.getElementById('v_o2').value || '-', dtx: document.getElementById('v_dtx').value || '-', pupil_l: document.getElementById('v_pupill').value || '-', pupil_r: document.getElementById('v_pupilr').value || '-',
@@ -439,16 +532,20 @@
         };
 
         try {
-            await updateDoc(doc(db, "stroke_patients", window.activeDocId), { interventions: intvData, status: 'completed', completedAt: serverTimestamp() });
+            await updateDoc(doc(db, "stroke_patients", window.activeDocId), { 
+                interventions: intvData, 
+                status: 'completed', 
+                er_outcome: selectedOutcome, 
+                completedAt: serverTimestamp() 
+            });
             alert("บันทึกข้อมูลและปิดงานเรียบร้อย!");
             document.getElementById('interventionForm').reset();
             window.activeDocId = null;
-            document.getElementById('btnFinish').innerHTML = '<i class="fas fa-check-circle mr-1"></i> จบงาน & บันทึก';
-            window.switchTab('history');
+            window.switchTab('dashboard'); 
         } catch (error) { alert("เกิดข้อผิดพลาด"); }
     }
 
-   // ⚡ ฟังก์ชันดูประวัติในหน้า A4 (บนจอมือถือ) ⚡
+    // หน้าปริ้นท์ A4 (จัดการ CC / PI)
     window.viewCase = function(docId) {
         const rec = window.allCases.find(c => c.id === docId);
         if(!rec) return;
@@ -464,7 +561,7 @@
         let gcsTotal = (v.gcs?.e!=='-' && v.gcs?.v!=='-' && v.gcs?.m!=='-') ? parseInt(v.gcs?.e) + parseInt(v.gcs?.v) + parseInt(v.gcs?.m) : '-';
         const chk = (c) => c ? '☑' : '☐';
 
-      const html = `
+        const html = `
             <div style="padding: 15px 30px; font-family: 'Sarabun', sans-serif; color: black; line-height: 1.5;">
                 <div style="border-bottom: 2px solid black; padding-bottom: 5px; margin-bottom: 10px; text-align: center;">
                     <h1 style="font-size: 20px; font-weight: bold; margin: 0;">แบบบันทึกการดูแลผู้ป่วยฉุกเฉิน Stroke Fast Track</h1>
@@ -480,17 +577,12 @@
                         </tr>
                         <tr>
                             <td colspan="2" style="padding-bottom: 2px; border-bottom: 1px dotted #ccc;">
-                                <b>CC:</b> ........................................................................................................................................
+                                <b>CC:</b> ${rec.cc ? rec.cc : '........................................................................................................................................'}
                             </td>
                         </tr>
                         <tr>
-                            <td colspan="2" style="padding-top: 4px; padding-bottom: 2px;">
-                                <b>PI:</b> ........................................................................................................................................
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2" style="padding-bottom: 4px; border-bottom: 1px dotted #ccc;">
-                                ......................................................................................................................................................
+                            <td colspan="2" style="padding-top: 4px; padding-bottom: 4px; border-bottom: 1px dotted #ccc; line-height: 1.8;">
+                                <b>PI:</b> ${rec.pi ? rec.pi.replace(/\n/g, '<br>') : '........................................................................................................................................<br>......................................................................................................................................................'}
                             </td>
                         </tr>
                         <tr>
@@ -507,7 +599,6 @@
                 <div style="margin-bottom: 10px;">
                     <h2 style="font-weight: bold; font-size: 16px; background-color: #f3f4f6; padding: 3px 10px; border-left: 4px solid #374151; margin-bottom: 5px;">2. การประเมินอาการ (Assessment) & Motor Power</h2>
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; padding-left: 5px;">
-                        <!-- ส่วนซ้าย: อาการ BE-FAST -->
                         <div style="font-size: 14px; width: 65%;">
                             <p style="margin: 0 0 5px 0;"><b>BE-FAST:</b> 
                                 ${chk(rec.befast?.b)} Balance &nbsp; 
@@ -521,7 +612,6 @@
                             <p style="color: #dc2626; font-weight: bold; margin: 0;">สถานะ: ${rec.isLvo ? 'VAN Positive (สงสัย LVO)' : 'VAN Negative'}</p>
                         </div>
                         
-                        <!-- ส่วนขวา: ตาราง Motor Power ทรงกากบาท -->
                         <div style="width: 35%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;">
                             <b style="font-size: 13px; margin-bottom: 2px; color: #374151;">Motor Power (0-5)</b>
                             <table style="border-collapse: collapse; text-align: center; font-weight: bold; font-size: 14px;">
@@ -615,7 +705,6 @@
         window.switchTab('document');
     }
 
-    // ฟังก์ชันสั่งพิมพ์จากหน้า Document
     window.printDocument = function() {
         const docHtml = document.getElementById('documentContent').innerHTML;
         const originalContent = document.body.innerHTML;
@@ -627,9 +716,11 @@
 
     window.exportToCSV = function() {
         if(window.allCases.length === 0) { alert("ไม่มีข้อมูล"); return; }
-        let csv = "\uFEFFชื่อ,Onset,FMC,Activate,Door,CT,Needle,สถานะ\n";
+        let csv = "\uFEFFชื่อ,CC,PI,Onset,FMC,Activate,Door,CT,Needle,สถานะ\n";
         window.allCases.forEach(r => {
-            csv += `"${r.name}","${r.onset}","${r.fmc}","${r.activateTime}","${r.interventions?.timeDoor||'-'}","${r.interventions?.timeCT||'-'}","${r.interventions?.timeNeedle||'-'}","${r.status}"\n`;
+            let safeCC = r.cc ? r.cc.replace(/"/g, '""') : '';
+            let safePI = r.pi ? r.pi.replace(/"/g, '""').replace(/\n/g, ' ') : '';
+            csv += `"${r.name}","${safeCC}","${safePI}","${r.onset}","${r.fmc}","${r.activateTime}","${r.interventions?.timeDoor||'-'}","${r.interventions?.timeCT||'-'}","${r.interventions?.timeNeedle||'-'}","${r.status}"\n`;
         });
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
@@ -641,12 +732,26 @@
     onSnapshot(query(collection(db, "stroke_patients"), orderBy("createdAt", "desc")), (snapshot) => {
         const historyList = document.getElementById('historyList');
         historyList.innerHTML = ''; window.allCases = [];
+        
+        let todayStr = new Date().toLocaleDateString('th-TH');
+        let dTotal = 0, dStroke = 0, dLvo = 0, dActive = 0;
+        let outs = { rtpa: 0, mt: 0, admit: 0, refer: 0, refused: 0, dead: 0, pending: 0 };
 
         if (snapshot.empty) { historyList.innerHTML = '<p class="text-center">ยังไม่มีประวัติในระบบ</p>'; return; }
 
         snapshot.forEach((docSnap) => {
             const rec = { id: docSnap.id, ...docSnap.data() };
             window.allCases.push(rec);
+            
+            if (rec.dateStr === todayStr) {
+                dTotal++;
+                if (rec.isFastTrack) dStroke++;
+                if (rec.isLvo) dLvo++;
+                if (rec.status === 'active') dActive++;
+                if (rec.status === 'completed' && rec.er_outcome && outs[rec.er_outcome] !== undefined) {
+                    outs[rec.er_outcome]++;
+                }
+            }
             
             let btnAction = ''; let badge = '<span class="bg-gray-400 text-white text-[10px] px-2 py-1 rounded">ไม่เข้าเกณฑ์</span>';
             if(rec.status === 'active') {
@@ -665,8 +770,22 @@
                 </div>
             `;
         });
+
+        // อัปเดตตัวเลขหน้า Dashboard
+        const dashTotal = document.getElementById('dash-total');
+        if(dashTotal) {
+            dashTotal.innerText = dTotal;
+            document.getElementById('dash-stroke').innerText = dStroke;
+            document.getElementById('dash-lvo').innerText = dLvo;
+            document.getElementById('dash-active').innerText = dActive;
+            document.getElementById('out-rtpa').innerText = outs.rtpa;
+            document.getElementById('out-mt').innerText = outs.mt;
+            document.getElementById('out-admit').innerText = outs.admit;
+            document.getElementById('out-refer').innerText = outs.refer;
+            document.getElementById('out-refused').innerText = outs.refused;
+            document.getElementById('out-dead').innerText = outs.dead;
+        }
     });
 </script>
- 
 </body>
 </html>
