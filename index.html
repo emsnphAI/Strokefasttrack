@@ -8,9 +8,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
     <style>
         body { font-family: 'Sarabun', sans-serif; background-color: #0b0f19; } 
         .tab-btn { color: #94a3b8; transition: all 0.3s ease; }
@@ -21,9 +18,6 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
 
-        .leaflet-popup-content-wrapper { background-color: #1e293b; color: #f8fafc; border-radius: 8px; border: 1px solid #334155; }
-        .leaflet-popup-tip { background-color: #1e293b; border: 1px solid #334155; }
-
         .login-bg {
             background: linear-gradient(135deg, rgba(11, 15, 25, 0.85) 0%, rgba(15, 23, 42, 0.88) 100%), 
                         url('https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&w=1920&q=80');
@@ -31,7 +25,6 @@
             background-position: center;
         }
 
-        /* 🛡️ สไตล์ลายน้ำดิจิทัลพาดกลางเอกสาร A4 (Diagonal Watermark) */
         .watermark-container {
             position: relative;
             overflow: hidden;
@@ -97,9 +90,8 @@
             </button>
         </form>
 
-        <!-- แถบประกาศลิขสิทธิ์หน้า Login -->
         <div class="mt-6 pt-4 border-t border-slate-800/80 text-center">
-            <p class="text-[11px] text-slate-400 font-medium">© 2026 PTRVVD กลุ่มงานเวชศาสตร์ฉุกเฉิน รพ.นครปฐม</p>
+            <p class="text-[11px] text-slate-400 font-medium">กลุ่มงานการแพทย์ฉุกเฉิน รพ.นครปฐม PTRVVD © 2026</p>
             <p class="text-[9px] text-slate-600 uppercase tracking-wider mt-0.5">All Rights Reserved • Protected by Innovation Copyright</p>
         </div>
     </div>
@@ -174,14 +166,13 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            <!-- GPS Tracking -->
+            <!-- Google Maps Tracking -->
             <div class="bg-slate-800 p-4 md:p-6 rounded-2xl shadow-xl border border-slate-700/50 flex flex-col">
-                <h3 class="font-bold text-slate-200 mb-4 border-b border-slate-700 pb-2 text-base md:text-lg"><i class="fas fa-map-marked-alt text-red-500 mr-2"></i> GPS Tracking & ควบคุมเคส</h3>
+                <h3 class="font-bold text-slate-200 mb-4 border-b border-slate-700 pb-2 text-base md:text-lg"><i class="fas fa-map-marked-alt text-red-500 mr-2"></i> Google Maps Tracking</h3>
                 
-                <div id="mainMap" class="w-full h-40 md:h-56 rounded-xl border border-slate-700 mb-4 shadow-inner z-10 relative bg-slate-900">
-                    <div class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 text-xs z-0" id="map-placeholder">
-                        <i class="fas fa-spinner fa-spin text-2xl mb-2 opacity-50"></i> กำลังโหลดแผนที่...
-                    </div>
+                <!-- เปลี่ยนช่องแสดงผลเป็น Google Maps Embed พื้นหลังมืด -->
+                <div class="w-full h-40 md:h-56 rounded-xl border border-slate-700 mb-4 shadow-inner z-10 relative bg-slate-900 overflow-hidden">
+                    <iframe id="googleMapFrame" width="100%" height="100%" style="border:0; filter: invert(90%) hue-rotate(180deg) contrast(120%);" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/place?key=&q=Hospital+Nakhon+Pathom"></iframe>
                 </div>
 
                 <div id="activeCasesList" class="space-y-3 flex-1 overflow-y-auto pr-2 custom-scrollbar max-h-48 md:max-h-64">
@@ -203,14 +194,13 @@
             </div>
         </div>
 
-        <!-- แถบลิขสิทธิ์ Digital Watermark ด้านล่างหน้าจอศูนย์สั่งการ -->
         <div class="mt-8 pt-4 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 px-2">
             <div class="flex items-center space-x-2 mb-2 sm:mb-0">
                 <i class="fas fa-shield-alt text-emerald-500"></i>
                 <span>นวัตกรรมระบบบริการการแพทย์ฉุกเฉิน • โรงพยาบาลนครปฐม</span>
             </div>
             <div>
-                <span>© 2026 All Rights Reserved | CPG-STK-V2</span>
+                <span>All Rights Reserved | CPG-STK-V2 © 2026</span>
             </div>
         </div>
     </div>
@@ -321,40 +311,21 @@
             <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-200 text-sm md:text-base space-y-4">
                 <h3 class="font-bold text-teal-800 border-b pb-2 mb-4 md:text-lg flex items-center"><i class="fas fa-medkit mr-2 text-xl"></i> การดูแลรักษา (Interventions)</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- A+B management -->
                     <label class="flex items-start space-x-3 bg-gray-50 p-4 rounded-xl border border-gray-200 cursor-pointer hover:bg-teal-50 hover:border-teal-200 transition">
                         <input type="checkbox" id="chk_ab_manage" class="w-6 h-6 text-teal-600 rounded mt-1 focus:ring-teal-500">
-                        <div class="flex-1">
-                            <span class="font-bold text-gray-800 block mb-1">A+B management:</span>
-                            <input type="text" id="val_ab_manage" class="w-full border border-gray-300 rounded-lg p-2 bg-white focus:ring-2 focus:ring-teal-400 outline-none" placeholder="ระบุการจัดการ">
-                        </div>
+                        <div class="flex-1"><span class="font-bold text-gray-800 block mb-1">A+B management:</span><input type="text" id="val_ab_manage" class="w-full border border-gray-300 rounded-lg p-2 bg-white focus:ring-2 focus:ring-teal-400 outline-none" placeholder="ระบุการจัดการ"></div>
                     </label>
-
-                    <!-- เก็บแลป Stroke FT bundle + ให้สารน้ำ -->
                     <label class="flex items-start space-x-3 bg-gray-50 p-4 rounded-xl border border-gray-200 cursor-pointer hover:bg-teal-50 hover:border-teal-200 transition">
                         <input type="checkbox" id="chk_iv" class="w-6 h-6 text-teal-600 rounded mt-1 focus:ring-teal-500">
-                        <div class="flex-1">
-                            <span class="font-bold text-gray-800 block mb-1">เก็บแลป Stroke FT bundle + ให้สารน้ำ</span>
-                            IV rate: <input type="number" id="val_iv_rate" class="border-b-2 border-teal-400 w-16 text-center bg-transparent focus:outline-none font-bold text-teal-700"> ml/hr
-                        </div>
+                        <div class="flex-1"><span class="font-bold text-gray-800 block mb-1">เก็บแลป Stroke FT bundle + ให้สารน้ำ</span> IV rate: <input type="number" id="val_iv_rate" class="border-b-2 border-teal-400 w-16 text-center bg-transparent focus:outline-none font-bold text-teal-700"> ml/hr</div>
                     </label>
-
-                    <!-- การรักษาอื่นๆ -->
                     <label class="flex items-start space-x-3 bg-gray-50 p-4 rounded-xl border border-gray-200 cursor-pointer hover:bg-teal-50 hover:border-teal-200 transition">
                         <input type="checkbox" id="chk_other" class="w-6 h-6 text-teal-600 rounded mt-1 focus:ring-teal-500">
-                        <div class="flex-1">
-                            <span class="font-bold text-gray-800 block mb-1">การรักษาอื่นๆ:</span>
-                            <input type="text" id="val_other" class="w-full border border-gray-300 rounded-lg p-2 bg-white focus:ring-2 focus:ring-teal-400 outline-none" placeholder="ระบุเพิ่มเติม">
-                        </div>
+                        <div class="flex-1"><span class="font-bold text-gray-800 block mb-1">การรักษาอื่นๆ:</span><input type="text" id="val_other" class="w-full border border-gray-300 rounded-lg p-2 bg-white focus:ring-2 focus:ring-teal-400 outline-none" placeholder="ระบุเพิ่มเติม"></div>
                     </label>
-
-                    <!-- การปรึกษา/คำสั่งอำนวยการจาก พอป. -->
                     <label class="flex items-start space-x-3 bg-gray-50 p-4 rounded-xl border border-gray-200 cursor-pointer hover:bg-teal-50 hover:border-teal-200 transition">
                         <input type="checkbox" id="chk_consult" class="w-6 h-6 text-teal-600 rounded mt-1 focus:ring-teal-500">
-                        <div class="flex-1">
-                            <span class="font-bold text-gray-800 block mb-1">การปรึกษา/คำสั่งอำนวยการจาก พอป.:</span>
-                            <input type="text" id="val_consult" class="w-full border border-gray-300 rounded-lg p-2 bg-white focus:ring-2 focus:ring-teal-400 outline-none" placeholder="ระบุรายละเอียด / คำสั่ง พอป.">
-                        </div>
+                        <div class="flex-1"><span class="font-bold text-gray-800 block mb-1">การปรึกษา/คำสั่งอำนวยการจาก พอป.:</span><input type="text" id="val_consult" class="w-full border border-gray-300 rounded-lg p-2 bg-white focus:ring-2 focus:ring-teal-400 outline-none" placeholder="ระบุรายละเอียด / คำสั่ง พอป."></div>
                     </label>
                 </div>
             </div>
@@ -469,28 +440,46 @@
     window.allCases = [];
     window.selectedCaseToClose = null;
 
-    let map = null;
-    let markers = {};
-    const ambIcon = L.divIcon({
-        html: '<i class="fas fa-ambulance fa-2x text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]"></i>',
-        className: 'bg-transparent',
-        iconSize: [30, 30],
-        iconAnchor: [15, 15]
-    });
+    // ระบบจัดการ Google Maps
+    function updateGoogleMap(lat, lng, name) {
+        const frame = document.getElementById('googleMapFrame');
+        if(frame) {
+            if(lat && lng) {
+                // ปักหมุดตามพิกัดจริงที่รถกู้ชีพส่งมา
+                frame.src = `https://www.google.com/maps/embed/v1/view?key=&center=${lat},${lng}&zoom=15`;
+            } else {
+                // ค่าเริ่มต้นศูนย์กลาง รพ.นครปฐม
+                frame.src = `https://www.google.com/maps/embed/v1/place?key=&q=Hospital+Nakhon+Pathom`;
+            }
+        }
+    }
 
-    function initMap() {
-        if (!map) {
-            const placeholder = document.getElementById('map-placeholder');
-            if(placeholder) placeholder.style.display = 'none';
-            
-            // เซ็ตจุดกึ่งกลางเริ่มต้นที่ รพ.นครปฐม
-            map = L.map('mainMap').setView([13.814036, 100.037293], 12);
-            
-            // เปลี่ยนมาใช้ OpenStreetMap มาตรฐาน (ฟรี และไม่ต้องใช้ API Key)
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(map);
+    window.switchTab = function(tab) {
+        ['dashboard', 'assess', 'action', 'history', 'document'].forEach(t => {
+            const el = document.getElementById(`${t}-view`);
+            const btn = document.getElementById(`tab-${t}`);
+            if(el) el.classList.add('hidden');
+            if(btn) btn.classList.remove('active');
+        });
+        const targetEl = document.getElementById(`${tab}-view`);
+        const targetBtn = document.getElementById(`tab-${tab}`);
+        if(targetEl) targetEl.classList.remove('hidden');
+        if(targetBtn) targetBtn.classList.add('active');
+        window.scrollTo(0, 0);
+
+        if (tab === 'dashboard') {
+            updateGoogleMap();
+        }
+    }
+
+    window.toggleNeedleTime = function() {
+        const outcome = document.querySelector('input[name="er_outcome"]:checked');
+        const needleDiv = document.getElementById('needleTimeDiv');
+        if(outcome && outcome.value === 'rtpa') {
+            needleDiv.classList.remove('hidden');
+        } else {
+            needleDiv.classList.add('hidden');
+            document.getElementById('m_needle').value = '';
         }
     }
 
@@ -544,39 +533,6 @@
             btn.disabled = false;
         }
     });
-
-    // ================= 🚀 NAVIGATION =================
-    window.switchTab = function(tab) {
-        ['dashboard', 'assess', 'action', 'history', 'document'].forEach(t => {
-            const el = document.getElementById(`${t}-view`);
-            const btn = document.getElementById(`tab-${t}`);
-            if(el) el.classList.add('hidden');
-            if(btn) btn.classList.remove('active');
-        });
-        const targetEl = document.getElementById(`${tab}-view`);
-        const targetBtn = document.getElementById(`tab-${tab}`);
-        if(targetEl) targetEl.classList.remove('hidden');
-        if(targetBtn) targetBtn.classList.add('active');
-        window.scrollTo(0, 0);
-
-        if (tab === 'dashboard') {
-            setTimeout(() => {
-                initMap();
-                if(map) map.invalidateSize();
-            }, 100);
-        }
-    }
-
-    window.toggleNeedleTime = function() {
-        const outcome = document.querySelector('input[name="er_outcome"]:checked');
-        const needleDiv = document.getElementById('needleTimeDiv');
-        if(outcome && outcome.value === 'rtpa') {
-            needleDiv.classList.remove('hidden');
-        } else {
-            needleDiv.classList.add('hidden');
-            document.getElementById('m_needle').value = '';
-        }
-    }
 
     // ================= 🩺 CLINICAL FLOW =================
     window.evaluatePatient = function() {
@@ -753,7 +709,6 @@
         } catch (error) { alert("เกิดข้อผิดพลาด"); }
     }
 
-    // ================= 📄 หน้าปรินต์ A4 พร้อม Digital Watermark และข้อความลิขสิทธิ์ =================
     window.viewCase = function(docId) {
         const rec = window.allCases.find(c => c.id === docId);
         if(!rec) return;
@@ -776,7 +731,6 @@
         const html = `
             <div class="watermark-container" style="padding: 20px 30px; font-family: 'Sarabun', sans-serif; color: black; line-height: 1.5; position: relative;">
                 
-                <!-- ลายน้ำดิจิทัลพาดกลางกระดาษ A4 -->
                 <div class="watermark-text">
                     NAKHON PATHOM HOSPITAL • EMS ALS
                 </div>
@@ -787,7 +741,7 @@
                         <span style="font-size: 10px; color: #64748b;">TEMSA Element 5 Certified</span>
                     </div>
                     <h1 style="font-size: 20px; font-weight: bold; margin: 2px 0 0 0;">แบบบันทึกการดูแลผู้ป่วยฉุกเฉิน Stroke Fast Track</h1>
-                    <p style="font-size: 13px; margin: 3px 0 0 0; color: #334155;">กลุ่มงานเวชศาสตร์ฉุกเฉิน โรงพยาบาลนครปฐม</p>
+                    <p style="font-size: 13px; margin: 3px 0 0 0; color: #334155;">กลุ่มงานการแพทย์ฉุกเฉินและนิติเวช โรงพยาบาลนครปฐม</p>
                 </div>
 
                 <div style="margin-bottom: 10px; position: relative; z-index: 10;">
@@ -835,11 +789,11 @@
                     </table>
                 </div>
 
-                <div style="margin-bottom: 12px; position: relative; z-index: 10;">
+                <div style="margin-bottom: 10px; position: relative; z-index: 10;">
                     <h2 style="font-weight: bold; font-size: 15px; background-color: #f3f4f6; padding: 3px 10px; border-left: 4px solid #374151; margin-bottom: 6px;">4. การรักษาพยาบาล (Interventions)</h2>
                     <div style="padding-left: 5px; line-height: 1.5; font-size: 13px;">
                         <p style="margin: 0;">${chk(rec.interventions?.ab_manage?.done)} <b>A+B manage:</b> ${rec.interventions?.ab_manage?.detail || '-'}</p>
-                        <p style="margin: 0;">${chk(rec.interventions?.iv?.done)} <b>เก็บแลป Stroke FT bundle + ให้สารน้ำ:</b> NSS IV rate ${rec.interventions?.iv?.rate || '-'} ml/hr</p>
+                        <p style="margin: 0;">${chk(rec.interventions?.iv?.done)} <b>เก็บแลป Stroke FT bundle + ให้สารน้ำ:</b> IV rate ${rec.interventions?.iv?.rate || '-'} ml/hr</p>
                         <p style="margin: 0;">${chk(rec.interventions?.other?.done)} <b>การรักษาอื่นๆ:</b> ${rec.interventions?.other?.detail || '-'}</p>
                         <p style="margin: 0;">${chk(rec.interventions?.consult?.done)} <b>การปรึกษา/คำสั่งอำนวยการจาก พอป.:</b> ${rec.interventions?.consult?.detail || '-'}</p>
                     </div>
@@ -865,9 +819,8 @@
                     </tr>
                 </table>
 
-                <!-- ลายน้ำส่วนท้ายกระดาษสำหรับยืนยันสิทธิ์นวัตกรรม -->
                 <div style="margin-top: 25px; border-top: 1px solid #cbd5e1; padding-top: 6px; display: flex; justify-content: space-between; font-size: 9px; color: #64748b; position: relative; z-index: 10;">
-                    <span>ลิขสิทธิ์นวัตกรรมระบบบริการสุขภาพ © 2026 หน่วยปฏิบัติการแพทย์ระดับสูง (ALS) รพ.นครปฐม</span>
+                    <span>ลิขสิทธิ์นวัตกรรมระบบบริการสุขภาพ หน่วยปฏิบัติการแพทย์ระดับสูง (ALS) รพ.นครปฐม © 2026</span>
                     <span>ห้ามทำซ้ำหรือดัดแปลงโดยไม่ได้รับอนุญาต • ระบบบันทึกเวชระเบียนฉุกเฉินอิเล็กทรอนิกส์</span>
                 </div>
             </div>
@@ -911,7 +864,7 @@
         let todayStr = new Date().toLocaleDateString('th-TH');
         let dTotal = 0, dActive = 0, dStroke = 0, dLvo = 0;
         let outs = { rtpa: 0, mt: 0, admit: 0, refer: 0, refused: 0, dead: 0, pending: 0 };
-        let activeMarkerIds = [];
+        let latestLat = null, latestLng = null, latestName = "";
 
         if (snapshot.empty) { 
             historyList.innerHTML = '<p class="text-center text-gray-500 py-4">ยังไม่มีประวัติในระบบ</p>'; 
@@ -968,37 +921,20 @@
                     </div>
                 </div>`;
 
+                // บันทึกพิกัดล่าสุดที่มีการแชร์เข้ามาเพื่ออัปเดต Google Map
                 if(rec.locationShared && rec.lat && rec.lng) {
-                    activeMarkerIds.push(rec.id);
-                    if(map) {
-                        if(markers[rec.id]) {
-                            markers[rec.id].setLatLng([rec.lat, rec.lng]);
-                        } else {
-                            markers[rec.id] = L.marker([rec.lat, rec.lng], {icon: ambIcon})
-                                .addTo(map)
-                                .bindPopup(`<div class="text-center font-bold text-slate-800">${rec.name}<br><span class="text-xs text-red-600">Activate: ${rec.activateTime} น.</span></div>`);
-                        }
-                    }
+                    latestLat = rec.lat;
+                    latestLng = rec.lng;
+                    latestName = rec.name;
                 }
             }
         });
 
-        if(map) {
-            Object.keys(markers).forEach(id => {
-                if(!activeMarkerIds.includes(id)) {
-                    map.removeLayer(markers[id]);
-                    delete markers[id];
-                }
-            });
-            const placeholder = document.getElementById('map-placeholder');
-            if(placeholder) {
-                if(activeMarkerIds.length === 0) {
-                    placeholder.innerHTML = `<i class="fas fa-map-pin text-2xl md:text-3xl mb-2 opacity-30 text-slate-400"></i><p class="text-slate-500 italic">ไม่มีพิกัดในระบบ (รอการแชร์)</p>`;
-                    placeholder.style.display = 'flex';
-                } else {
-                    placeholder.style.display = 'none';
-                }
-            }
+        // อัปเดตพิกัดบน Google Maps ของศูนย์สั่งการ
+        if (latestLat && latestLng) {
+            updateGoogleMap(latestLat, latestLng, latestName);
+        } else {
+            updateGoogleMap();
         }
 
         const dashTotal = document.getElementById('dash-total');
