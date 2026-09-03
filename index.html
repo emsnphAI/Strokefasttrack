@@ -321,21 +321,40 @@
             <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-200 text-sm md:text-base space-y-4">
                 <h3 class="font-bold text-teal-800 border-b pb-2 mb-4 md:text-lg flex items-center"><i class="fas fa-medkit mr-2 text-xl"></i> การดูแลรักษา (Interventions)</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- A+B management -->
                     <label class="flex items-start space-x-3 bg-gray-50 p-4 rounded-xl border border-gray-200 cursor-pointer hover:bg-teal-50 hover:border-teal-200 transition">
                         <input type="checkbox" id="chk_ab_manage" class="w-6 h-6 text-teal-600 rounded mt-1 focus:ring-teal-500">
-                        <div class="flex-1"><span class="font-bold text-gray-800 block mb-1">A+B management:</span><input type="text" id="val_ab_manage" class="w-full border border-gray-300 rounded-lg p-2 bg-white focus:ring-2 focus:ring-teal-400 outline-none" placeholder="ระบุการจัดการ"></div>
+                        <div class="flex-1">
+                            <span class="font-bold text-gray-800 block mb-1">A+B management:</span>
+                            <input type="text" id="val_ab_manage" class="w-full border border-gray-300 rounded-lg p-2 bg-white focus:ring-2 focus:ring-teal-400 outline-none" placeholder="ระบุการจัดการ">
+                        </div>
                     </label>
+
+                    <!-- เก็บแลป Stroke FT bundle + ให้สารน้ำ -->
                     <label class="flex items-start space-x-3 bg-gray-50 p-4 rounded-xl border border-gray-200 cursor-pointer hover:bg-teal-50 hover:border-teal-200 transition">
                         <input type="checkbox" id="chk_iv" class="w-6 h-6 text-teal-600 rounded mt-1 focus:ring-teal-500">
-                        <div class="flex-1"><span class="font-bold text-gray-800 block mb-1">ให้สารน้ำ (NSS 1000 ml)</span> IV rate: <input type="number" id="val_iv_rate" class="border-b-2 border-teal-400 w-16 text-center bg-transparent focus:outline-none font-bold text-teal-700"> ml/hr</div>
+                        <div class="flex-1">
+                            <span class="font-bold text-gray-800 block mb-1">เก็บแลป Stroke FT bundle + ให้สารน้ำ</span>
+                            IV rate: <input type="number" id="val_iv_rate" class="border-b-2 border-teal-400 w-16 text-center bg-transparent focus:outline-none font-bold text-teal-700"> ml/hr
+                        </div>
                     </label>
-                    <label class="flex items-center space-x-3 bg-gray-50 p-4 rounded-xl border border-gray-200 cursor-pointer hover:bg-teal-50 hover:border-teal-200 transition">
-                        <input type="checkbox" id="chk_blood" class="w-6 h-6 text-teal-600 rounded focus:ring-teal-500">
-                        <span class="font-bold text-gray-800">เจาะเลือด (CBC, Chem, Coag, Clotted)</span>
-                    </label>
+
+                    <!-- การรักษาอื่นๆ -->
                     <label class="flex items-start space-x-3 bg-gray-50 p-4 rounded-xl border border-gray-200 cursor-pointer hover:bg-teal-50 hover:border-teal-200 transition">
                         <input type="checkbox" id="chk_other" class="w-6 h-6 text-teal-600 rounded mt-1 focus:ring-teal-500">
-                        <div class="flex-1"><span class="font-bold text-gray-800 block mb-1">การรักษาอื่นๆ:</span><input type="text" id="val_other" class="w-full border border-gray-300 rounded-lg p-2 bg-white focus:ring-2 focus:ring-teal-400 outline-none" placeholder="ระบุเพิ่มเติม"></div>
+                        <div class="flex-1">
+                            <span class="font-bold text-gray-800 block mb-1">การรักษาอื่นๆ:</span>
+                            <input type="text" id="val_other" class="w-full border border-gray-300 rounded-lg p-2 bg-white focus:ring-2 focus:ring-teal-400 outline-none" placeholder="ระบุเพิ่มเติม">
+                        </div>
+                    </label>
+
+                    <!-- การปรึกษา/คำสั่งอำนวยการจาก พอป. -->
+                    <label class="flex items-start space-x-3 bg-gray-50 p-4 rounded-xl border border-gray-200 cursor-pointer hover:bg-teal-50 hover:border-teal-200 transition">
+                        <input type="checkbox" id="chk_consult" class="w-6 h-6 text-teal-600 rounded mt-1 focus:ring-teal-500">
+                        <div class="flex-1">
+                            <span class="font-bold text-gray-800 block mb-1">การปรึกษา/คำสั่งอำนวยการจาก พอป.:</span>
+                            <input type="text" id="val_consult" class="w-full border border-gray-300 rounded-lg p-2 bg-white focus:ring-2 focus:ring-teal-400 outline-none" placeholder="ระบุรายละเอียด / คำสั่ง พอป.">
+                        </div>
                     </label>
                 </div>
             </div>
@@ -463,9 +482,14 @@
         if (!map) {
             const placeholder = document.getElementById('map-placeholder');
             if(placeholder) placeholder.style.display = 'none';
+            
+            // เซ็ตจุดกึ่งกลางเริ่มต้นที่ รพ.นครปฐม
             map = L.map('mainMap').setView([13.814036, 100.037293], 12);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; OpenStreetMap'
+            
+            // เปลี่ยนมาใช้ OpenStreetMap มาตรฐาน (ฟรี และไม่ต้องใช้ API Key)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map);
         }
     }
@@ -645,7 +669,7 @@
             vitals: v,
             ab_manage: { done: document.getElementById('chk_ab_manage').checked, detail: document.getElementById('val_ab_manage').value || '-' },
             iv: { done: document.getElementById('chk_iv').checked, rate: document.getElementById('val_iv_rate').value || '-' },
-            blood: document.getElementById('chk_blood').checked, 
+            consult: { done: document.getElementById('chk_consult').checked, detail: document.getElementById('val_consult').value || '-' },
             other: { done: document.getElementById('chk_other').checked, detail: document.getElementById('val_other').value || '-' }
         };
 
@@ -811,13 +835,13 @@
                     </table>
                 </div>
 
-                <div style="margin-bottom: 10px; position: relative; z-index: 10;">
+                <div style="margin-bottom: 12px; position: relative; z-index: 10;">
                     <h2 style="font-weight: bold; font-size: 15px; background-color: #f3f4f6; padding: 3px 10px; border-left: 4px solid #374151; margin-bottom: 6px;">4. การรักษาพยาบาล (Interventions)</h2>
                     <div style="padding-left: 5px; line-height: 1.5; font-size: 13px;">
                         <p style="margin: 0;">${chk(rec.interventions?.ab_manage?.done)} <b>A+B manage:</b> ${rec.interventions?.ab_manage?.detail || '-'}</p>
-                        <p style="margin: 0;">${chk(rec.interventions?.iv?.done)} <b>สารน้ำ:</b> NSS 1000 ml IV rate ${rec.interventions?.iv?.rate || '-'} ml/hr</p>
-                        <p style="margin: 0;">${chk(rec.interventions?.blood)} <b>เจาะเลือด:</b> CBC, Chem, Coag, Clotted</p>
+                        <p style="margin: 0;">${chk(rec.interventions?.iv?.done)} <b>เก็บแลป Stroke FT bundle + ให้สารน้ำ:</b> NSS IV rate ${rec.interventions?.iv?.rate || '-'} ml/hr</p>
                         <p style="margin: 0;">${chk(rec.interventions?.other?.done)} <b>การรักษาอื่นๆ:</b> ${rec.interventions?.other?.detail || '-'}</p>
+                        <p style="margin: 0;">${chk(rec.interventions?.consult?.done)} <b>การปรึกษา/คำสั่งอำนวยการจาก พอป.:</b> ${rec.interventions?.consult?.detail || '-'}</p>
                     </div>
                 </div>
 
