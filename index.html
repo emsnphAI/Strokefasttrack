@@ -464,91 +464,148 @@
         let gcsTotal = (v.gcs?.e!=='-' && v.gcs?.v!=='-' && v.gcs?.m!=='-') ? parseInt(v.gcs?.e) + parseInt(v.gcs?.v) + parseInt(v.gcs?.m) : '-';
         const chk = (c) => c ? '☑' : '☐';
 
-        const html = `
-            <div style="padding: 20px 30px; font-family: 'Sarabun', sans-serif; color: black; line-height: 1.5;">
-                <div style="border-bottom: 2px solid black; padding-bottom: 10px; margin-bottom: 15px; text-align: center;">
+      const html = `
+            <div style="padding: 15px 30px; font-family: 'Sarabun', sans-serif; color: black; line-height: 1.5;">
+                <div style="border-bottom: 2px solid black; padding-bottom: 5px; margin-bottom: 10px; text-align: center;">
                     <h1 style="font-size: 20px; font-weight: bold; margin: 0;">แบบบันทึกการดูแลผู้ป่วยฉุกเฉิน Stroke Fast Track</h1>
-                    <p style="font-size: 14px; margin: 5px 0 0 0;">หน่วยปฏิบัติการการแพทย์ฉุกเฉิน</p>
+                    <p style="font-size: 14px; margin: 5px 0 0 0;">หน่วยปฏิบัติการแพทย์ฉุกเฉิน รพ.นครปฐม</p>
                 </div>
 
-                <h2 style="font-weight: bold; font-size: 16px; background: #f3f4f6; padding: 5px; border-left: 4px solid #374151; margin-bottom: 10px;">1. ข้อมูลผู้ป่วยและเวลา</h2>
-                <table style="width: 100%; font-size: 14px; margin-bottom: 15px;">
-                    <tr><td style="width: 50%; padding: 4px 0;"><b>ชื่อ/HN:</b> ${rec.name}</td><td><b>วันที่:</b> ${rec.dateStr || '-'}</td></tr>
-                    <tr><td style="padding: 4px 0;"><b>Last Known Well:</b> ${rec.lkw}</td><td><b>เวลา Onset:</b> ${rec.onset} น.</td></tr>
-                    <tr><td style="color: #2563eb; padding: 4px 0;"><b>เวลาพบผู้ป่วย (FMC):</b> ${rec.fmc} น.</td><td style="color: #dc2626;"><b>เวลา Activate:</b> ${rec.activateTime} น.</td></tr>
-                </table>
-
-                <h2 style="font-weight: bold; font-size: 16px; background: #f3f4f6; padding: 5px; border-left: 4px solid #374151; margin-bottom: 10px;">2. การประเมินอาการ (Assessment) & Motor Power</h2>
-                <div style="display: flex; justify-content: space-between; align-items: center; padding-left: 5px; margin-bottom: 15px;">
-                    <!-- ด้านซ้าย: อาการ BE-FAST -->
-                    <div style="font-size: 14px; width: 65%;">
-                        <p><b>BE-FAST:</b> ${chk(rec.befast?.b)} Balance &nbsp; ${chk(rec.befast?.e)} Eyes &nbsp; ${chk(rec.befast?.f)} Face<br>${chk(rec.befast?.a)} Arms &nbsp; ${chk(rec.befast?.s)} Speech</p>
-                        <p style="color: #dc2626; font-weight: bold; margin-top: 5px;">สถานะ: ${rec.isLvo ? 'VAN Positive (สงสัย LVO)' : 'VAN Negative'}</p>
-                    </div>
-                    
-                    <!-- ด้านขวา: ตาราง Motor Power ทรงกากบาท -->
-                    <div style="width: 35%; display: flex; flex-direction: column; align-items: center;">
-                        <b style="font-size: 13px; margin-bottom: 5px;">Motor Power (0-5)</b>
-                        <table style="border-collapse: collapse; text-align: center; font-weight: bold; font-size: 14px;">
-                            <tr>
-                                <td style="padding: 0 10px 2px 10px; color: #1d4ed8;">Rt.</td>
-                                <td style="padding: 0 10px 2px 10px; color: #be185d;">Lt.</td>
-                            </tr>
-                            <tr>
-                                <td style="border-bottom: 2px solid black; border-right: 2px solid black; padding: 5px 15px;">${v.motor?.ra||'-'}</td>
-                                <td style="border-bottom: 2px solid black; padding: 5px 15px;">${v.motor?.la||'-'}</td>
-                            </tr>
-                            <tr>
-                                <td style="border-right: 2px solid black; padding: 5px 15px;">${v.motor?.rl||'-'}</td>
-                                <td style="padding: 5px 15px;">${v.motor?.ll||'-'}</td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-
-                <h2 style="font-weight: bold; font-size: 16px; background: #f3f4f6; padding: 5px; border-left: 4px solid #374151; margin-bottom: 10px;">3. สัญญาณชีพแรกรับ</h2>
-                <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 13px; margin-bottom: 15px;">
-                    <tr style="background: #e5e7eb;">
-                        <th style="border: 1px solid black; padding: 4px;">BP</th><th style="border: 1px solid black; padding: 4px;">HR</th>
-                        <th style="border: 1px solid black; padding: 4px;">RR</th><th style="border: 1px solid black; padding: 4px;">O2 Sat</th>
-                        <th style="border: 1px solid black; padding: 4px;">DTX</th><th style="border: 1px solid black; padding: 4px;">Pupils</th>
-                        <th style="border: 1px solid black; padding: 4px;">GCS (E,V,M)</th><th style="border: 1px solid black; padding: 4px;">Total</th>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid black; padding: 4px;">${v.bp||'-'}</td><td style="border: 1px solid black; padding: 4px;">${v.hr||'-'}</td>
-                        <td style="border: 1px solid black; padding: 4px;">${v.rr||'-'}</td><td style="border: 1px solid black; padding: 4px;">${v.o2||'-'}%</td>
-                        <td style="border: 1px solid black; padding: 4px;">${v.dtx||'-'}</td><td style="border: 1px solid black; padding: 4px;">${v.pupil_l||'-'}/${v.pupil_r||'-'}</td>
-                        <td style="border: 1px solid black; padding: 4px;">E${v.gcs?.e||'-'}V${v.gcs?.v||'-'}M${v.gcs?.m||'-'}</td><td style="border: 1px solid black; padding: 4px; font-weight: bold;">${gcsTotal}</td>
-                    </tr>
-                </table>
-
-                <h2 style="font-weight: bold; font-size: 16px; background: #f3f4f6; padding: 5px; border-left: 4px solid #374151; margin-bottom: 10px;">4. การรักษาพยาบาล (Interventions)</h2>
-                <div style="font-size: 14px; margin-bottom: 15px; padding-left: 5px; line-height: 1.8;">
-                    <p>${chk(rec.interventions?.ab_manage?.done)} <b>A+B manage:</b> ${rec.interventions?.ab_manage?.detail||'-'}</p>
-                    <p>${chk(rec.interventions?.iv?.done)} <b>สารน้ำ:</b> NSS 1000 ml IV rate ${rec.interventions?.iv?.rate||'-'} ml/hr</p>
-                    <p>${chk(rec.interventions?.blood)} <b>เจาะเลือด:</b> CBC, Chem, Coag, Clotted</p>
-                    <p>${chk(rec.interventions?.consult?.done)} <b>รายงานแพทย์:</b> ${rec.interventions?.consult?.detail||'-'}</p>
-                    <p>${chk(rec.interventions?.coord)} <b>ประสานงาน รพ.ปลายทางเรียบร้อย</b></p>
-                    <p>${chk(rec.interventions?.other?.done)} <b>การรักษาอื่นๆ:</b> ${rec.interventions?.other?.detail || '-'}</p>
-                </div>
-
-                <div style="border: 2px solid black; padding: 10px; margin-bottom: 10px;">
-                    <h2 style="font-weight: bold; font-size: 16px; text-decoration: underline; margin-top: 0;">5. สรุปเวลาตัวชี้วัด (KPI)</h2>
-                    <table style="width: 100%; font-size: 14px; margin-bottom: 10px;">
-                        <tr><td style="width: 50%; padding: 4px 0;">• Door: <b>${rec.interventions?.timeDoor||'........'} น.</b></td><td>• Onset->FMC: <b>${calcDiff(rec.onset, rec.fmc)}</b> นาที</td></tr>
-                        <tr><td style="padding: 4px 0;">• CT Brain: <b>${rec.interventions?.timeCT||'........'} น.</b></td><td>• Onset->Activate: <b>${calcDiff(rec.onset, rec.activateTime)}</b> นาที</td></tr>
-                        <tr><td style="padding: 4px 0;">• Needle: <b>${rec.interventions?.timeNeedle||'........'} น.</b></td><td>• Activate->Door: <b>${calcDiff(rec.activateTime, rec.interventions?.timeDoor)}</b> นาที</td></tr>
+                <div style="margin-bottom: 10px;">
+                    <h2 style="font-weight: bold; font-size: 16px; background-color: #f3f4f6; padding: 3px 10px; border-left: 4px solid #374151; margin-bottom: 5px;">1. ข้อมูลผู้ป่วยและเวลา</h2>
+                    <table style="width: 100%; border-spacing: 0; margin-left: 5px; font-size: 14px;">
+                        <tr>
+                            <td style="width: 50%; padding-bottom: 2px;"><b>ชื่อผู้ป่วย/HN:</b> ${rec.name}</td>
+                            <td style="width: 50%; padding-bottom: 2px;"><b>วันที่ประเมิน:</b> ${rec.dateStr || '-'}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="padding-bottom: 2px; border-bottom: 1px dotted #ccc;">
+                                <b>CC:</b> ........................................................................................................................................
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="padding-top: 4px; padding-bottom: 2px;">
+                                <b>PI:</b> ........................................................................................................................................
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="padding-bottom: 4px; border-bottom: 1px dotted #ccc;">
+                                ......................................................................................................................................................
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding-top: 4px; padding-bottom: 2px;"><b>Last Known Well:</b> ${rec.lkw}</td>
+                            <td style="padding-top: 4px; padding-bottom: 2px;"><b>เวลา Onset:</b> ${rec.onset} น.</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #2563eb; padding-bottom: 2px;"><b>เวลาพบผู้ป่วย (FMC):</b> ${rec.fmc} น.</td>
+                            <td style="color: #dc2626; padding-bottom: 2px;"><b>เวลา Activate:</b> ${rec.activateTime} น.</td>
+                        </tr>
                     </table>
-                    <div style="border-top: 1px dashed gray; padding-top: 10px; font-weight: bold;">
+                </div>
+
+                <div style="margin-bottom: 10px;">
+                    <h2 style="font-weight: bold; font-size: 16px; background-color: #f3f4f6; padding: 3px 10px; border-left: 4px solid #374151; margin-bottom: 5px;">2. การประเมินอาการ (Assessment) & Motor Power</h2>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; padding-left: 5px;">
+                        <!-- ส่วนซ้าย: อาการ BE-FAST -->
+                        <div style="font-size: 14px; width: 65%;">
+                            <p style="margin: 0 0 5px 0;"><b>BE-FAST:</b> 
+                                ${chk(rec.befast?.b)} Balance &nbsp; 
+                                ${chk(rec.befast?.e)} Eyes &nbsp; 
+                                ${chk(rec.befast?.f)} Face
+                            </p>
+                            <p style="margin: 0 0 5px 0;">
+                                ${chk(rec.befast?.a)} Arms &nbsp; 
+                                ${chk(rec.befast?.s)} Speech
+                            </p>
+                            <p style="color: #dc2626; font-weight: bold; margin: 0;">สถานะ: ${rec.isLvo ? 'VAN Positive (สงสัย LVO)' : 'VAN Negative'}</p>
+                        </div>
+                        
+                        <!-- ส่วนขวา: ตาราง Motor Power ทรงกากบาท -->
+                        <div style="width: 35%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;">
+                            <b style="font-size: 13px; margin-bottom: 2px; color: #374151;">Motor Power (0-5)</b>
+                            <table style="border-collapse: collapse; text-align: center; font-weight: bold; font-size: 14px;">
+                                <tr>
+                                    <td style="padding: 0 10px 2px 10px; color: #1d4ed8;">Rt.</td>
+                                    <td style="padding: 0 10px 2px 10px; color: #be185d;">Lt.</td>
+                                </tr>
+                                <tr>
+                                    <td style="border-bottom: 2px solid black; border-right: 2px solid black; padding: 2px 15px;">${v.motor?.ra||'-'}</td>
+                                    <td style="border-bottom: 2px solid black; padding: 2px 15px;">${v.motor?.la||'-'}</td>
+                                </tr>
+                                <tr>
+                                    <td style="border-right: 2px solid black; padding: 2px 15px;">${v.motor?.rl||'-'}</td>
+                                    <td style="padding: 2px 15px;">${v.motor?.ll||'-'}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 10px;">
+                    <h2 style="font-weight: bold; font-size: 16px; background-color: #f3f4f6; padding: 3px 10px; border-left: 4px solid #374151; margin-bottom: 5px;">3. สัญญาณชีพแรกรับ </h2>
+                    <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 13px;">
+                        <tr style="background-color: #e5e7eb;">
+                            <th style="border: 1px solid black; padding: 3px;">BP</th>
+                            <th style="border: 1px solid black; padding: 3px;">HR</th>
+                            <th style="border: 1px solid black; padding: 3px;">RR</th>
+                            <th style="border: 1px solid black; padding: 3px;">O2 Sat</th>
+                            <th style="border: 1px solid black; padding: 3px;">DTX</th>
+                            <th style="border: 1px solid black; padding: 3px;">Pupils</th>
+                            <th style="border: 1px solid black; padding: 3px;">GCS (E,V,M)</th>
+                            <th style="border: 1px solid black; padding: 3px;">Total</th>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid black; padding: 3px;">${v.bp || '-'}</td>
+                            <td style="border: 1px solid black; padding: 3px;">${v.hr || '-'}</td>
+                            <td style="border: 1px solid black; padding: 3px;">${v.rr || '-'}</td>
+                            <td style="border: 1px solid black; padding: 3px;">${v.o2 || '-'}%</td>
+                            <td style="border: 1px solid black; padding: 3px;">${v.dtx || '-'}</td>
+                            <td style="border: 1px solid black; padding: 3px;">${v.pupil_l || '-'} / ${v.pupil_r || '-'}</td>
+                            <td style="border: 1px solid black; padding: 3px;">E${v.gcs?.e || '-'} V${v.gcs?.v || '-'} M${v.gcs?.m || '-'}</td>
+                            <td style="border: 1px solid black; padding: 3px; font-weight: bold;">${gcsTotal}</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div style="margin-bottom: 10px;">
+                    <h2 style="font-weight: bold; font-size: 16px; background-color: #f3f4f6; padding: 3px 10px; border-left: 4px solid #374151; margin-bottom: 5px;">4. การรักษาพยาบาล (Interventions)</h2>
+                    <div style="padding-left: 5px; line-height: 1.5; font-size: 14px;">
+                        <p style="margin: 0;">${chk(rec.interventions?.ab_manage?.done)} <b>A+B manage:</b> ${rec.interventions?.ab_manage?.detail || '-'}</p>
+                        <p style="margin: 0;">${chk(rec.interventions?.iv?.done)} <b>สารน้ำ:</b> NSS 1000 ml IV rate ${rec.interventions?.iv?.rate || '-'} ml/hr</p>
+                        <p style="margin: 0;">${chk(rec.interventions?.blood)} <b>เจาะเลือด:</b> CBC, Chem, Coag, Clotted</p>
+                        <p style="margin: 0;">${chk(rec.interventions?.consult?.done)} <b>รายงานแพทย์:</b> ${rec.interventions?.consult?.detail || '-'}</p>
+                        <p style="margin: 0;">${chk(rec.interventions?.coord)} <b>ประสานงาน รพ.ปลายทางเรียบร้อย</b></p>
+                        <p style="margin: 0;">${chk(rec.interventions?.other?.done)} <b>การรักษาอื่นๆ:</b> ${rec.interventions?.other?.detail || '-'}</p>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 10px; border: 2px solid black; padding: 5px 10px;">
+                    <h2 style="font-weight: bold; font-size: 16px; margin-top: 0; margin-bottom: 5px; text-decoration: underline;">5. สรุปเวลาตัวชี้วัด (KPI)</h2>
+                    <table style="width: 100%; font-size: 14px; margin-bottom: 5px;">
+                        <tr>
+                            <td style="width: 50%; padding-bottom: 2px;">• Door: <b>${rec.interventions?.timeDoor || '........'} น.</b></td>
+                            <td style="width: 50%; padding-bottom: 2px;">• Onset->FMC: <b>${calcDiff(rec.onset, rec.fmc)}</b> นาที</td>
+                        </tr>
+                        <tr>
+                            <td style="padding-bottom: 2px;">• CT Brain: <b>${rec.interventions?.timeCT || '........'} น.</b></td>
+                            <td style="padding-bottom: 2px;">• Onset->Activate: <b>${calcDiff(rec.onset, rec.activateTime)}</b> นาที</td>
+                        </tr>
+                        <tr>
+                            <td style="padding-bottom: 2px;">• Needle: <b>${rec.interventions?.timeNeedle || '........'} น.</b></td>
+                            <td style="padding-bottom: 2px;">• Activate->Door: <b>${calcDiff(rec.activateTime, rec.interventions?.timeDoor)}</b> นาที</td>
+                        </tr>
+                    </table>
+                    <div style="border-top: 1px dashed gray; padding-top: 5px; font-weight: bold;">
                         <span style="color: #dc2626; margin-right: 15px;">🔥 Door to CT (≤ 25) = ${calcDiff(rec.interventions?.timeDoor, rec.interventions?.timeCT)} นาที</span>
                         <span style="color: #16a34a;">💉 Door to Needle (≤ 60) = ${calcDiff(rec.interventions?.timeDoor, rec.interventions?.timeNeedle)} นาที</span>
                     </div>
                 </div>
 
-                <table style="width: 100%; text-align: center; margin-top: 20px; font-size: 14px;">
+                <table style="width: 100%; text-align: center; margin-top: 15px; font-size: 14px;">
                     <tr>
-                        <td style="width: 50%;"><p>ลงชื่อ.........................................ผู้ประเมิน</p><p class="mt-2">(.........................................)</p></td>
-                        <td style="width: 50%;"><p>ลงชื่อ.........................................ผู้รับมอบ</p><p class="mt-2">(.........................................)</p></td>
+                        <td style="width: 50%;"><p>ลงชื่อ.........................................ผู้ประเมิน</p><p style="margin-top: 5px;">(.........................................)</p></td>
+                        <td style="width: 50%;"><p>ลงชื่อ.........................................ผู้รับมอบ</p><p style="margin-top: 5px;">(.........................................)</p></td>
                     </tr>
                 </table>
             </div>
