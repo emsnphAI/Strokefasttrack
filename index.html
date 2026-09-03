@@ -7,6 +7,8 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <style>
         body { font-family: 'Sarabun', sans-serif; background-color: #0b0f19; } 
@@ -165,20 +167,11 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            <!-- Google Maps Tracking -->
-            <div class="bg-slate-800 p-4 md:p-6 rounded-2xl shadow-xl border border-slate-700/50 flex flex-col">
-                <h3 class="font-bold text-slate-200 mb-4 border-b border-slate-700 pb-2 text-base md:text-lg"><i class="fas fa-map-marked-alt text-red-500 mr-2"></i> Google Maps Tracking</h3>
-                
-                <!-- เปลี่ยนช่องแสดงผลเป็น Google Maps Embed พื้นหลังมืด -->
-                <div class="w-full h-40 md:h-56 rounded-xl border border-slate-700 mb-4 shadow-inner z-10 relative bg-slate-900 overflow-hidden">
-                    <iframe id="googleMapFrame" width="100%" height="100%" style="border:0; filter: invert(90%) hue-rotate(180deg) contrast(120%);" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/place?key=&q=Hospital+Nakhon+Pathom"></iframe>
-                </div>
-
-                <div id="activeCasesList" class="space-y-3 flex-1 overflow-y-auto pr-2 custom-scrollbar max-h-48 md:max-h-64">
-                    <p class="text-center text-sm text-slate-500 py-4 italic">ไม่มีเคสที่กำลังดำเนินการ</p>
-                </div>
-            </div>
+       <div id="mainMap" class="w-full h-40 md:h-56 rounded-xl border border-slate-700 mb-4 shadow-inner z-10 relative bg-slate-900">
+    <div class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 text-xs z-0" id="map-placeholder">
+        <i class="fas fa-spinner fa-spin text-2xl mb-2 opacity-50"></i> กำลังโหลดแผนที่...
+    </div>
+</div>
 
             <!-- ER Outcomes -->
             <div class="bg-slate-800 p-4 md:p-6 rounded-2xl shadow-xl border border-slate-700/50">
@@ -440,19 +433,26 @@
     window.allCases = [];
     window.selectedCaseToClose = null;
 
-    // ระบบจัดการ Google Maps
-    function updateGoogleMap(lat, lng, name) {
-        const frame = document.getElementById('googleMapFrame');
-        if(frame) {
-            if(lat && lng) {
-                // ปักหมุดตามพิกัดจริงที่รถกู้ชีพส่งมา
-                frame.src = `https://www.google.com/maps/embed/v1/view?key=&center=${lat},${lng}&zoom=15`;
-            } else {
-                // ค่าเริ่มต้นศูนย์กลาง รพ.นครปฐม
-                frame.src = `https://www.google.com/maps/embed/v1/place?key=&q=Hospital+Nakhon+Pathom`;
-            }
-        }
+   let map = null;
+let markers = {};
+const ambIcon = L.divIcon({
+    html: '<i class="fas fa-ambulance fa-2x text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]"></i>',
+    className: 'bg-transparent',
+    iconSize: [30, 30],
+    iconAnchor: [15, 15]
+});
+
+function initMap() {
+    if (!map) {
+        const placeholder = document.getElementById('map-placeholder');
+        if(placeholder) placeholder.style.display = 'none';
+        map = L.map('mainMap').setView([13.814036, 100.037293], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
     }
+}
 
     window.switchTab = function(tab) {
         ['dashboard', 'assess', 'action', 'history', 'document'].forEach(t => {
