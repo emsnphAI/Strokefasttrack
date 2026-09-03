@@ -709,7 +709,7 @@
         } catch (error) { alert("เกิดข้อผิดพลาด"); }
     }
 
-    window.viewCase = function(docId) {
+   window.viewCase = function(docId) {
         const rec = window.allCases.find(c => c.id === docId);
         if(!rec) return;
 
@@ -736,12 +736,11 @@
                 </div>
 
                 <div style="border-bottom: 2px solid black; padding-bottom: 5px; margin-bottom: 12px; text-align: center; position: relative; z-index: 10;">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div style="display: flex; justify-content: flex-end; align-items: flex-start;">
                         <span style="font-size: 10px; color: #64748b;">รหัสเอกสาร: NKP-CPG-STK-01 (Master List)</span>
-                        <span style="font-size: 10px; color: #64748b;">TEMSA Element 5 Certified</span>
                     </div>
                     <h1 style="font-size: 20px; font-weight: bold; margin: 2px 0 0 0;">แบบบันทึกการดูแลผู้ป่วยฉุกเฉิน Stroke Fast Track</h1>
-                    <p style="font-size: 13px; margin: 3px 0 0 0; color: #334155;">กลุ่มงานการแพทย์ฉุกเฉินและนิติเวช โรงพยาบาลนครปฐม</p>
+                    <p style="font-size: 13px; margin: 3px 0 0 0; color: #334155;">หน่วยปฎิบัติการแพทย์ฉุกเฉิน โรงพยาบาลนครปฐม</p>
                 </div>
 
                 <div style="margin-bottom: 10px; position: relative; z-index: 10;">
@@ -793,7 +792,7 @@
                     <h2 style="font-weight: bold; font-size: 15px; background-color: #f3f4f6; padding: 3px 10px; border-left: 4px solid #374151; margin-bottom: 6px;">4. การรักษาพยาบาล (Interventions)</h2>
                     <div style="padding-left: 5px; line-height: 1.5; font-size: 13px;">
                         <p style="margin: 0;">${chk(rec.interventions?.ab_manage?.done)} <b>A+B manage:</b> ${rec.interventions?.ab_manage?.detail || '-'}</p>
-                        <p style="margin: 0;">${chk(rec.interventions?.iv?.done)} <b>เก็บแลป Stroke FT bundle + ให้สารน้ำ:</b> IV rate ${rec.interventions?.iv?.rate || '-'} ml/hr</p>
+                        <p style="margin: 0;">${chk(rec.interventions?.iv?.done)} <b>เก็บแลป Stroke FT bundle + ให้สารน้ำ:</b> NSS IV rate ${rec.interventions?.iv?.rate || '-'} ml/hr</p>
                         <p style="margin: 0;">${chk(rec.interventions?.other?.done)} <b>การรักษาอื่นๆ:</b> ${rec.interventions?.other?.detail || '-'}</p>
                         <p style="margin: 0;">${chk(rec.interventions?.consult?.done)} <b>การปรึกษา/คำสั่งอำนวยการจาก พอป.:</b> ${rec.interventions?.consult?.detail || '-'}</p>
                     </div>
@@ -812,15 +811,26 @@
                     </div>
                 </div>
 
-                <table style="width: 100%; text-align: center; margin-top: 18px; font-size: 13px; position: relative; z-index: 10;">
+                <!-- ส่วนลงชื่อที่ปรับโครงสร้างใหม่ให้ตรงเป๊ะ -->
+                <table style="width: 100%; text-align: center; margin-top: 25px; font-size: 13px; position: relative; z-index: 10; border-collapse: collapse;">
                     <tr>
-                        <td style="width: 50%;"><p>ลงชื่อ.........................................ผู้ประเมิน</p><p style="margin-top: 6px;">(.........................................)</p></td>
-                        <td style="width: 50%;"><p>ลงชื่อ.........................................แพทย์/พยาบาล ER</p><p style="margin-top: 6px;">(.........................................)</p></td>
+                        <td style="width: 50%; vertical-align: top; padding: 0 20px;">
+                            <div style="display: inline-block; text-align: left;">
+                                ลงชื่อ.............................................................ผู้ประเมิน<br>
+                                <div style="text-align: center; margin-top: 4px;">(..................................................................)</div>
+                            </div>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; padding: 0 20px;">
+                            <div style="display: inline-block; text-align: left;">
+                                ลงชื่อ.............................................................แพทย์/พยาบาล ER<br>
+                                <div style="text-align: center; margin-top: 4px;">(..................................................................)</div>
+                            </div>
+                        </td>
                     </tr>
                 </table>
 
                 <div style="margin-top: 25px; border-top: 1px solid #cbd5e1; padding-top: 6px; display: flex; justify-content: space-between; font-size: 9px; color: #64748b; position: relative; z-index: 10;">
-                    <span>ลิขสิทธิ์นวัตกรรมระบบบริการสุขภาพ หน่วยปฏิบัติการแพทย์ระดับสูง (ALS) รพ.นครปฐม © 2026</span>
+                    <span>ลิขสิทธิ์นวัตกรรมระบบบริการสุขภาพ กลุ่มงานเวชศาสตร์ฉุกเฉิน รพ.นครปฐม © 2026</span>
                     <span>ห้ามทำซ้ำหรือดัดแปลงโดยไม่ได้รับอนุญาต • ระบบบันทึกเวชระเบียนฉุกเฉินอิเล็กทรอนิกส์</span>
                 </div>
             </div>
