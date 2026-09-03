@@ -8,220 +8,219 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
         body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; }
-        .tab-btn.active { border-bottom: 2px solid #ef4444; color: #ef4444; font-weight: bold; }
+        .tab-btn.active { border-bottom: 3px solid #ef4444; color: #ef4444; font-weight: bold; background-color: #fef2f2; }
+        .map-container { background: url('https://www.transparenttextures.com/patterns/cubes.png') #e5e7eb; position: relative; }
+        .ambulance-marker { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); animation: pulse 2s infinite; }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="text-gray-800 relative pb-10">
 
-<div class="max-w-md mx-auto bg-white min-h-screen shadow-lg relative">
-    <div class="bg-red-600 text-white p-4 text-center shadow-md">
-        <h1 class="text-xl font-bold"><i class="fas fa-ambulance mr-2"></i>Stroke Fast Track CPG</h1>
-        <p class="text-sm">แนวทางปฏิบัติกลุ่มอาการโรคหลอดเลือดสมอง</p>
+<!-- ปรับ max-w-md เป็น max-w-4xl เพื่อให้รองรับหน้าจอคอมพิวเตอร์และแท็บเล็ต -->
+<div class="max-w-4xl mx-auto bg-white min-h-screen shadow-2xl relative">
+    <div class="bg-red-600 text-white p-4 md:p-6 text-center shadow-md">
+        <h1 class="text-xl md:text-2xl font-bold"><i class="fas fa-ambulance mr-2"></i>Stroke Fast Track CPG</h1>
+        <p class="text-sm md:text-base opacity-90">แนวทางปฏิบัติกลุ่มอาการโรคหลอดเลือดสมอง</p>
     </div>
 
-    <!-- แถบเมนูนำทาง -->
-    <div class="flex justify-around bg-gray-100 border-b">
-        <button id="tab-dashboard" class="tab-btn active w-1/4 py-3 text-sm" onclick="window.switchTab('dashboard')">
-            <i class="fas fa-chart-pie"></i> ศูนย์สั่งการ
+    <div class="flex justify-around bg-gray-50 border-b sticky top-0 z-40 shadow-sm">
+        <button id="tab-dashboard" class="tab-btn active w-1/4 py-3 md:py-4 text-sm md:text-base transition" onclick="window.switchTab('dashboard')">
+            <i class="fas fa-tv block md:inline mb-1 md:mb-0"></i> ศูนย์สั่งการ
         </button>
-        <button id="tab-assess" class="tab-btn w-1/4 py-3 text-sm" onclick="window.switchTab('assess')">
-            <i class="fas fa-stethoscope"></i> ประเมิน
+        <button id="tab-assess" class="tab-btn w-1/4 py-3 md:py-4 text-sm md:text-base transition" onclick="window.switchTab('assess')">
+            <i class="fas fa-stethoscope block md:inline mb-1 md:mb-0"></i> ประเมิน
         </button>
-        <button id="tab-action" class="tab-btn w-1/4 py-3 text-sm hidden text-orange-600" onclick="window.switchTab('action')">
-            <i class="fas fa-clipboard-list"></i> ปฏิบัติการ
+        <button id="tab-action" class="tab-btn w-1/4 py-3 md:py-4 text-sm md:text-base hidden text-orange-600 transition" onclick="window.switchTab('action')">
+            <i class="fas fa-clipboard-list block md:inline mb-1 md:mb-0"></i> ปฏิบัติการ
         </button>
-        <button id="tab-history" class="tab-btn w-1/4 py-3 text-sm" onclick="window.switchTab('history')">
-            <i class="fas fa-history"></i> ประวัติ
+        <button id="tab-history" class="tab-btn w-1/4 py-3 md:py-4 text-sm md:text-base transition" onclick="window.switchTab('history')">
+            <i class="fas fa-history block md:inline mb-1 md:mb-0"></i> ประวัติ
         </button>
     </div>
 
     <!-- ================= 0. หน้าศูนย์สั่งการ (Dashboard View) ================= -->
-    <div id="dashboard-view" class="p-4 bg-gray-200 min-h-screen">
-        <div class="bg-gray-800 text-white p-4 rounded-xl shadow-lg mb-4">
-            <h2 class="font-bold text-lg text-center mb-1"><i class="fas fa-tv mr-2"></i> COMMAND CENTER</h2>
-            <p class="text-center text-xs text-gray-400">สถานการณ์ประจำวัน: <span id="dash-date"></span></p>
+    <div id="dashboard-view" class="p-4 md:p-6 bg-gray-200 min-h-screen">
+        <button onclick="window.switchTab('assess')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 md:py-4 rounded-lg shadow-md mb-4 md:mb-6 transition text-lg">
+            <i class="fas fa-plus-circle mr-1"></i> เพิ่มเคสใหม่
+        </button>
+
+        <div class="bg-gray-800 text-white p-4 md:p-6 rounded-xl shadow-lg mb-4 md:mb-6">
+            <h2 class="font-bold text-lg md:text-xl text-center mb-1"><i class="fas fa-satellite-dish mr-2"></i> COMMAND CENTER</h2>
+            <p class="text-center text-xs md:text-sm text-gray-400 mb-4">สถานการณ์ประจำวัน: <span id="dash-date"></span></p>
             
-            <div class="grid grid-cols-2 gap-3 mt-4">
-                <div class="bg-gray-700 p-3 rounded-lg text-center border-l-4 border-blue-500">
-                    <p class="text-xs text-gray-300">เคสทั้งหมด</p>
-                    <p id="dash-total" class="text-2xl font-bold text-blue-400">0</p>
+            <!-- ปรับเป็น 4 คอลัมน์บนจอใหญ่ (md:grid-cols-4) -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                <div class="bg-gray-700 p-3 md:p-4 rounded-lg text-center border-l-4 border-blue-500 hover:bg-gray-600 transition">
+                    <p class="text-xs md:text-sm text-gray-300">เคสทั้งหมด</p>
+                    <p id="dash-total" class="text-2xl md:text-3xl font-bold text-blue-400">0</p>
                 </div>
-                <div class="bg-gray-700 p-3 rounded-lg text-center border-l-4 border-red-500">
-                    <p class="text-xs text-gray-300">Stroke Activate</p>
-                    <p id="dash-stroke" class="text-2xl font-bold text-red-400">0</p>
+                <div class="bg-gray-700 p-3 md:p-4 rounded-lg text-center border-l-4 border-red-500 hover:bg-gray-600 transition">
+                    <p class="text-xs md:text-sm text-gray-300">Stroke Activate</p>
+                    <p id="dash-stroke" class="text-2xl md:text-3xl font-bold text-red-400">0</p>
                 </div>
-                <div class="bg-gray-700 p-3 rounded-lg text-center border-l-4 border-orange-500">
-                    <p class="text-xs text-gray-300">LVO Suspected</p>
-                    <p id="dash-lvo" class="text-2xl font-bold text-orange-400">0</p>
+                <div class="bg-gray-700 p-3 md:p-4 rounded-lg text-center border-l-4 border-orange-500 hover:bg-gray-600 transition">
+                    <p class="text-xs md:text-sm text-gray-300">LVO Suspected</p>
+                    <p id="dash-lvo" class="text-2xl md:text-3xl font-bold text-orange-400">0</p>
                 </div>
-                <div class="bg-gray-700 p-3 rounded-lg text-center border-l-4 border-green-500 animate-pulse">
-                    <p class="text-xs text-gray-300">กำลังดำเนินการ</p>
-                    <p id="dash-active" class="text-2xl font-bold text-green-400">0</p>
+                <div class="bg-gray-700 p-3 md:p-4 rounded-lg text-center border-l-4 border-green-500 animate-pulse">
+                    <p class="text-xs md:text-sm text-gray-300">กำลังนำส่ง (Active)</p>
+                    <p id="dash-active" class="text-2xl md:text-3xl font-bold text-green-400">0</p>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white p-4 rounded-xl shadow-md mb-4 border border-gray-200">
-            <h3 class="font-bold text-gray-800 mb-3 border-b pb-1"><i class="fas fa-hospital-user text-blue-600 mr-1"></i> สรุปผลการรักษา (ER Outcomes)</h3>
-            <ul class="text-sm space-y-2 text-gray-600">
-                <li class="flex justify-between border-b border-dashed pb-1"><span>💉 ให้ยาละลายลิ่มเลือด (rt-PA):</span> <b id="out-rtpa" class="text-blue-600">0</b></li>
-                <li class="flex justify-between border-b border-dashed pb-1"><span>🧠 ลากลิ่มเลือด (MT / EVT):</span> <b id="out-mt" class="text-indigo-600">0</b></li>
-                <li class="flex justify-between border-b border-dashed pb-1"><span>🛏️ รับไว้รักษา (Admit):</span> <b id="out-admit" class="text-green-600">0</b></li>
-                <li class="flex justify-between border-b border-dashed pb-1"><span>🚑 ส่งต่อ รพ.อื่น (Refer):</span> <b id="out-refer" class="text-orange-600">0</b></li>
-                <li class="flex justify-between border-b border-dashed pb-1"><span>❌ ปฏิเสธการรักษา:</span> <b id="out-refused" class="text-gray-500">0</b></li>
-                <li class="flex justify-between"><span>⚫ เสียชีวิตที่ ER (Dead):</span> <b id="out-dead" class="text-red-600">0</b></li>
-            </ul>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <div class="bg-white p-4 md:p-6 rounded-xl shadow-md border border-gray-200">
+                <h3 class="font-bold text-gray-800 mb-3 border-b pb-2 md:text-lg"><i class="fas fa-map-marked-alt text-red-600 mr-1"></i> GPS Tracking & ควบคุมเคส</h3>
+                <div class="map-container w-full h-32 md:h-48 rounded-lg border border-gray-300 mb-4 shadow-inner overflow-hidden">
+                    <div id="map-status" class="w-full h-full flex flex-col items-center justify-center text-gray-500 text-xs md:text-sm">
+                        <i class="fas fa-map-pin text-2xl md:text-3xl mb-2 opacity-50"></i> รอการแชร์พิกัดจากทีมกู้ชีพ
+                    </div>
+                </div>
+                <div id="activeCasesList" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                    <p class="text-center text-xs md:text-sm text-gray-500 py-2">ไม่มีเคสที่กำลังดำเนินการ</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 md:p-6 rounded-xl shadow-md border border-gray-200">
+                <h3 class="font-bold text-gray-800 mb-3 border-b pb-2 md:text-lg"><i class="fas fa-hospital-user text-blue-600 mr-1"></i> สรุปผลการรักษา (ER Outcomes)</h3>
+                <ul class="text-sm md:text-base space-y-3 md:space-y-4 text-gray-600 mt-2">
+                    <li class="flex justify-between border-b border-dashed pb-2"><span>💉 ให้ยาละลายลิ่มเลือด (rt-PA):</span> <b id="out-rtpa" class="text-blue-600 text-lg">0</b></li>
+                    <li class="flex justify-between border-b border-dashed pb-2"><span>🧠 ลากลิ่มเลือด (MT / EVT):</span> <b id="out-mt" class="text-indigo-600 text-lg">0</b></li>
+                    <li class="flex justify-between border-b border-dashed pb-2"><span>🛏️ รับไว้รักษา (Admit):</span> <b id="out-admit" class="text-green-600 text-lg">0</b></li>
+                    <li class="flex justify-between border-b border-dashed pb-2"><span>🚑 ส่งต่อ รพ.อื่น (Refer):</span> <b id="out-refer" class="text-orange-600 text-lg">0</b></li>
+                    <li class="flex justify-between border-b border-dashed pb-2"><span>❌ ปฏิเสธการรักษา:</span> <b id="out-refused" class="text-gray-500 text-lg">0</b></li>
+                    <li class="flex justify-between"><span>⚫ เสียชีวิตที่ ER (Dead):</span> <b id="out-dead" class="text-red-600 text-lg">0</b></li>
+                </ul>
+            </div>
         </div>
     </div>
 
     <!-- ================= 1. แท็บประเมิน (Assess View) ================= -->
-    <div id="assess-view" class="p-4 hidden">
+    <div id="assess-view" class="p-4 md:p-6 hidden">
         <form id="strokeForm">
-            <div class="bg-blue-50 p-3 rounded-lg mb-4 border border-blue-200">
-                <h2 class="font-bold text-blue-800 mb-2 border-b border-blue-200 pb-1">ข้อมูลผู้ป่วยและเวลา</h2>
-                <div class="mb-2">
-                    <label class="block text-sm font-medium">ชื่อผู้ป่วย / รหัส (HN):</label>
-                    <input type="text" id="patientName" required class="w-full mt-1 p-2 border rounded-md bg-white appearance-none" placeholder="เช่น นายสมชาย หรือ HN12345">
-                </div>
-                <!-- ช่องกรอก CC และ PI -->
-                <div class="mb-2">
-                    <label class="block text-sm font-medium">อาการสำคัญ (CC):</label>
-                    <input type="text" id="patientCC" class="w-full mt-1 p-2 border rounded-md bg-white appearance-none" placeholder="อาการที่ทำให้มา รพ.">
-                </div>
-                <div class="mb-2">
-                    <label class="block text-sm font-medium">ประวัติปัจจุบัน (PI):</label>
-                    <textarea id="patientPI" rows="2" class="w-full mt-1 p-2 border rounded-md bg-white appearance-none" placeholder="ประวัติการเจ็บป่วยปัจจุบัน"></textarea>
-                </div>
-                <div class="mb-2">
-                    <label class="block text-sm font-medium text-red-600">Last Known Well (เวลาปกติล่าสุด):</label>
-                    <input type="datetime-local" id="timeLkw" class="w-full mt-1 p-2 border rounded-md bg-white appearance-none">
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-2">
+            <div class="bg-blue-50 p-4 md:p-5 rounded-xl mb-4 md:mb-6 border border-blue-200 shadow-sm">
+                <h2 class="font-bold text-blue-800 mb-3 border-b border-blue-200 pb-2 md:text-lg"><i class="far fa-id-card mr-1"></i> ข้อมูลผู้ป่วยและเวลา</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-red-600">เวลา Onset:</label>
-                        <input type="text" id="timeOnset" class="w-full mt-1 p-2 border rounded-md bg-white appearance-none" placeholder="เช่น 08.00">
+                        <label class="block text-sm md:text-base font-medium">ชื่อผู้ป่วย / รหัส (HN):</label>
+                        <input type="text" id="patientName" required class="w-full mt-1 p-2 md:p-3 border rounded-lg bg-white shadow-inner" placeholder="เช่น นายสมชาย หรือ HN12345">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-blue-700">เวลาพบผู้ป่วย (FMC):</label>
-                        <input type="time" id="timeFMC" class="w-full mt-1 p-2 border rounded-md bg-blue-100 appearance-none">
+                        <label class="block text-sm md:text-base font-medium text-red-600">Last Known Well (เวลาปกติล่าสุด):</label>
+                        <input type="datetime-local" id="timeLkw" class="w-full mt-1 p-2 md:p-3 border rounded-lg bg-white shadow-inner">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm md:text-base font-medium">อาการสำคัญ (CC):</label>
+                        <input type="text" id="patientCC" class="w-full mt-1 p-2 md:p-3 border rounded-lg bg-white shadow-inner" placeholder="อาการที่ทำให้มา รพ.">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm md:text-base font-medium">ประวัติปัจจุบัน (PI):</label>
+                        <textarea id="patientPI" rows="2" class="w-full mt-1 p-2 md:p-3 border rounded-lg bg-white shadow-inner" placeholder="ประวัติการเจ็บป่วยปัจจุบัน"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm md:text-base font-medium text-red-600">เวลา Onset:</label>
+                        <input type="text" id="timeOnset" class="w-full mt-1 p-2 md:p-3 border rounded-lg bg-white shadow-inner" placeholder="เช่น 08.00">
+                    </div>
+                    <div>
+                        <label class="block text-sm md:text-base font-medium text-blue-700">เวลาพบผู้ป่วย (FMC):</label>
+                        <input type="time" id="timeFMC" class="w-full mt-1 p-2 md:p-3 border rounded-lg bg-blue-100 shadow-inner">
                     </div>
                 </div>
             </div>
 
-            <div class="bg-gray-50 p-3 rounded-lg mb-4 border border-gray-200">
-                <h2 class="font-bold text-gray-800 mb-2 border-b pb-1">BE-FAST (Screening)</h2>
-                <label class="flex items-center space-x-2 mb-2"><input type="checkbox" id="befast_b" class="w-5 h-5 text-red-600 rounded"><span><b>B</b>alance: เสียการทรงตัว เดินเซ</span></label>
-                <label class="flex items-center space-x-2 mb-2"><input type="checkbox" id="befast_e" class="w-5 h-5 text-red-600 rounded"><span><b>E</b>yes: ตามัว มองไม่เห็นภาพซ้อน</span></label>
-                <label class="flex items-center space-x-2 mb-2"><input type="checkbox" id="befast_f" class="w-5 h-5 text-red-600 rounded"><span><b>F</b>ace: หน้าเบี้ยว มุมปากตก</span></label>
-                <label class="flex items-center space-x-2 mb-2"><input type="checkbox" id="befast_a" class="w-5 h-5 text-red-600 rounded"><span><b>A</b>rms: แขนขาอ่อนแรงครึ่งซีก</span></label>
-                <label class="flex items-center space-x-2"><input type="checkbox" id="befast_s" class="w-5 h-5 text-red-600 rounded"><span><b>S</b>peech: พูดไม่ชัด นึกคำไม่ออก</span></label>
-            </div>
+            <!-- จัดเรียง BE-FAST และ VAN ให้อยู่ข้างกันเมื่อหน้าจอใหญ่ -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm h-full">
+                    <h2 class="font-bold text-gray-800 mb-3 border-b pb-2 md:text-lg"><i class="fas fa-search mr-1"></i> BE-FAST (Screening)</h2>
+                    <div class="space-y-3">
+                        <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 p-1 rounded transition"><input type="checkbox" id="befast_b" class="w-5 h-5 text-red-600 rounded"><span class="text-sm md:text-base"><b>B</b>alance: เสียการทรงตัว เดินเซ</span></label>
+                        <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 p-1 rounded transition"><input type="checkbox" id="befast_e" class="w-5 h-5 text-red-600 rounded"><span class="text-sm md:text-base"><b>E</b>yes: ตามัว มองไม่เห็นภาพซ้อน</span></label>
+                        <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 p-1 rounded transition"><input type="checkbox" id="befast_f" class="w-5 h-5 text-red-600 rounded"><span class="text-sm md:text-base"><b>F</b>ace: หน้าเบี้ยว มุมปากตก</span></label>
+                        <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 p-1 rounded transition"><input type="checkbox" id="befast_a" class="w-5 h-5 text-red-600 rounded"><span class="text-sm md:text-base"><b>A</b>rms: แขนขาอ่อนแรงครึ่งซีก</span></label>
+                        <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 p-1 rounded transition"><input type="checkbox" id="befast_s" class="w-5 h-5 text-red-600 rounded"><span class="text-sm md:text-base"><b>S</b>peech: พูดไม่ชัด นึกคำไม่ออก</span></label>
+                    </div>
+                </div>
 
-            <div class="bg-yellow-50 p-3 rounded-lg mb-4 border border-yellow-200">
-                <h2 class="font-bold text-yellow-800 mb-2 border-b border-yellow-200 pb-1">VAN (LVO Severity)</h2>
-                <div class="space-y-3 text-sm">
-                    <p class="text-xs text-red-600 mb-1">* เงื่อนไข: ผู้ป่วยต้องมีอาการแขนอ่อนแรง จึงจะถือว่า VAN Positive ได้</p>
-                    
-                    <label class="flex items-center space-x-2 bg-white p-2 rounded border shadow-sm">
-                        <input type="checkbox" id="van_arm" class="w-5 h-5 text-yellow-600 rounded">
-                        <span class="font-bold">Arm Weakness: แขนตกหรืออ่อนแรง</span>
-                    </label>
-                    
-                    <div class="pl-2 border-l-2 border-yellow-300 space-y-2 mt-2">
-                        <label class="flex items-start space-x-2">
-                            <input type="checkbox" id="van_v" class="w-5 h-5 text-yellow-600 rounded mt-1">
-                            <div><span class="font-bold">V - Vision (การมองเห็น):</span><br><span class="text-gray-600 text-xs">มองไม่เห็นภาพซีกหนึ่ง, เห็นภาพซ้อนใหม่</span></div>
+                <div class="bg-yellow-50 p-4 rounded-xl border border-yellow-200 shadow-sm h-full">
+                    <h2 class="font-bold text-yellow-800 mb-3 border-b border-yellow-200 pb-2 md:text-lg"><i class="fas fa-exclamation-triangle mr-1"></i> VAN (LVO Severity)</h2>
+                    <div class="space-y-3 text-sm md:text-base">
+                        <label class="flex items-center space-x-3 bg-white p-3 rounded-lg border shadow-sm cursor-pointer hover:bg-yellow-100 transition">
+                            <input type="checkbox" id="van_arm" class="w-6 h-6 text-yellow-600 rounded">
+                            <span class="font-bold">Arm Weakness: แขนตกหรืออ่อนแรง</span>
                         </label>
-                        <label class="flex items-start space-x-2">
-                            <input type="checkbox" id="van_a" class="w-5 h-5 text-yellow-600 rounded mt-1">
-                            <div><span class="font-bold">A - Aphasia (การสื่อสาร):</span><br><span class="text-gray-600 text-xs">นึกคำพูดไม่ออก, พูดไม่เป็นคำ, ไม่เข้าใจคำสั่ง</span></div>
-                        </label>
-                        <label class="flex items-start space-x-2">
-                            <input type="checkbox" id="van_n" class="w-5 h-5 text-yellow-600 rounded mt-1">
-                            <div><span class="font-bold">N - Neglect (ละเลยร่างกาย):</span><br><span class="text-gray-600 text-xs">ตากลอกข้ามเส้นกลางไม่ได้, ไม่สนใจร่างกายซีกหนึ่ง</span></div>
-                        </label>
+                        <div class="pl-4 border-l-4 border-yellow-300 space-y-3 mt-3">
+                            <label class="flex items-start space-x-3 cursor-pointer">
+                                <input type="checkbox" id="van_v" class="w-5 h-5 text-yellow-600 rounded mt-1">
+                                <div><span class="font-bold">V - Vision (การมองเห็น)</span><p class="text-xs md:text-sm text-gray-500">มองไม่เห็นภาพซีกหนึ่ง, เห็นภาพซ้อนใหม่</p></div>
+                            </label>
+                            <label class="flex items-start space-x-3 cursor-pointer">
+                                <input type="checkbox" id="van_a" class="w-5 h-5 text-yellow-600 rounded mt-1">
+                                <div><span class="font-bold">A - Aphasia (การสื่อสาร)</span><p class="text-xs md:text-sm text-gray-500">นึกคำพูดไม่ออก, ไม่เข้าใจคำสั่ง</p></div>
+                            </label>
+                            <label class="flex items-start space-x-3 cursor-pointer">
+                                <input type="checkbox" id="van_n" class="w-5 h-5 text-yellow-600 rounded mt-1">
+                                <div><span class="font-bold">N - Neglect (ละเลยร่างกาย)</span><p class="text-xs md:text-sm text-gray-500">ตากลอกข้ามเส้นกลางไม่ได้, ไม่สนใจร่างกายซีกหนึ่ง</p></div>
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <button type="button" id="btnEvaluate" onclick="window.evaluatePatient()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg shadow-lg transition duration-200">
-                ประมวลผล & บันทึก
+            <button type="button" id="btnEvaluate" onclick="window.evaluatePatient()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl shadow-lg transition duration-200 text-lg md:text-xl">
+                ประมวลผล & Activate
             </button>
         </form>
     </div>
 
     <!-- ================= 2. แท็บปฏิบัติการ (Action View) ================= -->
-    <div id="action-view" class="p-4 hidden bg-orange-50 min-h-screen">
-        <div class="bg-red-600 text-white p-3 rounded-lg mb-4 shadow text-center">
-            <h2 class="font-bold text-lg"><i class="fas fa-siren-on animate-pulse"></i> STROKE FAST TRACK</h2>
-            <p id="activePatientName" class="font-semibold text-lg mt-1"></p>
-            <p class="text-sm"><i class="far fa-clock"></i> เวลา Activate: <span id="activeTime" class="font-bold"></span></p>
+    <div id="action-view" class="p-4 md:p-6 hidden bg-orange-50 min-h-screen">
+        <div class="bg-red-600 text-white p-4 rounded-xl mb-6 shadow-md text-center relative overflow-hidden">
+            <div class="absolute inset-0 bg-red-700 opacity-50 animate-pulse"></div>
+            <h2 class="font-bold text-xl md:text-2xl relative z-10"><i class="fas fa-siren-on"></i> STROKE FAST TRACK</h2>
+            <p id="activePatientName" class="font-semibold text-lg md:text-xl mt-1 relative z-10"></p>
         </div>
 
-        <form id="interventionForm" class="space-y-3">
-            <div class="bg-white p-3 rounded-lg shadow border border-gray-200">
-                <h3 class="font-bold mb-2 text-blue-800">1. บันทึกสัญญาณชีพแรกรับ (Vitals)</h3>
-                <div class="grid grid-cols-2 gap-2 text-sm">
-                    <div><label>BP (mmHg)</label><input type="text" id="v_bp" class="w-full border rounded p-1"></div>
-                    <div><label>HR (/min)</label><input type="number" id="v_hr" class="w-full border rounded p-1"></div>
-                    <div><label>RR (/min)</label><input type="number" id="v_rr" class="w-full border rounded p-1"></div>
-                    <div><label>O2 Sat (%)</label><input type="number" id="v_o2" class="w-full border rounded p-1"></div>
-                    <div class="col-span-2"><label>DTX (mg/dL)</label><input type="number" id="v_dtx" class="w-full border rounded p-1"></div>
-                    <div><label>Pupil L (mm)</label><input type="text" id="v_pupill" class="w-full border rounded p-1"></div>
-                    <div><label>Pupil R (mm)</label><input type="text" id="v_pupilr" class="w-full border rounded p-1"></div>
+        <form id="interventionForm" class="space-y-4 md:space-y-6">
+            <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-200">
+                <h3 class="font-bold mb-4 text-blue-800 border-b pb-2 md:text-lg"><i class="fas fa-heartbeat mr-1"></i> 1. สัญญาณชีพแรกรับ (Vitals & Neuro)</h3>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 text-sm md:text-base">
+                    <div><label class="font-medium text-gray-700">BP (mmHg)</label><input type="text" id="v_bp" class="w-full border rounded-lg p-2 mt-1 shadow-inner bg-gray-50"></div>
+                    <div><label class="font-medium text-gray-700">HR (/min)</label><input type="number" id="v_hr" class="w-full border rounded-lg p-2 mt-1 shadow-inner bg-gray-50"></div>
+                    <div><label class="font-medium text-gray-700">RR (/min)</label><input type="number" id="v_rr" class="w-full border rounded-lg p-2 mt-1 shadow-inner bg-gray-50"></div>
+                    <div><label class="font-medium text-gray-700">O2 Sat (%)</label><input type="number" id="v_o2" class="w-full border rounded-lg p-2 mt-1 shadow-inner bg-gray-50"></div>
                     
-                    <div class="col-span-2 mt-2">
-                        <label class="block font-bold text-gray-700 mb-1">GCS (Glasgow Coma Scale)</label>
-                        <div class="flex space-x-2">
-                            <div class="flex items-center w-1/3"><span class="mr-1 text-gray-600 font-semibold">E</span><input type="number" id="v_gcs_e" min="1" max="4" class="w-full border rounded p-1 text-center" placeholder="1-4"></div>
-                            <div class="flex items-center w-1/3"><span class="mr-1 text-gray-600 font-semibold">V</span><input type="number" id="v_gcs_v" min="1" max="5" class="w-full border rounded p-1 text-center" placeholder="1-5"></div>
-                            <div class="flex items-center w-1/3"><span class="mr-1 text-gray-600 font-semibold">M</span><input type="number" id="v_gcs_m" min="1" max="6" class="w-full border rounded p-1 text-center" placeholder="1-6"></div>
+                    <div class="col-span-2 md:col-span-1"><label class="font-medium text-gray-700">DTX (mg/dL)</label><input type="number" id="v_dtx" class="w-full border rounded-lg p-2 mt-1 shadow-inner bg-gray-50"></div>
+                    <div class="col-span-1"><label class="font-medium text-gray-700">Pupil L (mm)</label><input type="text" id="v_pupill" class="w-full border rounded-lg p-2 mt-1 shadow-inner bg-gray-50"></div>
+                    <div class="col-span-1"><label class="font-medium text-gray-700">Pupil R (mm)</label><input type="text" id="v_pupilr" class="w-full border rounded-lg p-2 mt-1 shadow-inner bg-gray-50"></div>
+                    
+                    <div class="col-span-2 md:col-span-4 mt-2">
+                        <label class="block font-bold text-gray-700 mb-2">GCS (Glasgow Coma Scale)</label>
+                        <div class="grid grid-cols-3 gap-2 md:gap-4">
+                            <div class="flex items-center bg-gray-100 p-2 rounded-lg"><span class="mr-2 text-gray-600 font-bold">E</span><input type="number" id="v_gcs_e" min="1" max="4" class="w-full border rounded p-1 text-center bg-white"></div>
+                            <div class="flex items-center bg-gray-100 p-2 rounded-lg"><span class="mr-2 text-gray-600 font-bold">V</span><input type="number" id="v_gcs_v" min="1" max="5" class="w-full border rounded p-1 text-center bg-white"></div>
+                            <div class="flex items-center bg-gray-100 p-2 rounded-lg"><span class="mr-2 text-gray-600 font-bold">M</span><input type="number" id="v_gcs_m" min="1" max="6" class="w-full border rounded p-1 text-center bg-white"></div>
                         </div>
                     </div>
                 </div>
                 
-                <div class="mt-4 bg-gray-50 p-3 rounded border border-gray-200 shadow-sm">
-                    <label class="font-bold text-gray-700 text-center block mb-2 text-sm">Motor Power (0-5)</label>
+                <div class="mt-6 bg-gray-50 p-4 md:p-5 rounded-xl border border-gray-200 shadow-inner">
+                    <label class="font-bold text-gray-700 text-center block mb-3 md:text-lg">Motor Power (0-5)</label>
                     <div class="flex justify-center items-center">
-                        <table class="text-center border-collapse">
-                            <thead>
-                                <tr>
-                                    <th class="text-blue-700 pb-1 text-sm">Rt. (ขวา)</th>
-                                    <th class="w-px"></th>
-                                    <th class="text-pink-600 pb-1 text-sm">Lt. (ซ้าย)</th>
-                                </tr>
-                            </thead>
+                        <table class="text-center border-collapse text-base md:text-lg">
+                            <thead><tr><th class="text-blue-700 pb-2">Rt.</th><th class="w-4 md:w-8"></th><th class="text-pink-600 pb-2">Lt.</th></tr></thead>
                             <tbody>
                                 <tr>
-                                    <td class="border-b-2 border-r-2 border-gray-400 p-2">
-                                        <div class="flex items-center justify-end space-x-2">
-                                            <label class="text-xs font-bold text-gray-500">แขน</label>
-                                            <select id="m_ra" class="border rounded p-1 w-16 text-center font-semibold bg-blue-50"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select>
-                                        </div>
-                                    </td>
+                                    <td class="border-b-2 border-r-2 border-gray-400 p-3"><select id="m_ra" class="border rounded-lg p-2 w-16 md:w-20 text-center font-bold bg-blue-50 shadow-sm"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select></td>
                                     <td class="border-b-2 border-gray-400"></td>
-                                    <td class="border-b-2 border-gray-400 p-2">
-                                        <div class="flex items-center space-x-2">
-                                            <select id="m_la" class="border rounded p-1 w-16 text-center font-semibold bg-pink-50"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select>
-                                            <label class="text-xs font-bold text-gray-500">แขน</label>
-                                        </div>
-                                    </td>
+                                    <td class="border-b-2 border-gray-400 p-3"><select id="m_la" class="border rounded-lg p-2 w-16 md:w-20 text-center font-bold bg-pink-50 shadow-sm"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select></td>
                                 </tr>
                                 <tr>
-                                    <td class="border-r-2 border-gray-400 p-2">
-                                        <div class="flex items-center justify-end space-x-2">
-                                            <label class="text-xs font-bold text-gray-500">ขา</label>
-                                            <select id="m_rl" class="border rounded p-1 w-16 text-center font-semibold bg-blue-50"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select>
-                                        </div>
-                                    </td>
+                                    <td class="border-r-2 border-gray-400 p-3"><select id="m_rl" class="border rounded-lg p-2 w-16 md:w-20 text-center font-bold bg-blue-50 shadow-sm"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select></td>
                                     <td></td>
-                                    <td class="p-2">
-                                        <div class="flex items-center space-x-2">
-                                            <select id="m_ll" class="border rounded p-1 w-16 text-center font-semibold bg-pink-50"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select>
-                                            <label class="text-xs font-bold text-gray-500">ขา</label>
-                                        </div>
-                                    </td>
+                                    <td class="p-3"><select id="m_ll" class="border rounded-lg p-2 w-16 md:w-20 text-center font-bold bg-pink-50 shadow-sm"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -229,93 +228,113 @@
                 </div>
             </div>
 
-            <div class="bg-white p-3 rounded-lg shadow border border-gray-200 text-sm space-y-3">
-                <label class="flex items-start space-x-2"><input type="checkbox" id="chk_ab_manage" class="w-5 h-5 text-red-600 rounded mt-1"><div class="flex-1"><span class="font-bold">2. A+B management:</span><input type="text" id="val_ab_manage" class="w-full border rounded p-1 mt-1"></div></label>
-                <label class="flex items-start space-x-2"><input type="checkbox" id="chk_iv" class="w-5 h-5 text-red-600 rounded mt-1"><div class="flex-1"><span class="font-bold">3. สารน้ำ</span> NSS 1,000 ml IV rate: <input type="number" id="val_iv_rate" class="border-b w-12 text-center"> ml/hr</div></label>
-                <label class="flex items-center space-x-2"><input type="checkbox" id="chk_blood" class="w-5 h-5 text-red-600 rounded"><span class="font-bold">4. เจาะเลือด (CBC, Chem, Coag, Clotted)</span></label>
-                <label class="flex items-start space-x-2"><input type="checkbox" id="chk_consult" class="w-5 h-5 text-red-600 rounded mt-1"><div class="flex-1"><span class="font-bold">5. ปรึกษาแพทย์:</span><input type="text" id="val_consult" class="w-full border rounded p-1 mt-1"></div></label>
-                <label class="flex items-center space-x-2"><input type="checkbox" id="chk_coord" class="w-5 h-5 text-red-600 rounded"><span class="font-bold">6. ประสานส่งต่อ รพ.ปลายทาง</span></label>
-                <label class="flex items-start space-x-2"><input type="checkbox" id="chk_other" class="w-5 h-5 text-red-600 rounded mt-1"><div class="flex-1"><span class="font-bold">7. การรักษาอื่นๆ:</span><input type="text" id="val_other" class="w-full border rounded p-1 mt-1"></div></label>
-            </div>
-
-            <div class="bg-indigo-50 p-3 rounded-lg shadow border border-indigo-200">
-                <h3 class="font-bold mb-2 text-indigo-800"><i class="fas fa-stopwatch"></i> 8. เวลาบันทึก KPI ปลายทาง</h3>
-                <div class="grid grid-cols-2 gap-2 text-sm">
-                    <div><label class="font-semibold text-red-600">เวลาถึง รพ. (Door):</label><input type="time" id="v_door" class="w-full border rounded p-1 mt-1 bg-white"></div>
-                    <div><label class="font-semibold text-blue-600">เวลาเข้า CT Brain:</label><input type="time" id="v_ct" class="w-full border rounded p-1 mt-1 bg-white"></div>
-                    <div class="col-span-2"><label class="font-semibold text-green-600">เวลาเริ่มยา rt-PA (Needle Time):</label><input type="time" id="v_needle" class="w-full border rounded p-1 mt-1 bg-white"></div>
+            <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-200 text-sm md:text-base space-y-4">
+                <h3 class="font-bold text-teal-800 border-b pb-2 mb-3 md:text-lg"><i class="fas fa-medkit mr-1"></i> การดูแลรักษา (Interventions)</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <label class="flex items-start space-x-3 bg-gray-50 p-3 rounded-lg border cursor-pointer hover:bg-gray-100 transition">
+                        <input type="checkbox" id="chk_ab_manage" class="w-6 h-6 text-teal-600 rounded mt-1">
+                        <div class="flex-1"><span class="font-bold text-gray-700">2. A+B manage:</span><input type="text" id="val_ab_manage" class="w-full border rounded p-2 mt-2 bg-white" placeholder="ระบุการจัดการ"></div>
+                    </label>
+                    <label class="flex items-start space-x-3 bg-gray-50 p-3 rounded-lg border cursor-pointer hover:bg-gray-100 transition">
+                        <input type="checkbox" id="chk_iv" class="w-6 h-6 text-teal-600 rounded mt-1">
+                        <div class="flex-1"><span class="font-bold text-gray-700">3. สารน้ำ</span> NSS 1000 ml IV rate: <input type="number" id="val_iv_rate" class="border-b-2 border-teal-300 w-16 text-center bg-transparent focus:outline-none"> ml/hr</div>
+                    </label>
+                    <label class="flex items-center space-x-3 bg-gray-50 p-3 rounded-lg border cursor-pointer hover:bg-gray-100 transition">
+                        <input type="checkbox" id="chk_blood" class="w-6 h-6 text-teal-600 rounded">
+                        <span class="font-bold text-gray-700">4. เจาะเลือด (CBC, Chem, Coag, Clotted)</span>
+                    </label>
+                    <label class="flex items-start space-x-3 bg-gray-50 p-3 rounded-lg border cursor-pointer hover:bg-gray-100 transition">
+                        <input type="checkbox" id="chk_other" class="w-6 h-6 text-teal-600 rounded mt-1">
+                        <div class="flex-1"><span class="font-bold text-gray-700">5. การรักษาอื่นๆ:</span><input type="text" id="val_other" class="w-full border rounded p-2 mt-2 bg-white" placeholder="ระบุเพิ่มเติม"></div>
+                    </label>
                 </div>
             </div>
 
-            <button type="button" id="btnFinish" onclick="document.getElementById('outcomeModal').classList.remove('hidden')" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg shadow-lg text-lg transition duration-200 mt-4">
-                <i class="fas fa-check-circle mr-1"></i> จบงาน & บันทึก
+            <button type="button" id="btnShareLocation" onclick="window.saveAndShareLocation()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg text-lg md:text-xl transition duration-200 mt-6">
+                <i class="fas fa-map-marker-alt mr-2"></i> บันทึกการรักษา & แชร์พิกัด
             </button>
         </form>
     </div>
 
     <!-- ================= 3. แท็บประวัติ (History View) ================= -->
-    <div id="history-view" class="p-4 hidden">
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="font-bold text-lg text-gray-800">ประวัติเคสผู้ป่วย</h2>
-            <button onclick="window.exportToCSV()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm shadow flex items-center">
-                <i class="fas fa-file-excel mr-1"></i> Export Excel
+    <div id="history-view" class="p-4 md:p-6 hidden">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="font-bold text-xl text-gray-800"><i class="fas fa-folder-open mr-2 text-blue-600"></i> ประวัติปฏิบัติการ</h2>
+            <button onclick="window.exportToCSV()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow flex items-center transition md:text-base font-medium">
+                <i class="fas fa-file-excel mr-2"></i> Export Excel
             </button>
         </div>
-        <div id="historyList" class="space-y-3">
-            <p class="text-center text-gray-500 mt-4">กำลังโหลดข้อมูล...</p>
+        <!-- ปรับกริดให้รองรับ 2 คอลัมน์บนจอใหญ่ -->
+        <div id="historyList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <p class="text-center text-gray-500 mt-8 col-span-full">กำลังโหลดข้อมูล...</p>
         </div>
     </div>
 
     <!-- ================= 4. หน้าสำหรับดูเอกสาร A4 (Document View) ================= -->
-    <div id="document-view" class="hidden absolute top-0 left-0 w-full min-h-screen bg-gray-200 z-40 pb-10">
-        <div class="bg-gray-800 text-white p-3 flex justify-between items-center sticky top-0 z-50 shadow-md">
-            <button onclick="window.switchTab('history')" class="bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded text-sm"><i class="fas fa-arrow-left"></i> กลับ</button>
-            <span class="font-bold text-sm">แบบบันทึก A4</span>
-            <button onclick="window.printDocument()" class="bg-blue-600 hover:bg-blue-500 px-3 py-2 rounded text-sm"><i class="fas fa-print"></i> พิมพ์</button>
+    <div id="document-view" class="hidden absolute top-0 left-0 w-full min-h-screen bg-gray-200 z-50 pb-10">
+        <div class="bg-gray-800 text-white p-3 md:p-4 flex justify-between items-center sticky top-0 z-50 shadow-md">
+            <button onclick="window.switchTab('history')" class="bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded shadow transition"><i class="fas fa-arrow-left mr-1"></i> กลับ</button>
+            <span class="font-bold md:text-lg">ระบบตัวอย่างก่อนพิมพ์ A4</span>
+            <button onclick="window.printDocument()" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded shadow transition font-bold"><i class="fas fa-print mr-1"></i> พิมพ์</button>
         </div>
-        <div id="documentContent" class="bg-white shadow-xl mx-auto mt-4 overflow-hidden" style="width: 210mm; min-height: 297mm; max-width: 100%; transform-origin: top left; font-size: 14px;">
-            <!-- Content will be injected here -->
+        <!-- ใส่ overflow-x-auto เพื่อให้จอเล็กสามารถเลื่อนดู A4 ได้โดยไม่พัง -->
+        <div class="w-full overflow-x-auto p-2 md:p-6">
+            <div id="documentContent" class="bg-white shadow-2xl mx-auto overflow-hidden" style="width: 210mm; min-height: 297mm; transform-origin: top left; font-size: 14px;"></div>
         </div>
     </div>
 </div>
 
-<!-- Modal ถามผลการรักษาจาก ER -->
-<div id="outcomeModal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50 px-4 print-hidden">
-    <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm">
-        <h3 class="text-xl font-bold text-gray-900 mb-4 text-center border-b pb-2">ผลการรักษาที่ห้องฉุกเฉิน</h3>
-        <p class="text-xs text-gray-500 text-center mb-4">กรุณาระบุผลลัพธ์สุดท้ายที่ ER ก่อนปิดเคส</p>
-        
-        <div class="space-y-2 mb-5 text-sm font-medium text-gray-700">
-            <label class="flex items-center space-x-3 p-2 border rounded-lg hover:bg-blue-50 cursor-pointer transition"><input type="radio" name="er_outcome" value="rtpa" class="w-5 h-5 text-blue-600"><span>💉 ให้ยาละลายลิ่มเลือด (rt-PA)</span></label>
-            <label class="flex items-center space-x-3 p-2 border rounded-lg hover:bg-indigo-50 cursor-pointer transition"><input type="radio" name="er_outcome" value="mt" class="w-5 h-5 text-indigo-600"><span>🧠 ทำหัตถการลากลิ่มเลือด (MT)</span></label>
-            <label class="flex items-center space-x-3 p-2 border rounded-lg hover:bg-green-50 cursor-pointer transition"><input type="radio" name="er_outcome" value="admit" class="w-5 h-5 text-green-600"><span>🛏️ รับไว้รักษาใน รพ. (Admit)</span></label>
-            <label class="flex items-center space-x-3 p-2 border rounded-lg hover:bg-orange-50 cursor-pointer transition"><input type="radio" name="er_outcome" value="refer" class="w-5 h-5 text-orange-600"><span>🚑 ส่งต่อโรงพยาบาลอื่น (Refer)</span></label>
-            <label class="flex items-center space-x-3 p-2 border rounded-lg hover:bg-gray-100 cursor-pointer transition"><input type="radio" name="er_outcome" value="refused" class="w-5 h-5 text-gray-600"><span>❌ ปฏิเสธการรักษา</span></label>
-            <label class="flex items-center space-x-3 p-2 border rounded-lg hover:bg-red-50 cursor-pointer transition"><input type="radio" name="er_outcome" value="dead" class="w-5 h-5 text-red-600"><span>⚫ เสียชีวิต (Dead at ER)</span></label>
-            <label class="flex items-center space-x-3 p-2 border rounded-lg hover:bg-gray-100 cursor-pointer transition bg-gray-50"><input type="radio" name="er_outcome" value="pending" class="w-5 h-5 text-gray-600" checked><span>⏳ ยังไม่ทราบผล / รอติดตาม</span></label>
+<!-- Modal Pop-up Activation (ทีมกู้ชีพ) -->
+<div id="activationModal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50 px-4">
+    <div class="bg-white rounded-2xl shadow-2xl p-6 md:p-8 w-full max-w-md text-center">
+        <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-red-100 mb-6">
+            <i class="fas fa-siren-on text-4xl text-red-600 fa-bullhorn animate-pulse"></i>
         </div>
-        
-        <button onclick="window.confirmFinishCase()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg shadow transition">
-            <i class="fas fa-save mr-1"></i> ยืนยันการปิดเคส
-        </button>
-        <button onclick="document.getElementById('outcomeModal').classList.add('hidden')" class="w-full mt-2 bg-white text-gray-600 font-bold py-3 rounded-lg border hover:bg-gray-50 transition">ยกเลิก</button>
+        <h3 class="text-2xl md:text-3xl font-bold text-gray-900 mb-3">Activate Stroke Fast Track</h3>
+        <p class="text-gray-500 mb-6">กดยืนยันเพื่อบันทึกเวลา และเตรียมส่งพิกัดให้ศูนย์สั่งการทันที</p>
+        <div id="modalLvoAlert" class="bg-yellow-100 text-yellow-800 px-4 py-3 rounded-lg mb-6 font-bold text-sm md:text-base hidden border"></div>
+        <div class="flex flex-col space-y-3">
+            <button onclick="window.confirmActivation()" class="w-full py-4 bg-red-600 text-white font-bold text-lg rounded-xl shadow hover:bg-red-700 transition">ยืนยัน Activate</button>
+            <button onclick="document.getElementById('activationModal').classList.add('hidden')" class="w-full py-3 bg-white text-gray-700 font-bold border-2 rounded-xl hover:bg-gray-50 transition">ยกเลิก</button>
+        </div>
     </div>
 </div>
 
-<!-- Modal Pop-up Activation -->
-<div id="activationModal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50 px-4 print-hidden">
-    <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm text-center">
-        <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
-            <i class="fas fa-siren-on text-3xl text-red-600 fa-bullhorn"></i>
-        </div>
-        <h3 class="text-2xl font-bold text-gray-900 mb-2">Activate Stroke Fast Track</h3>
-        <p class="text-sm text-gray-500 mb-4">กดยืนยันเพื่อบันทึกเวลา และเข้าสู่หน้า CPG Checklist</p>
+<!-- Modal สรุปผลการรักษา (ศูนย์สั่งการกดปิดเคส) -->
+<div id="outcomeModal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50 px-4">
+    <div class="bg-white rounded-2xl shadow-2xl p-6 md:p-8 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <h3 class="text-xl md:text-2xl font-bold text-gray-900 mb-2 text-center border-b pb-4"><i class="fas fa-flag-checkered text-blue-600 mr-2"></i> ปิดเคส & สรุปผลห้องฉุกเฉิน</h3>
         
-        <div id="modalLvoAlert" class="bg-yellow-100 text-yellow-800 px-3 py-2 rounded mb-4 font-semibold text-sm hidden"></div>
+        <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-200 mb-6 mt-4 shadow-sm">
+            <h4 class="font-bold text-indigo-900 mb-3 md:text-lg"><i class="fas fa-stopwatch mr-1"></i> เวลา KPI ปลายทาง (ศูนย์สั่งการลงข้อมูล)</h4>
+            <div class="grid grid-cols-2 gap-4 text-sm md:text-base">
+                <div><label class="font-semibold text-gray-700">เวลาถึง รพ. (Door):</label><input type="time" id="m_door" class="w-full border rounded-lg p-2 mt-1 bg-white shadow-inner"></div>
+                <div><label class="font-semibold text-gray-700">เวลาเข้า CT Brain:</label><input type="time" id="m_ct" class="w-full border rounded-lg p-2 mt-1 bg-white shadow-inner"></div>
+            </div>
+        </div>
 
-        <div class="mt-5 flex flex-col space-y-2">
-            <button onclick="window.confirmActivation()" class="w-full py-3 bg-red-600 text-white font-bold rounded-md shadow-sm hover:bg-red-700">ยืนยัน Activate</button>
-            <button onclick="window.closeModal()" class="w-full py-3 bg-white text-gray-700 font-bold border rounded-md shadow-sm hover:bg-gray-50">ยกเลิก</button>
+        <p class="text-base md:text-lg font-bold text-gray-800 mb-3">ผลการรักษาที่ ER:</p>
+        <div class="space-y-3 mb-6 text-sm md:text-base font-medium text-gray-700">
+            <label class="flex items-center space-x-3 p-3 border rounded-xl hover:bg-blue-50 cursor-pointer transition"><input type="radio" name="er_outcome" value="rtpa" class="w-5 h-5 md:w-6 md:h-6 text-blue-600" onchange="window.toggleNeedleTime()"><span class="flex-1">💉 ให้ยาละลายลิ่มเลือด (rt-PA)</span></label>
+            
+            <div id="needleTimeDiv" class="hidden pl-10 pr-2 pb-3">
+                <label class="font-bold text-green-700 text-sm md:text-base block mb-1">เวลาเริ่มยา rt-PA (Needle Time):</label>
+                <input type="time" id="m_needle" class="w-full border-2 rounded-lg p-2 bg-green-50 border-green-400 shadow-inner">
+            </div>
+
+            <label class="flex items-center space-x-3 p-3 border rounded-xl hover:bg-indigo-50 cursor-pointer transition"><input type="radio" name="er_outcome" value="mt" class="w-5 h-5 md:w-6 md:h-6 text-indigo-600" onchange="window.toggleNeedleTime()"><span class="flex-1">🧠 ทำหัตถการลากลิ่มเลือด (MT)</span></label>
+            <label class="flex items-center space-x-3 p-3 border rounded-xl hover:bg-green-50 cursor-pointer transition"><input type="radio" name="er_outcome" value="admit" class="w-5 h-5 md:w-6 md:h-6 text-green-600" onchange="window.toggleNeedleTime()"><span class="flex-1">🛏️ รับไว้รักษาใน รพ. (Admit)</span></label>
+            <label class="flex items-center space-x-3 p-3 border rounded-xl hover:bg-orange-50 cursor-pointer transition"><input type="radio" name="er_outcome" value="refer" class="w-5 h-5 md:w-6 md:h-6 text-orange-600" onchange="window.toggleNeedleTime()"><span class="flex-1">🚑 ส่งต่อโรงพยาบาลอื่น (Refer)</span></label>
+            <label class="flex items-center space-x-3 p-3 border rounded-xl hover:bg-gray-100 cursor-pointer transition"><input type="radio" name="er_outcome" value="refused" class="w-5 h-5 md:w-6 md:h-6 text-gray-600" onchange="window.toggleNeedleTime()"><span class="flex-1">❌ ปฏิเสธการรักษา</span></label>
+            <label class="flex items-center space-x-3 p-3 border rounded-xl hover:bg-red-50 cursor-pointer transition"><input type="radio" name="er_outcome" value="dead" class="w-5 h-5 md:w-6 md:h-6 text-red-600" onchange="window.toggleNeedleTime()"><span class="flex-1">⚫ เสียชีวิต (Dead at ER)</span></label>
+        </div>
+        
+        <div class="flex space-x-3">
+            <button onclick="document.getElementById('outcomeModal').classList.add('hidden')" class="w-1/3 bg-white text-gray-600 font-bold py-3 md:py-4 rounded-xl border-2 hover:bg-gray-50 transition">ยกเลิก</button>
+            <button onclick="window.confirmFinishCase()" class="w-2/3 bg-green-600 hover:bg-green-700 text-white font-bold text-lg py-3 md:py-4 rounded-xl shadow-lg transition">
+                <i class="fas fa-save mr-2"></i> จบงาน & พิมพ์
+            </button>
         </div>
     </div>
 </div>
@@ -344,8 +363,8 @@
     let tempEvalData = null; 
     window.activeDocId = null;
     window.allCases = [];
+    window.selectedCaseToClose = null;
 
-    // ฟังก์ชันเปลี่ยนแท็บ
     window.switchTab = function(tab) {
         ['dashboard', 'assess', 'action', 'history', 'document'].forEach(t => {
             const el = document.getElementById(`${t}-view`);
@@ -353,150 +372,94 @@
             if(el) el.classList.add('hidden');
             if(btn) btn.classList.remove('active');
         });
-        
         const targetEl = document.getElementById(`${tab}-view`);
         const targetBtn = document.getElementById(`tab-${tab}`);
         if(targetEl) targetEl.classList.remove('hidden');
         if(targetBtn) targetBtn.classList.add('active');
-        
         window.scrollTo(0, 0);
     }
 
-    // เริ่มต้นแอปให้เปิดหน้า Dashboard
+    window.toggleNeedleTime = function() {
+        const outcome = document.querySelector('input[name="er_outcome"]:checked');
+        const needleDiv = document.getElementById('needleTimeDiv');
+        if(outcome && outcome.value === 'rtpa') {
+            needleDiv.classList.remove('hidden');
+        } else {
+            needleDiv.classList.add('hidden');
+            document.getElementById('m_needle').value = '';
+        }
+    }
+
     window.switchTab('dashboard');
 
     window.evaluatePatient = function() {
         const name = document.getElementById('patientName').value;
-        if(!name) { alert('กรุณากรอกชื่อผู้ป่วย / HN'); return; }
+        if(!name) { alert('กรุณากรอกชื่อผู้ป่วย'); return; }
 
-        // รับค่า CC และ PI
         const ccInput = document.getElementById('patientCC').value || '';
         const piInput = document.getElementById('patientPI').value || '';
         const lkwInput = document.getElementById('timeLkw').value;
         const onset = document.getElementById('timeOnset').value || 'ไม่ระบุ';
 
-        const isBeFastPositive = 
-            document.getElementById('befast_b').checked ||
-            document.getElementById('befast_e').checked ||
-            document.getElementById('befast_f').checked ||
-            document.getElementById('befast_a').checked ||
-            document.getElementById('befast_s').checked;
-
-        const vanArm = document.getElementById('van_arm').checked;
-        const vanV = document.getElementById('van_v').checked;
-        const vanA = document.getElementById('van_a').checked;
-        const vanN = document.getElementById('van_n').checked;
-
-        const isLvo = vanArm && (vanV || vanA || vanN);
+        const isBeFastPositive = ['b','e','f','a','s'].some(id => document.getElementById(`befast_${id}`).checked);
+        const isLvo = document.getElementById('van_arm').checked && (document.getElementById('van_v').checked || document.getElementById('van_a').checked || document.getElementById('van_n').checked);
 
         tempEvalData = {
-            name: name,
-            cc: ccInput,
-            pi: piInput,
+            name: name, cc: ccInput, pi: piInput,
             lkw: lkwInput ? new Date(lkwInput).toLocaleString('th-TH') : 'ไม่ระบุ',
-            onset: onset,
-            fmc: document.getElementById('timeFMC').value || '-', 
-            befast: { 
-                b: document.getElementById('befast_b').checked,
-                e: document.getElementById('befast_e').checked,
-                f: document.getElementById('befast_f').checked,
-                a: document.getElementById('befast_a').checked,
-                s: document.getElementById('befast_s').checked
-            },
-            isLvo: isLvo,
-            isFastTrack: isBeFastPositive,
-            status: 'assessed'
+            onset: onset, fmc: document.getElementById('timeFMC').value || '-', 
+            befast: { b: document.getElementById('befast_b').checked, e: document.getElementById('befast_e').checked, f: document.getElementById('befast_f').checked, a: document.getElementById('befast_a').checked, s: document.getElementById('befast_s').checked },
+            isLvo: isLvo, isFastTrack: isBeFastPositive, status: 'assessed'
         };
 
         if (!isBeFastPositive) {
             tempEvalData.status = 'not_qualify';
-            saveRecordToFirebase();
-            return;
+            saveRecordToFirebase(); return;
         }
-
-        if (!lkwInput) {
-            alert('กรุณาระบุเวลา "Last Known Well" เพื่อให้ระบบคำนวณกรอบเวลา (Time Window)');
-            return;
-        }
+        if (!lkwInput) { alert('กรุณาระบุเวลา "Last Known Well"'); return; }
 
         let lkwTime = new Date(lkwInput);
-        if (lkwTime.getFullYear() > 2400) {
-            lkwTime.setFullYear(lkwTime.getFullYear() - 543);
-        }
+        if (lkwTime.getFullYear() > 2400) lkwTime.setFullYear(lkwTime.getFullYear() - 543);
+        const diffHours = (new Date() - lkwTime) / (1000 * 60 * 60);
 
-        const now = new Date();
-        const diffHours = (now - lkwTime) / (1000 * 60 * 60);
+        if (diffHours < 0) { alert("เวลา Last Known Well อยู่ในอนาคต กรุณาตรวจสอบใหม่"); return; }
 
-        if (diffHours < 0) {
-            alert("ตรวจพบข้อผิดพลาด: เวลา Last Known Well อยู่ในอนาคต กรุณาตรวจสอบใหม่อีกครั้งครับ");
-            return;
-        }
-
-        let shouldActivate = false;
-        let alertMsg = "";
-        let alertClass = "bg-yellow-100 text-yellow-800 px-3 py-2 rounded mb-4 font-semibold text-sm";
-
+        let shouldActivate = false, alertMsg = "", alertClass = "bg-yellow-100 text-yellow-800 px-3 py-2 rounded-lg mb-4 font-semibold text-sm md:text-base border border-yellow-300";
         if (diffHours <= 4.5) {
-            shouldActivate = true;
-            alertMsg = "✅ อยู่ในกรอบเวลา 4.5 ชม.<br>(Activate Stroke Fast Track เพื่อพิจารณา rt-PA)";
-            if (isLvo) {
-                alertMsg += "<br><br>⚠️ VAN Positive: สงสัยหลอดเลือดสมองเส้นใหญ่อุดตัน (LVO)";
-                alertClass = "bg-red-100 text-red-800 px-3 py-2 rounded mb-4 font-semibold text-sm border border-red-300";
-            }
-        } 
-        else if (diffHours > 4.5 && diffHours <= 24 && isLvo) {
-            shouldActivate = true;
-            alertMsg = "⚠️ เกิน 4.5 ชม. แต่ VAN Positive (สงสัย LVO)<br><br>➡️ Activate Stroke Fast Track<br>(อยู่ในกรอบ 24 ชม. เพื่อพิจารณา EVT/Thrombectomy)";
-            alertClass = "bg-orange-100 text-orange-800 px-3 py-2 rounded mb-4 font-semibold text-sm border border-orange-300";
-        } 
-        else {
-            shouldActivate = false;
+            shouldActivate = true; alertMsg = "✅ อยู่ในกรอบเวลา 4.5 ชม.<br>(Activate Stroke Fast Track เพื่อพิจารณา rt-PA)";
+            if (isLvo) { alertMsg += "<br><br>⚠️ VAN Positive: สงสัยหลอดเลือดสมองเส้นใหญ่อุดตัน (LVO)"; alertClass = "bg-red-100 text-red-800 px-4 py-3 rounded-lg mb-4 border border-red-300"; }
+        } else if (diffHours <= 24 && isLvo) {
+            shouldActivate = true; alertMsg = "⚠️ เกิน 4.5 ชม. แต่ VAN Positive (สงสัย LVO)<br><br>➡️ Activate (พิจารณา EVT/Thrombectomy)"; alertClass = "bg-orange-100 text-orange-800 px-4 py-3 rounded-lg mb-4 border border-orange-300";
         }
 
         if (shouldActivate) {
             document.getElementById('activationModal').classList.remove('hidden');
             const alertBox = document.getElementById('modalLvoAlert');
-            alertBox.innerHTML = alertMsg;
-            alertBox.className = alertClass;
-            alertBox.classList.remove('hidden');
+            alertBox.innerHTML = alertMsg; alertBox.className = alertClass; alertBox.classList.remove('hidden');
         } else {
-            let reason = diffHours > 24 ? "เกิน 24 ชั่วโมง" : "เกิน 4.5 ชั่วโมง และ ไม่เข้าเกณฑ์ LVO";
-            alert(`ผู้ป่วยมีอาการ BE-FAST แต่ไม่อยู่ในเกณฑ์ Stroke Fast Track\n(สาเหตุ: Last Known Well ${reason})`);
-            
-            tempEvalData.status = 'not_qualify';
-            saveRecordToFirebase();
+            alert("เกินเวลาที่กำหนดและไม่เข้าเกณฑ์ LVO");
+            tempEvalData.status = 'not_qualify'; saveRecordToFirebase();
         }
     }
 
     window.confirmActivation = async function() {
         document.getElementById('activationModal').classList.add('hidden');
-        const now = new Date();
-        const activateTime = now.toTimeString().slice(0,5);
-        
-        const record = { ...tempEvalData, activateTime: activateTime, dateStr: now.toLocaleDateString('th-TH'), status: 'active', createdAt: serverTimestamp() };
+        const activateTime = new Date().toTimeString().slice(0,5);
+        const record = { ...tempEvalData, activateTime: activateTime, dateStr: new Date().toLocaleDateString('th-TH'), status: 'active', createdAt: serverTimestamp() };
 
         try {
-            const docRef = await addDoc(collection(db, "stroke_patients"), record);
-            window.activeDocId = docRef.id;
+            await addDoc(collection(db, "stroke_patients"), record);
             document.getElementById('strokeForm').reset();
-            document.getElementById('activePatientName').innerText = `ผู้ป่วย: ${tempEvalData.name}`;
-            document.getElementById('activeTime').innerText = activateTime + " น.";
-            window.switchTab('action');
-        } catch (error) { alert("เชื่อมต่อฐานข้อมูลล้มเหลว"); }
-    }
-
-    window.closeModal = function() {
-        document.getElementById('activationModal').classList.add('hidden');
-        tempEvalData.status = 'not_qualify';
-        saveRecordToFirebase();
+            alert("🚨 แจ้งศูนย์สั่งการเรียบร้อย!\n(สามารถบันทึกการรักษาและแชร์พิกัดต่อได้ที่แท็บ 'ประวัติ' ครับ)");
+            window.switchTab('dashboard');
+        } catch (error) { alert("เชื่อมต่อล้มเหลว"); }
     }
 
     async function saveRecordToFirebase() {
-        if(!tempEvalData) return;
         const record = { ...tempEvalData, activateTime: '-', dateStr: new Date().toLocaleDateString('th-TH'), createdAt: serverTimestamp() };
         await addDoc(collection(db, "stroke_patients"), record);
         document.getElementById('strokeForm').reset();
-        alert("บันทึกเข้าระบบเรียบร้อย (ไม่เข้าเกณฑ์ Stroke)");
+        alert("บันทึกเรียบร้อย (ไม่เข้าเกณฑ์)"); window.switchTab('dashboard');
     }
 
     window.resumeCase = function(docId) {
@@ -508,44 +471,70 @@
         window.switchTab('action');
     }
 
-    window.confirmFinishCase = async function() {
+    window.saveAndShareLocation = async function() {
         if(!window.activeDocId) return;
-        
-        const selectedOutcomeElement = document.querySelector('input[name="er_outcome"]:checked');
-        const selectedOutcome = selectedOutcomeElement ? selectedOutcomeElement.value : 'pending';
-        
-        document.getElementById('outcomeModal').classList.add('hidden');
         
         const v = {
             bp: document.getElementById('v_bp').value || '-', hr: document.getElementById('v_hr').value || '-', rr: document.getElementById('v_rr').value || '-', o2: document.getElementById('v_o2').value || '-', dtx: document.getElementById('v_dtx').value || '-', pupil_l: document.getElementById('v_pupill').value || '-', pupil_r: document.getElementById('v_pupilr').value || '-',
             gcs: { e: document.getElementById('v_gcs_e').value || '-', v: document.getElementById('v_gcs_v').value || '-', m: document.getElementById('v_gcs_m').value || '-' },
             motor: { ra: document.getElementById('m_ra').value, la: document.getElementById('m_la').value, rl: document.getElementById('m_rl').value, ll: document.getElementById('m_ll').value }
         };
-
         const intvData = {
             vitals: v,
             ab_manage: { done: document.getElementById('chk_ab_manage').checked, detail: document.getElementById('val_ab_manage').value || '-' },
             iv: { done: document.getElementById('chk_iv').checked, rate: document.getElementById('val_iv_rate').value || '-' },
-            blood: document.getElementById('chk_blood').checked, consult: { done: document.getElementById('chk_consult').checked, detail: document.getElementById('val_consult').value || '-' },
-            coord: document.getElementById('chk_coord').checked, other: { done: document.getElementById('chk_other').checked, detail: document.getElementById('val_other').value || '-' },
-            timeDoor: document.getElementById('v_door').value || '-', timeCT: document.getElementById('v_ct').value || '-', timeNeedle: document.getElementById('v_needle').value || '-'
+            blood: document.getElementById('chk_blood').checked, 
+            other: { done: document.getElementById('chk_other').checked, detail: document.getElementById('val_other').value || '-' }
         };
 
         try {
-            await updateDoc(doc(db, "stroke_patients", window.activeDocId), { 
-                interventions: intvData, 
-                status: 'completed', 
-                er_outcome: selectedOutcome, 
-                completedAt: serverTimestamp() 
-            });
-            alert("บันทึกข้อมูลและปิดงานเรียบร้อย!");
+            await updateDoc(doc(db, "stroke_patients", window.activeDocId), { interventions: intvData, locationShared: true });
+            alert("📍 บันทึกข้อมูลการรักษาและเริ่มแชร์พิกัด GPS ไปยังศูนย์สั่งการแล้ว");
             document.getElementById('interventionForm').reset();
             window.activeDocId = null;
             window.switchTab('dashboard'); 
         } catch (error) { alert("เกิดข้อผิดพลาด"); }
     }
 
-    // หน้าปริ้นท์ A4 (จัดการ CC / PI)
+    window.openFinishModal = function(docId) {
+        window.selectedCaseToClose = docId;
+        document.getElementById('m_door').value = '';
+        document.getElementById('m_ct').value = '';
+        document.getElementById('m_needle').value = '';
+        
+        const radios = document.querySelectorAll('input[name="er_outcome"]');
+        radios.forEach(r => r.checked = false);
+        window.toggleNeedleTime();
+
+        document.getElementById('outcomeModal').classList.remove('hidden');
+    }
+
+    window.confirmFinishCase = async function() {
+        if(!window.selectedCaseToClose) return;
+        
+        const outcomeElement = document.querySelector('input[name="er_outcome"]:checked');
+        if(!outcomeElement) { alert("กรุณาเลือกผลการรักษาที่ ER ก่อนปิดเคส"); return; }
+        
+        const doorTime = document.getElementById('m_door').value || '-';
+        const ctTime = document.getElementById('m_ct').value || '-';
+        const needleTime = outcomeElement.value === 'rtpa' ? (document.getElementById('m_needle').value || '-') : '-';
+
+        try {
+            await updateDoc(doc(db, "stroke_patients", window.selectedCaseToClose), { 
+                status: 'completed', 
+                er_outcome: outcomeElement.value,
+                timeDoor: doorTime,
+                timeCT: ctTime,
+                timeNeedle: needleTime,
+                completedAt: serverTimestamp() 
+            });
+            document.getElementById('outcomeModal').classList.add('hidden');
+            window.selectedCaseToClose = null;
+            alert("จบงานและบันทึก KPI สำเร็จ!");
+            window.viewCase(window.selectedCaseToClose); 
+        } catch (error) { alert("เกิดข้อผิดพลาด"); }
+    }
+
     window.viewCase = function(docId) {
         const rec = window.allCases.find(c => c.id === docId);
         if(!rec) return;
@@ -561,148 +550,96 @@
         let gcsTotal = (v.gcs?.e!=='-' && v.gcs?.v!=='-' && v.gcs?.m!=='-') ? parseInt(v.gcs?.e) + parseInt(v.gcs?.v) + parseInt(v.gcs?.m) : '-';
         const chk = (c) => c ? '☑' : '☐';
 
+        const tDoor = rec.timeDoor || '-';
+        const tCT = rec.timeCT || '-';
+        const tNeedle = rec.timeNeedle || '-';
+
         const html = `
-            <div style="padding: 15px 30px; font-family: 'Sarabun', sans-serif; color: black; line-height: 1.5;">
-                <div style="border-bottom: 2px solid black; padding-bottom: 5px; margin-bottom: 10px; text-align: center;">
+            <div style="padding: 20px 30px; font-family: 'Sarabun', sans-serif; color: black; line-height: 1.5;">
+                <div style="border-bottom: 2px solid black; padding-bottom: 5px; margin-bottom: 15px; text-align: center;">
                     <h1 style="font-size: 20px; font-weight: bold; margin: 0;">แบบบันทึกการดูแลผู้ป่วยฉุกเฉิน Stroke Fast Track</h1>
                     <p style="font-size: 14px; margin: 5px 0 0 0;">หน่วยปฏิบัติการแพทย์ฉุกเฉิน รพ.นครปฐม</p>
                 </div>
 
-                <div style="margin-bottom: 10px;">
-                    <h2 style="font-weight: bold; font-size: 16px; background-color: #f3f4f6; padding: 3px 10px; border-left: 4px solid #374151; margin-bottom: 5px;">1. ข้อมูลผู้ป่วยและเวลา</h2>
+                <div style="margin-bottom: 12px;">
+                    <h2 style="font-weight: bold; font-size: 16px; background-color: #f3f4f6; padding: 3px 10px; border-left: 4px solid #374151; margin-bottom: 8px;">1. ข้อมูลผู้ป่วยและเวลา</h2>
                     <table style="width: 100%; border-spacing: 0; margin-left: 5px; font-size: 14px;">
-                        <tr>
-                            <td style="width: 50%; padding-bottom: 2px;"><b>ชื่อผู้ป่วย/HN:</b> ${rec.name}</td>
-                            <td style="width: 50%; padding-bottom: 2px;"><b>วันที่ประเมิน:</b> ${rec.dateStr || '-'}</td>
-                        </tr>
-                        <tr>
-                            <td colspan="2" style="padding-bottom: 2px; border-bottom: 1px dotted #ccc;">
-                                <b>CC:</b> ${rec.cc ? rec.cc : '........................................................................................................................................'}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2" style="padding-top: 4px; padding-bottom: 4px; border-bottom: 1px dotted #ccc; line-height: 1.8;">
-                                <b>PI:</b> ${rec.pi ? rec.pi.replace(/\n/g, '<br>') : '........................................................................................................................................<br>......................................................................................................................................................'}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="padding-top: 4px; padding-bottom: 2px;"><b>Last Known Well:</b> ${rec.lkw}</td>
-                            <td style="padding-top: 4px; padding-bottom: 2px;"><b>เวลา Onset:</b> ${rec.onset} น.</td>
-                        </tr>
-                        <tr>
-                            <td style="color: #2563eb; padding-bottom: 2px;"><b>เวลาพบผู้ป่วย (FMC):</b> ${rec.fmc} น.</td>
-                            <td style="color: #dc2626; padding-bottom: 2px;"><b>เวลา Activate:</b> ${rec.activateTime} น.</td>
-                        </tr>
+                        <tr><td style="width: 50%; padding-bottom: 4px;"><b>ชื่อผู้ป่วย/HN:</b> ${rec.name}</td><td style="width: 50%; padding-bottom: 4px;"><b>วันที่ประเมิน:</b> ${rec.dateStr || '-'}</td></tr>
+                        <tr><td colspan="2" style="padding-bottom: 8px; border-bottom: 1px dotted #ccc;"><b>CC:</b> ${rec.cc ? rec.cc : '................................................................................................................................................................'}</td></tr>
+                        <tr><td colspan="2" style="padding-top: 8px; padding-bottom: 6px;"><b>PI:</b> ${rec.pi ? rec.pi.replace(/\n/g, '<br>') : '................................................................................................................................................................'}</td></tr>
+                        <tr><td colspan="2" style="padding-bottom: 8px; border-bottom: 1px dotted #ccc;">${rec.pi ? '&nbsp;' : '................................................................................................................................................................'}</td></tr>
+                        <tr><td style="padding-top: 8px; padding-bottom: 2px;"><b>Last Known Well:</b> ${rec.lkw}</td><td style="padding-top: 8px; padding-bottom: 2px;"><b>เวลา Onset:</b> ${rec.onset} น.</td></tr>
+                        <tr><td style="color: #2563eb; padding-bottom: 2px;"><b>เวลาพบผู้ป่วย (FMC):</b> ${rec.fmc} น.</td><td style="color: #dc2626; padding-bottom: 2px;"><b>เวลา Activate:</b> ${rec.activateTime} น.</td></tr>
                     </table>
                 </div>
 
-                <div style="margin-bottom: 10px;">
-                    <h2 style="font-weight: bold; font-size: 16px; background-color: #f3f4f6; padding: 3px 10px; border-left: 4px solid #374151; margin-bottom: 5px;">2. การประเมินอาการ (Assessment) & Motor Power</h2>
+                <div style="margin-bottom: 12px;">
+                    <h2 style="font-weight: bold; font-size: 16px; background-color: #f3f4f6; padding: 3px 10px; border-left: 4px solid #374151; margin-bottom: 8px;">2. การประเมินอาการ (Assessment) & Motor Power</h2>
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; padding-left: 5px;">
                         <div style="font-size: 14px; width: 65%;">
-                            <p style="margin: 0 0 5px 0;"><b>BE-FAST:</b> 
-                                ${chk(rec.befast?.b)} Balance &nbsp; 
-                                ${chk(rec.befast?.e)} Eyes &nbsp; 
-                                ${chk(rec.befast?.f)} Face
-                            </p>
-                            <p style="margin: 0 0 5px 0;">
-                                ${chk(rec.befast?.a)} Arms &nbsp; 
-                                ${chk(rec.befast?.s)} Speech
-                            </p>
+                            <p style="margin: 0 0 5px 0;"><b>BE-FAST:</b> ${chk(rec.befast?.b)} Balance &nbsp; ${chk(rec.befast?.e)} Eyes &nbsp; ${chk(rec.befast?.f)} Face</p>
+                            <p style="margin: 0 0 5px 0;">${chk(rec.befast?.a)} Arms &nbsp; ${chk(rec.befast?.s)} Speech</p>
                             <p style="color: #dc2626; font-weight: bold; margin: 0;">สถานะ: ${rec.isLvo ? 'VAN Positive (สงสัย LVO)' : 'VAN Negative'}</p>
                         </div>
-                        
                         <div style="width: 35%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;">
-                            <b style="font-size: 13px; margin-bottom: 2px; color: #374151;">Motor Power (0-5)</b>
+                            <b style="font-size: 13px; margin-bottom: 4px; color: #374151;">Motor Power (0-5)</b>
                             <table style="border-collapse: collapse; text-align: center; font-weight: bold; font-size: 14px;">
-                                <tr>
-                                    <td style="padding: 0 10px 2px 10px; color: #1d4ed8;">Rt.</td>
-                                    <td style="padding: 0 10px 2px 10px; color: #be185d;">Lt.</td>
-                                </tr>
-                                <tr>
-                                    <td style="border-bottom: 2px solid black; border-right: 2px solid black; padding: 2px 15px;">${v.motor?.ra||'-'}</td>
-                                    <td style="border-bottom: 2px solid black; padding: 2px 15px;">${v.motor?.la||'-'}</td>
-                                </tr>
-                                <tr>
-                                    <td style="border-right: 2px solid black; padding: 2px 15px;">${v.motor?.rl||'-'}</td>
-                                    <td style="padding: 2px 15px;">${v.motor?.ll||'-'}</td>
-                                </tr>
+                                <tr><td style="padding: 0 10px 4px 10px; color: #1d4ed8;">Rt.</td><td style="padding: 0 10px 4px 10px; color: #be185d;">Lt.</td></tr>
+                                <tr><td style="border-bottom: 2px solid black; border-right: 2px solid black; padding: 4px 15px;">${v.motor?.ra||'-'}</td><td style="border-bottom: 2px solid black; padding: 4px 15px;">${v.motor?.la||'-'}</td></tr>
+                                <tr><td style="border-right: 2px solid black; padding: 4px 15px;">${v.motor?.rl||'-'}</td><td style="padding: 4px 15px;">${v.motor?.ll||'-'}</td></tr>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <div style="margin-bottom: 10px;">
-                    <h2 style="font-weight: bold; font-size: 16px; background-color: #f3f4f6; padding: 3px 10px; border-left: 4px solid #374151; margin-bottom: 5px;">3. สัญญาณชีพแรกรับ </h2>
+                <div style="margin-bottom: 12px;">
+                    <h2 style="font-weight: bold; font-size: 16px; background-color: #f3f4f6; padding: 3px 10px; border-left: 4px solid #374151; margin-bottom: 8px;">3. สัญญาณชีพแรกรับ </h2>
                     <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 13px;">
                         <tr style="background-color: #e5e7eb;">
-                            <th style="border: 1px solid black; padding: 3px;">BP</th>
-                            <th style="border: 1px solid black; padding: 3px;">HR</th>
-                            <th style="border: 1px solid black; padding: 3px;">RR</th>
-                            <th style="border: 1px solid black; padding: 3px;">O2 Sat</th>
-                            <th style="border: 1px solid black; padding: 3px;">DTX</th>
-                            <th style="border: 1px solid black; padding: 3px;">Pupils</th>
-                            <th style="border: 1px solid black; padding: 3px;">GCS (E,V,M)</th>
-                            <th style="border: 1px solid black; padding: 3px;">Total</th>
+                            <th style="border: 1px solid black; padding: 4px;">BP</th><th style="border: 1px solid black; padding: 4px;">HR</th><th style="border: 1px solid black; padding: 4px;">RR</th><th style="border: 1px solid black; padding: 4px;">O2 Sat</th>
+                            <th style="border: 1px solid black; padding: 4px;">DTX</th><th style="border: 1px solid black; padding: 4px;">Pupils</th><th style="border: 1px solid black; padding: 4px;">GCS (E,V,M)</th><th style="border: 1px solid black; padding: 4px;">Total</th>
                         </tr>
                         <tr>
-                            <td style="border: 1px solid black; padding: 3px;">${v.bp || '-'}</td>
-                            <td style="border: 1px solid black; padding: 3px;">${v.hr || '-'}</td>
-                            <td style="border: 1px solid black; padding: 3px;">${v.rr || '-'}</td>
-                            <td style="border: 1px solid black; padding: 3px;">${v.o2 || '-'}%</td>
-                            <td style="border: 1px solid black; padding: 3px;">${v.dtx || '-'}</td>
-                            <td style="border: 1px solid black; padding: 3px;">${v.pupil_l || '-'} / ${v.pupil_r || '-'}</td>
-                            <td style="border: 1px solid black; padding: 3px;">E${v.gcs?.e || '-'} V${v.gcs?.v || '-'} M${v.gcs?.m || '-'}</td>
-                            <td style="border: 1px solid black; padding: 3px; font-weight: bold;">${gcsTotal}</td>
+                            <td style="border: 1px solid black; padding: 4px;">${v.bp || '-'}</td><td style="border: 1px solid black; padding: 4px;">${v.hr || '-'}</td><td style="border: 1px solid black; padding: 4px;">${v.rr || '-'}</td><td style="border: 1px solid black; padding: 4px;">${v.o2 || '-'}%</td>
+                            <td style="border: 1px solid black; padding: 4px;">${v.dtx || '-'}</td><td style="border: 1px solid black; padding: 4px;">${v.pupil_l || '-'} / ${v.pupil_r || '-'}</td><td style="border: 1px solid black; padding: 4px;">E${v.gcs?.e || '-'} V${v.gcs?.v || '-'} M${v.gcs?.m || '-'}</td><td style="border: 1px solid black; padding: 4px; font-weight: bold;">${gcsTotal}</td>
                         </tr>
                     </table>
                 </div>
 
-                <div style="margin-bottom: 10px;">
-                    <h2 style="font-weight: bold; font-size: 16px; background-color: #f3f4f6; padding: 3px 10px; border-left: 4px solid #374151; margin-bottom: 5px;">4. การรักษาพยาบาล (Interventions)</h2>
-                    <div style="padding-left: 5px; line-height: 1.5; font-size: 14px;">
+                <div style="margin-bottom: 12px;">
+                    <h2 style="font-weight: bold; font-size: 16px; background-color: #f3f4f6; padding: 3px 10px; border-left: 4px solid #374151; margin-bottom: 8px;">4. การรักษาพยาบาล (Interventions)</h2>
+                    <div style="padding-left: 5px; line-height: 1.6; font-size: 14px;">
                         <p style="margin: 0;">${chk(rec.interventions?.ab_manage?.done)} <b>A+B manage:</b> ${rec.interventions?.ab_manage?.detail || '-'}</p>
                         <p style="margin: 0;">${chk(rec.interventions?.iv?.done)} <b>สารน้ำ:</b> NSS 1000 ml IV rate ${rec.interventions?.iv?.rate || '-'} ml/hr</p>
                         <p style="margin: 0;">${chk(rec.interventions?.blood)} <b>เจาะเลือด:</b> CBC, Chem, Coag, Clotted</p>
-                        <p style="margin: 0;">${chk(rec.interventions?.consult?.done)} <b>รายงานแพทย์:</b> ${rec.interventions?.consult?.detail || '-'}</p>
-                        <p style="margin: 0;">${chk(rec.interventions?.coord)} <b>ประสานงาน รพ.ปลายทางเรียบร้อย</b></p>
                         <p style="margin: 0;">${chk(rec.interventions?.other?.done)} <b>การรักษาอื่นๆ:</b> ${rec.interventions?.other?.detail || '-'}</p>
                     </div>
                 </div>
 
-                <div style="margin-bottom: 10px; border: 2px solid black; padding: 5px 10px;">
-                    <h2 style="font-weight: bold; font-size: 16px; margin-top: 0; margin-bottom: 5px; text-decoration: underline;">5. สรุปเวลาตัวชี้วัด (KPI)</h2>
-                    <table style="width: 100%; font-size: 14px; margin-bottom: 5px;">
-                        <tr>
-                            <td style="width: 50%; padding-bottom: 2px;">• Door: <b>${rec.interventions?.timeDoor || '........'} น.</b></td>
-                            <td style="width: 50%; padding-bottom: 2px;">• Onset->FMC: <b>${calcDiff(rec.onset, rec.fmc)}</b> นาที</td>
-                        </tr>
-                        <tr>
-                            <td style="padding-bottom: 2px;">• CT Brain: <b>${rec.interventions?.timeCT || '........'} น.</b></td>
-                            <td style="padding-bottom: 2px;">• Onset->Activate: <b>${calcDiff(rec.onset, rec.activateTime)}</b> นาที</td>
-                        </tr>
-                        <tr>
-                            <td style="padding-bottom: 2px;">• Needle: <b>${rec.interventions?.timeNeedle || '........'} น.</b></td>
-                            <td style="padding-bottom: 2px;">• Activate->Door: <b>${calcDiff(rec.activateTime, rec.interventions?.timeDoor)}</b> นาที</td>
-                        </tr>
+                <div style="margin-bottom: 12px; border: 2px solid black; padding: 10px 15px;">
+                    <h2 style="font-weight: bold; font-size: 16px; margin-top: 0; margin-bottom: 8px; text-decoration: underline;">5. สรุปเวลาตัวชี้วัด (KPI) ศูนย์สั่งการบันทึก</h2>
+                    <table style="width: 100%; font-size: 14px; margin-bottom: 8px;">
+                        <tr><td style="width: 50%; padding-bottom: 4px;">• Door: <b>${tDoor} น.</b></td><td style="width: 50%; padding-bottom: 4px;">• Onset->FMC: <b>${calcDiff(rec.onset, rec.fmc)}</b> นาที</td></tr>
+                        <tr><td style="padding-bottom: 4px;">• CT Brain: <b>${tCT} น.</b></td><td style="padding-bottom: 4px;">• Onset->Activate: <b>${calcDiff(rec.onset, rec.activateTime)}</b> นาที</td></tr>
+                        <tr><td style="padding-bottom: 4px;">• Needle: <b>${tNeedle} น.</b></td><td style="padding-bottom: 4px;">• Activate->Door: <b>${calcDiff(rec.activateTime, tDoor)}</b> นาที</td></tr>
                     </table>
-                    <div style="border-top: 1px dashed gray; padding-top: 5px; font-weight: bold;">
-                        <span style="color: #dc2626; margin-right: 15px;">🔥 Door to CT (≤ 25) = ${calcDiff(rec.interventions?.timeDoor, rec.interventions?.timeCT)} นาที</span>
-                        <span style="color: #16a34a;">💉 Door to Needle (≤ 60) = ${calcDiff(rec.interventions?.timeDoor, rec.interventions?.timeNeedle)} นาที</span>
+                    <div style="border-top: 1px dashed gray; padding-top: 8px; font-weight: bold;">
+                        <span style="color: #dc2626; margin-right: 25px;">🔥 Door to CT (≤ 25) = ${calcDiff(tDoor, tCT)} นาที</span>
+                        <span style="color: #16a34a;">💉 Door to Needle (≤ 60) = ${calcDiff(tDoor, tNeedle)} นาที</span>
                     </div>
                 </div>
 
-                <table style="width: 100%; text-align: center; margin-top: 15px; font-size: 14px;">
+                <table style="width: 100%; text-align: center; margin-top: 25px; font-size: 14px;">
                     <tr>
-                        <td style="width: 50%;"><p>ลงชื่อ.........................................ผู้ประเมิน</p><p style="margin-top: 5px;">(.........................................)</p></td>
-                        <td style="width: 50%;"><p>ลงชื่อ.........................................ผู้รับมอบ</p><p style="margin-top: 5px;">(.........................................)</p></td>
+                        <td style="width: 50%;"><p>ลงชื่อ.........................................ผู้ประเมิน</p><p style="margin-top: 8px;">(.........................................)</p></td>
+                        <td style="width: 50%;"><p>ลงชื่อ.........................................แพทย์/พยาบาล ER</p><p style="margin-top: 8px;">(.........................................)</p></td>
                     </tr>
                 </table>
             </div>
         `;
-        
         document.getElementById('documentContent').innerHTML = html;
         window.switchTab('document');
+        if(docId) window.selectedCaseToClose = docId;
     }
 
     window.printDocument = function() {
@@ -720,7 +657,7 @@
         window.allCases.forEach(r => {
             let safeCC = r.cc ? r.cc.replace(/"/g, '""') : '';
             let safePI = r.pi ? r.pi.replace(/"/g, '""').replace(/\n/g, ' ') : '';
-            csv += `"${r.name}","${safeCC}","${safePI}","${r.onset}","${r.fmc}","${r.activateTime}","${r.interventions?.timeDoor||'-'}","${r.interventions?.timeCT||'-'}","${r.interventions?.timeNeedle||'-'}","${r.status}"\n`;
+            csv += `"${r.name}","${safeCC}","${safePI}","${r.onset}","${r.fmc}","${r.activateTime}","${r.timeDoor||'-'}","${r.timeCT||'-'}","${r.timeNeedle||'-'}","${r.status}"\n`;
         });
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
@@ -731,13 +668,19 @@
 
     onSnapshot(query(collection(db, "stroke_patients"), orderBy("createdAt", "desc")), (snapshot) => {
         const historyList = document.getElementById('historyList');
-        historyList.innerHTML = ''; window.allCases = [];
+        const activeList = document.getElementById('activeCasesList');
+        historyList.innerHTML = ''; activeList.innerHTML = ''; window.allCases = [];
         
         let todayStr = new Date().toLocaleDateString('th-TH');
-        let dTotal = 0, dStroke = 0, dLvo = 0, dActive = 0;
+        let dTotal = 0, dActive = 0, dStroke = 0, dLvo = 0;
         let outs = { rtpa: 0, mt: 0, admit: 0, refer: 0, refused: 0, dead: 0, pending: 0 };
+        let mapActive = false;
 
-        if (snapshot.empty) { historyList.innerHTML = '<p class="text-center">ยังไม่มีประวัติในระบบ</p>'; return; }
+        if (snapshot.empty) { 
+            historyList.innerHTML = '<p class="text-center text-gray-500 py-4">ยังไม่มีประวัติในระบบ</p>'; 
+            activeList.innerHTML = '<p class="text-center text-xs md:text-sm text-gray-500 py-4">ไม่มีเคสที่กำลังดำเนินการ</p>';
+            return; 
+        }
 
         snapshot.forEach((docSnap) => {
             const rec = { id: docSnap.id, ...docSnap.data() };
@@ -753,37 +696,66 @@
                 }
             }
             
-            let btnAction = ''; let badge = '<span class="bg-gray-400 text-white text-[10px] px-2 py-1 rounded">ไม่เข้าเกณฑ์</span>';
+            let badgeHistory = '<span class="bg-gray-400 text-white text-[10px] md:text-xs px-2 py-1 rounded">ไม่เข้าเกณฑ์</span>';
+            let btnHistory = '';
             if(rec.status === 'active') {
-                badge = '<span class="bg-red-600 text-white text-[10px] px-2 py-1 rounded animate-pulse">กำลังดำเนินการ</span>';
-                btnAction = `<button onclick="window.resumeCase('${rec.id}')" class="mt-2 w-full bg-orange-50 text-orange-700 text-xs py-2 rounded border border-orange-200 font-bold"><i class="fas fa-clipboard-list mr-1"></i> ดำเนินการต่อ (ทำ Checklist)</button>`;
+                badgeHistory = '<span class="bg-red-600 text-white text-[10px] md:text-xs px-2 py-1 rounded animate-pulse">กำลังดำเนินการ</span>';
+                btnHistory = `<button onclick="window.resumeCase('${rec.id}')" class="mt-3 w-full bg-orange-50 text-orange-700 text-xs md:text-sm py-2 md:py-3 rounded-lg border border-orange-200 font-bold transition hover:bg-orange-100"><i class="fas fa-edit mr-1"></i> บันทึกการรักษาเพิ่มเติม</button>`;
             } else if (rec.status === 'completed') {
-                badge = '<span class="bg-green-600 text-white text-[10px] px-2 py-1 rounded">ปิดเคสแล้ว</span>';
-                btnAction = `<button onclick="window.viewCase('${rec.id}')" class="mt-2 w-full bg-blue-50 text-blue-700 text-xs py-2 rounded border border-blue-200 font-bold"><i class="fas fa-file-alt"></i> 📄 ดูแบบบันทึก (A4)</button>`;
+                badgeHistory = '<span class="bg-green-600 text-white text-[10px] md:text-xs px-2 py-1 rounded">ปิดเคสแล้ว</span>';
+                btnHistory = `<button onclick="window.viewCase('${rec.id}')" class="mt-3 w-full bg-blue-50 text-blue-700 text-xs md:text-sm py-2 md:py-3 rounded-lg border border-blue-200 font-bold transition hover:bg-blue-100"><i class="fas fa-file-alt mr-1"></i> 📄 พิมพ์เอกสาร A4</button>`;
             }
 
             historyList.innerHTML += `
-                <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-                    <div class="flex justify-between items-start mb-2"><span class="font-bold text-gray-800">${rec.name}</span>${badge}</div>
-                    <div class="text-xs text-gray-600 space-y-1"><p>Onset: ${rec.onset} | FMC: ${rec.fmc}</p></div>
-                    ${btnAction}
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition">
+                    <div class="flex justify-between items-start mb-3"><span class="font-bold text-gray-800 text-sm md:text-base">${rec.name}</span>${badgeHistory}</div>
+                    <div class="text-xs md:text-sm text-gray-600 space-y-1"><p>Onset: ${rec.onset} | FMC: ${rec.fmc}</p></div>
+                    ${btnHistory}
                 </div>
             `;
+
+            if(rec.status === 'active') {
+                if(rec.locationShared) mapActive = true;
+                const locStatus = rec.locationShared ? `<span class="text-green-600 text-xs md:text-sm"><i class="fas fa-map-marker-alt animate-bounce mr-1"></i> กำลังแชร์พิกัด</span>` : `<span class="text-gray-400 text-xs md:text-sm">รอกู้ชีพแชร์พิกัด...</span>`;
+                
+                activeList.innerHTML += `
+                <div class="bg-white p-4 rounded-xl border-l-4 border-red-500 shadow-sm flex flex-col justify-between items-start hover:bg-gray-50 transition">
+                    <div class="w-full flex justify-between items-center mb-2">
+                        <span class="font-bold text-sm md:text-base text-gray-800">${rec.name}</span>
+                        <span class="text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded">Act: ${rec.activateTime} น.</span>
+                    </div>
+                    <div class="w-full flex justify-between items-center mt-2 border-t pt-3">
+                        ${locStatus}
+                        <button onclick="window.openFinishModal('${rec.id}')" class="bg-gray-800 text-white text-xs md:text-sm px-4 py-2 rounded-lg hover:bg-gray-900 transition font-bold shadow">
+                            <i class="fas fa-flag-checkered mr-1"></i> จบงาน
+                        </button>
+                    </div>
+                </div>`;
+            }
         });
 
-        // อัปเดตตัวเลขหน้า Dashboard
+        const mapContainer = document.getElementById('map-status');
+        if(mapActive) {
+            mapContainer.innerHTML = `<i class="fas fa-ambulance text-4xl md:text-5xl text-red-600 ambulance-marker drop-shadow-lg"></i>`;
+        } else {
+            mapContainer.innerHTML = `<i class="fas fa-map-pin text-2xl md:text-3xl mb-2 opacity-50"></i> รอการแชร์พิกัดจากทีมกู้ชีพ`;
+        }
+
         const dashTotal = document.getElementById('dash-total');
         if(dashTotal) {
             dashTotal.innerText = dTotal;
             document.getElementById('dash-stroke').innerText = dStroke;
             document.getElementById('dash-lvo').innerText = dLvo;
             document.getElementById('dash-active').innerText = dActive;
+            
             document.getElementById('out-rtpa').innerText = outs.rtpa;
             document.getElementById('out-mt').innerText = outs.mt;
             document.getElementById('out-admit').innerText = outs.admit;
             document.getElementById('out-refer').innerText = outs.refer;
             document.getElementById('out-refused').innerText = outs.refused;
             document.getElementById('out-dead').innerText = outs.dead;
+
+            if(dActive === 0) activeList.innerHTML = '<p class="text-center text-xs md:text-sm text-gray-500 py-4">ไม่มีเคสที่กำลังดำเนินการ</p>';
         }
     });
 </script>
