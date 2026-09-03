@@ -239,7 +239,7 @@
     window.activeDocId = null;
     window.allCases = [];
 
-    // ฟังก์ชันเปลี่ยนหน้าจอ (อัปเดตให้รองรับหน้า Document View)
+    // ฟังก์ชันเปลี่ยนหน้าจอ 
     window.switchTab = function(tab) {
         ['assess', 'action', 'history', 'document'].forEach(t => {
             const el = document.getElementById(`${t}-view`);
@@ -256,14 +256,14 @@
         window.scrollTo(0, 0);
     }
 
-  window.evaluatePatient = function() {
+    // ================= ฟังก์ชันที่หายไป (เพิ่มกลับมาแล้ว) =================
+    window.evaluatePatient = function() {
         const name = document.getElementById('patientName').value;
         if(!name) { alert('กรุณากรอกชื่อผู้ป่วย / HN'); return; }
 
         const lkwInput = document.getElementById('timeLkw').value;
         const onset = document.getElementById('timeOnset').value || 'ไม่ระบุ';
 
-        // เช็คอาการ BE-FAST
         const isBeFastPositive = 
             document.getElementById('befast_b').checked ||
             document.getElementById('befast_e').checked ||
@@ -271,16 +271,13 @@
             document.getElementById('befast_a').checked ||
             document.getElementById('befast_s').checked;
 
-        // ประมวลผล VAN Assessment
         const vanArm = document.getElementById('van_arm').checked;
         const vanV = document.getElementById('van_v').checked;
         const vanA = document.getElementById('van_a').checked;
         const vanN = document.getElementById('van_n').checked;
 
-        // VAN Positive (สงสัย LVO) = มี Arm Weakness + (V, A, หรือ N อย่างน้อย 1 อาการ)
         const isLvo = vanArm && (vanV || vanA || vanN);
 
-        // ดึงข้อมูลเพื่อเตรียมบันทึก
         tempEvalData = {
             name: name,
             lkw: lkwInput ? new Date(lkwInput).toLocaleString('th-TH') : 'ไม่ระบุ',
@@ -298,20 +295,17 @@
             status: 'assessed'
         };
 
-        // หากไม่มีอาการ BE-FAST เลย ให้บันทึกโดยไม่ Activate
         if (!isBeFastPositive) {
             tempEvalData.status = 'not_qualify';
             saveRecordToFirebase();
             return;
         }
 
-        // บังคับให้กรอก Last Known Well เพื่อคํานวณ Time Window
         if (!lkwInput) {
             alert('กรุณาระบุเวลา "Last Known Well" เพื่อให้ระบบคำนวณกรอบเวลา (Time Window)');
             return;
         }
 
-        // คำนวณระยะเวลาจาก Last Known Well ถึงเวลาปัจจุบัน (หน่วยเป็นชั่วโมง)
         const lkwTime = new Date(lkwInput);
         const now = new Date();
         const diffHours = (now - lkwTime) / (1000 * 60 * 60);
@@ -320,9 +314,7 @@
         let alertMsg = "";
         let alertClass = "bg-yellow-100 text-yellow-800 px-3 py-2 rounded mb-4 font-semibold text-sm";
 
-        // ================= ตรรกะการตัดสินใจตาม CPG =================
         if (diffHours <= 4.5) {
-            // กรณีที่ 1: อยู่ใน 4.5 ชม. -> Activate เสมอ
             shouldActivate = true;
             alertMsg = "✅ อยู่ในกรอบเวลา 4.5 ชม.<br>(Activate Stroke Fast Track เพื่อพิจารณา rt-PA)";
             if (isLvo) {
@@ -331,17 +323,14 @@
             }
         } 
         else if (diffHours > 4.5 && diffHours <= 24 && isLvo) {
-            // กรณีที่ 2: เกิน 4.5 ชม. (แต่ไม่เกิน 24 ชม.) และ "สงสัย LVO" -> Activate 
             shouldActivate = true;
             alertMsg = "⚠️ เกิน 4.5 ชม. แต่ VAN Positive (สงสัย LVO)<br><br>➡️ Activate Stroke Fast Track<br>(อยู่ในกรอบ 24 ชม. เพื่อพิจารณา EVT/Thrombectomy)";
             alertClass = "bg-orange-100 text-orange-800 px-3 py-2 rounded mb-4 font-semibold text-sm border border-orange-300";
         } 
         else {
-            // กรณีที่ 3: เกิน 4.5 ชม. แล้วไม่สงสัย LVO หรือ เกิน 24 ชม. ไปแล้ว -> ไม่ Activate
             shouldActivate = false;
         }
 
-        // ================= การแสดงผล =================
         if (shouldActivate) {
             document.getElementById('activationModal').classList.remove('hidden');
             const alertBox = document.getElementById('modalLvoAlert');
@@ -349,13 +338,45 @@
             alertBox.className = alertClass;
             alertBox.classList.remove('hidden');
         } else {
-            // มี BE-FAST แต่หลุดกรอบเวลา
             let reason = diffHours > 24 ? "เกิน 24 ชั่วโมง" : "เกิน 4.5 ชั่วโมง และ ไม่เข้าเกณฑ์ LVO";
             alert(`ผู้ป่วยมีอาการ BE-FAST แต่ไม่อยู่ในเกณฑ์ Stroke Fast Track\n(สาเหตุ: Last Known Well ${reason})`);
             
             tempEvalData.status = 'not_qualify';
             saveRecordToFirebase();
         }
+    }
+
+    window.confirmActivation = async function() {
+        document.getElementById('activationModal').classList.add('hidden');
+        const now = new Date();
+        const activateTime = now.toTimeString().slice(0,5);
+        
+        const record = { ...tempEvalData, activateTime: activateTime, dateStr: now.toLocaleDateString('th-TH'), status: 'active', createdAt: serverTimestamp() };
+
+        try {
+            const docRef = await addDoc(collection(db, "stroke_patients"), record);
+            window.activeDocId = docRef.id;
+            document.getElementById('strokeForm').reset();
+            document.getElementById('activePatientName').innerText = `ผู้ป่วย: ${tempEvalData.name}`;
+            document.getElementById('activeTime').innerText = activateTime + " น.";
+            window.switchTab('action');
+        } catch (error) { alert("เชื่อมต่อฐานข้อมูลล้มเหลว"); }
+    }
+
+    window.closeModal = function() {
+        document.getElementById('activationModal').classList.add('hidden');
+        tempEvalData.status = 'not_qualify';
+        saveRecordToFirebase();
+    }
+
+    async function saveRecordToFirebase() {
+        if(!tempEvalData) return;
+        const record = { ...tempEvalData, activateTime: '-', dateStr: new Date().toLocaleDateString('th-TH'), createdAt: serverTimestamp() };
+        await addDoc(collection(db, "stroke_patients"), record);
+        document.getElementById('strokeForm').reset();
+        alert("บันทึกเข้าระบบเรียบร้อย (ไม่เข้าเกณฑ์ Stroke)");
+    }
+    // ==========================================================
 
     window.resumeCase = function(docId) {
         const rec = window.allCases.find(c => c.id === docId);
@@ -492,7 +513,7 @@
         document.body.innerHTML = docHtml;
         window.print();
         document.body.innerHTML = originalContent;
-        window.location.reload(); // รีเฟรชเพื่อคืนค่าระบบหลังจากพิมพ์
+        window.location.reload(); 
     }
 
     window.exportToCSV = function() {
@@ -524,7 +545,6 @@
                 btnAction = `<button onclick="window.resumeCase('${rec.id}')" class="mt-2 w-full bg-orange-50 text-orange-700 text-xs py-2 rounded border border-orange-200 font-bold"><i class="fas fa-clipboard-list mr-1"></i> ดำเนินการต่อ (ทำ Checklist)</button>`;
             } else if (rec.status === 'completed') {
                 badge = '<span class="bg-green-600 text-white text-[10px] px-2 py-1 rounded">ปิดเคสแล้ว</span>';
-                // เปลี่ยนปุ่มพิมพ์ เป็นปุ่ม "ดูแบบบันทึก (A4)"
                 btnAction = `<button onclick="window.viewCase('${rec.id}')" class="mt-2 w-full bg-blue-50 text-blue-700 text-xs py-2 rounded border border-blue-200 font-bold"><i class="fas fa-file-alt"></i> 📄 ดูแบบบันทึก (A4)</button>`;
             }
 
