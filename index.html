@@ -130,18 +130,50 @@
                     </div>
                 </div>
                 
-                <div class="mt-4 bg-gray-50 p-3 rounded border border-gray-200">
+                <div class="mt-4 bg-gray-50 p-3 rounded border border-gray-200 shadow-sm">
                     <label class="font-bold text-gray-700 text-center block mb-2 text-sm">Motor Power (0-5)</label>
-                    <div class="flex justify-center items-center space-x-6">
-                        <div class="flex flex-col space-y-3">
-                            <div class="flex items-center space-x-2"><label class="text-xs font-bold text-gray-600 w-6 text-right">RA</label><select id="m_ra" class="border rounded p-1 w-16 text-center"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select></div>
-                            <div class="flex items-center space-x-2"><label class="text-xs font-bold text-gray-600 w-6 text-right">RL</label><select id="m_rl" class="border rounded p-1 w-16 text-center"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select></div>
-                        </div>
-                        <div class="h-16 w-px bg-gray-300"></div> 
-                        <div class="flex flex-col space-y-3">
-                            <div class="flex items-center space-x-2"><select id="m_la" class="border rounded p-1 w-16 text-center"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select><label class="text-xs font-bold text-gray-600 w-6">LA</label></div>
-                            <div class="flex items-center space-x-2"><select id="m_ll" class="border rounded p-1 w-16 text-center"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select><label class="text-xs font-bold text-gray-600 w-6">LL</label></div>
-                        </div>
+                    <div class="flex justify-center items-center">
+                        <table class="text-center border-collapse">
+                            <thead>
+                                <tr>
+                                    <th class="text-blue-700 pb-1 text-sm">Rt. (ขวา)</th>
+                                    <th class="w-px"></th>
+                                    <th class="text-pink-600 pb-1 text-sm">Lt. (ซ้าย)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="border-b-2 border-r-2 border-gray-400 p-2">
+                                        <div class="flex items-center justify-end space-x-2">
+                                            <label class="text-xs font-bold text-gray-500">แขน</label>
+                                            <select id="m_ra" class="border rounded p-1 w-16 text-center font-semibold bg-blue-50"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select>
+                                        </div>
+                                    </td>
+                                    <td class="border-b-2 border-gray-400"></td>
+                                    <td class="border-b-2 border-gray-400 p-2">
+                                        <div class="flex items-center space-x-2">
+                                            <select id="m_la" class="border rounded p-1 w-16 text-center font-semibold bg-pink-50"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select>
+                                            <label class="text-xs font-bold text-gray-500">แขน</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="border-r-2 border-gray-400 p-2">
+                                        <div class="flex items-center justify-end space-x-2">
+                                            <label class="text-xs font-bold text-gray-500">ขา</label>
+                                            <select id="m_rl" class="border rounded p-1 w-16 text-center font-semibold bg-blue-50"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                    <td class="p-2">
+                                        <div class="flex items-center space-x-2">
+                                            <select id="m_ll" class="border rounded p-1 w-16 text-center font-semibold bg-pink-50"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select>
+                                            <label class="text-xs font-bold text-gray-500">ขา</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -467,8 +499,24 @@
                         <td style="border: 1px solid black; padding: 4px;">E${v.gcs?.e||'-'}V${v.gcs?.v||'-'}M${v.gcs?.m||'-'}</td><td style="border: 1px solid black; padding: 4px; font-weight: bold;">${gcsTotal}</td>
                     </tr>
                 </table>
-                <div style="font-size: 13px; padding-left: 5px; margin-bottom: 15px;">
-                    <b>Motor Power:</b> RA=${v.motor?.ra||'-'}, LA=${v.motor?.la||'-'}, RL=${v.motor?.rl||'-'}, LL=${v.motor?.ll||'-'}
+                <div style="font-size: 14px; padding-left: 5px; margin-bottom: 20px;">
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <b style="margin-bottom: 5px;">Motor Power (0-5)</b>
+                        <table style="border-collapse: collapse; text-align: center; font-weight: bold; font-size: 16px;">
+                            <tr>
+                                <td style="padding: 0 15px 5px 15px; color: #1d4ed8;">Rt.</td>
+                                <td style="padding: 0 15px 5px 15px; color: #be185d;">Lt.</td>
+                            </tr>
+                            <tr>
+                                <td style="border-bottom: 2px solid black; border-right: 2px solid black; padding: 10px 25px;">${v.motor?.ra||'-'}</td>
+                                <td style="border-bottom: 2px solid black; padding: 10px 25px;">${v.motor?.la||'-'}</td>
+                            </tr>
+                            <tr>
+                                <td style="border-right: 2px solid black; padding: 10px 25px;">${v.motor?.rl||'-'}</td>
+                                <td style="padding: 10px 25px;">${v.motor?.ll||'-'}</td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
 
                 <h2 style="font-weight: bold; font-size: 16px; background: #f3f4f6; padding: 5px; border-left: 4px solid #374151; margin-bottom: 10px;">4. การรักษาพยาบาล (Interventions)</h2>
