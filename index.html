@@ -448,8 +448,7 @@
         } catch (error) { alert("เกิดข้อผิดพลาด"); }
     }
 
-    // ⚡ ฟังก์ชันดูประวัติในหน้า A4 (บนจอมือถือ) ⚡
- // ⚡ ฟังก์ชันดูประวัติในหน้า A4 (บนจอมือถือ) ⚡
+   // ⚡ ฟังก์ชันดูประวัติในหน้า A4 (บนจอมือถือ) ⚡
     window.viewCase = function(docId) {
         const rec = window.allCases.find(c => c.id === docId);
         if(!rec) return;
@@ -558,7 +557,59 @@
         document.getElementById('documentContent').innerHTML = html;
         window.switchTab('document');
     }
+
+    // ฟังก์ชันสั่งพิมพ์จากหน้า Document
+    window.printDocument = function() {
+        const docHtml = document.getElementById('documentContent').innerHTML;
+        const originalContent = document.body.innerHTML;
+        document.body.innerHTML = docHtml;
+        window.print();
+        document.body.innerHTML = originalContent;
+        window.location.reload(); 
+    }
+
+    window.exportToCSV = function() {
+        if(window.allCases.length === 0) { alert("ไม่มีข้อมูล"); return; }
+        let csv = "\uFEFFชื่อ,Onset,FMC,Activate,Door,CT,Needle,สถานะ\n";
+        window.allCases.forEach(r => {
+            csv += `"${r.name}","${r.onset}","${r.fmc}","${r.activateTime}","${r.interventions?.timeDoor||'-'}","${r.interventions?.timeCT||'-'}","${r.interventions?.timeNeedle||'-'}","${r.status}"\n`;
+        });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `Stroke_Data.csv`;
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    }
+
+    onSnapshot(query(collection(db, "stroke_patients"), orderBy("createdAt", "desc")), (snapshot) => {
+        const historyList = document.getElementById('historyList');
+        historyList.innerHTML = ''; window.allCases = [];
+
+        if (snapshot.empty) { historyList.innerHTML = '<p class="text-center">ยังไม่มีประวัติในระบบ</p>'; return; }
+
+        snapshot.forEach((docSnap) => {
+            const rec = { id: docSnap.id, ...docSnap.data() };
+            window.allCases.push(rec);
+            
+            let btnAction = ''; let badge = '<span class="bg-gray-400 text-white text-[10px] px-2 py-1 rounded">ไม่เข้าเกณฑ์</span>';
+            if(rec.status === 'active') {
+                badge = '<span class="bg-red-600 text-white text-[10px] px-2 py-1 rounded animate-pulse">กำลังดำเนินการ</span>';
+                btnAction = `<button onclick="window.resumeCase('${rec.id}')" class="mt-2 w-full bg-orange-50 text-orange-700 text-xs py-2 rounded border border-orange-200 font-bold"><i class="fas fa-clipboard-list mr-1"></i> ดำเนินการต่อ (ทำ Checklist)</button>`;
+            } else if (rec.status === 'completed') {
+                badge = '<span class="bg-green-600 text-white text-[10px] px-2 py-1 rounded">ปิดเคสแล้ว</span>';
+                btnAction = `<button onclick="window.viewCase('${rec.id}')" class="mt-2 w-full bg-blue-50 text-blue-700 text-xs py-2 rounded border border-blue-200 font-bold"><i class="fas fa-file-alt"></i> 📄 ดูแบบบันทึก (A4)</button>`;
+            }
+
+            historyList.innerHTML += `
+                <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex justify-between items-start mb-2"><span class="font-bold text-gray-800">${rec.name}</span>${badge}</div>
+                    <div class="text-xs text-gray-600 space-y-1"><p>Onset: ${rec.onset} | FMC: ${rec.fmc}</p></div>
+                    ${btnAction}
+                </div>
+            `;
+        });
     });
 </script>
+ 
 </body>
 </html>
