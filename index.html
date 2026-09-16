@@ -468,11 +468,21 @@
 
             <div class="bg-white p-3.5 md:p-4 rounded-xl shadow-sm border border-gray-200 space-y-2.5">
                 <h3 class="font-bold text-teal-800 border-b pb-1.5 mb-2 text-xs md:text-sm flex items-center"><i class="fas fa-medkit mr-1.5"></i> การดูแลรักษา (Interventions)</h3>
+                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-                    <label class="flex items-start space-x-2 bg-gray-50 p-2.5 rounded-lg border border-gray-200 cursor-pointer hover:bg-teal-50 transition">
-                        <input type="checkbox" id="chk_ab_manage" class="w-4 h-4 text-teal-600 rounded mt-0.5">
-                        <div class="flex-1"><span class="font-bold text-gray-800 block mb-0.5 text-[11px]">A+B management:</span><input type="text" id="val_ab_manage" class="w-full border border-gray-300 rounded p-1.5 bg-white text-xs outline-none" placeholder="ระบุการจัดการ"></div>
-                    </label>
+                    
+                    <!-- ส่วน A+B management ที่ปรับใหม่ -->
+                    <div class="bg-gray-50 p-2.5 rounded-lg border border-gray-200 hover:bg-teal-50 transition">
+                        <span class="font-bold text-gray-800 block mb-1.5 text-[11px]">A+B management:</span>
+                        <div class="grid grid-cols-2 gap-y-1.5 gap-x-2 mb-2">
+                            <label class="flex items-center space-x-1.5 cursor-pointer"><input type="checkbox" id="chk_ab_suction" class="w-3.5 h-3.5 text-teal-600 rounded"><span class="text-[10px] font-medium text-gray-700">suction</span></label>
+                            <label class="flex items-center space-x-1.5 cursor-pointer"><input type="checkbox" id="chk_ab_canular" class="w-3.5 h-3.5 text-teal-600 rounded"><span class="text-[10px] font-medium text-gray-700">canular</span></label>
+                            <label class="flex items-center space-x-1.5 cursor-pointer"><input type="checkbox" id="chk_ab_mask" class="w-3.5 h-3.5 text-teal-600 rounded"><span class="text-[10px] font-medium text-gray-700">mask with bag</span></label>
+                            <label class="flex items-center space-x-1.5 cursor-pointer"><input type="checkbox" id="chk_ab_ett" class="w-3.5 h-3.5 text-teal-600 rounded"><span class="text-[10px] font-medium text-gray-700">ETT</span></label>
+                        </div>
+                        <input type="text" id="val_ab_manage" class="w-full border border-gray-300 rounded p-1.5 bg-white text-xs outline-none focus:ring-1 focus:ring-teal-400" placeholder="ระบุเพิ่มเติม...">
+                    </div>
+
                     <label class="flex items-start space-x-2 bg-gray-50 p-2.5 rounded-lg border border-gray-200 cursor-pointer hover:bg-teal-50 transition">
                         <input type="checkbox" id="chk_iv" class="w-4 h-4 text-teal-600 rounded mt-0.5">
                         <div class="flex-1"><span class="font-bold text-gray-800 block mb-0.5 text-[11px]">เก็บแลป Stroke FT bundle + ให้สารน้ำ</span> IV rate: <input type="number" id="val_iv_rate" class="border-b border-teal-400 w-12 text-center bg-transparent outline-none font-bold text-teal-700 text-xs"> ml/hr</div>
@@ -600,7 +610,7 @@
     window.activeDocId = null;
     window.allCases = [];
     window.selectedCaseToClose = null;
-    let unsubscribeSnapshot = null; // ตัวแปรควบคุมการดึงข้อมูล
+    let unsubscribeSnapshot = null;
 
     // ================= 🗺️ LEAFLET MAP CONFIG =================
     let map = null;
@@ -834,7 +844,6 @@
             const displayUser = user.email.replace('@nkp-als.local', '');
             if(userBadge) userBadge.innerHTML = `<i class="fas fa-user-circle mr-1 text-emerald-400"></i> ${displayUser}`;
             
-            // เริ่มดึงข้อมูลเมื่อ Login ผ่านแล้ว
             startListeningData();
 
             window.switchTab('dashboard');
@@ -1024,8 +1033,17 @@
             }
             const intv = rec.interventions;
             if(intv.ab_manage) {
-                document.getElementById('chk_ab_manage').checked = intv.ab_manage.done;
-                document.getElementById('val_ab_manage').value = intv.ab_manage.detail !== '-' ? intv.ab_manage.detail : '';
+                document.getElementById('chk_ab_suction').checked = !!intv.ab_manage.suction;
+                document.getElementById('chk_ab_canular').checked = !!intv.ab_manage.canular;
+                document.getElementById('chk_ab_mask').checked = !!intv.ab_manage.mask;
+                document.getElementById('chk_ab_ett').checked = !!intv.ab_manage.ett;
+                document.getElementById('val_ab_manage').value = intv.ab_manage.detail && intv.ab_manage.detail !== '-' ? intv.ab_manage.detail : '';
+            } else {
+                document.getElementById('chk_ab_suction').checked = false;
+                document.getElementById('chk_ab_canular').checked = false;
+                document.getElementById('chk_ab_mask').checked = false;
+                document.getElementById('chk_ab_ett').checked = false;
+                document.getElementById('val_ab_manage').value = '';
             }
             if(intv.iv) {
                 document.getElementById('chk_iv').checked = intv.iv.done;
@@ -1061,7 +1079,13 @@
         const intvData = {
             vitals: v,
             motor: v.motor,
-            ab_manage: { done: document.getElementById('chk_ab_manage').checked, detail: document.getElementById('val_ab_manage').value || '-' },
+            ab_manage: { 
+                suction: document.getElementById('chk_ab_suction').checked,
+                canular: document.getElementById('chk_ab_canular').checked,
+                mask: document.getElementById('chk_ab_mask').checked,
+                ett: document.getElementById('chk_ab_ett').checked,
+                detail: document.getElementById('val_ab_manage').value || '-' 
+            },
             iv: { done: document.getElementById('chk_iv').checked, rate: document.getElementById('val_iv_rate').value || '-' },
             consult: { done: document.getElementById('chk_consult').checked, detail: document.getElementById('val_consult').value || '-' },
             other: { done: document.getElementById('chk_other').checked, detail: document.getElementById('val_other').value || '-' }
@@ -1227,6 +1251,21 @@
             });
         }
 
+        // ประมวลผลข้อความ A+B management
+        let abDetails = [];
+        if (rec.interventions?.ab_manage) {
+            if (rec.interventions.ab_manage.suction) abDetails.push('suction');
+            if (rec.interventions.ab_manage.canular) abDetails.push('canular');
+            if (rec.interventions.ab_manage.mask) abDetails.push('mask with bag');
+            if (rec.interventions.ab_manage.ett) abDetails.push('ETT');
+        }
+        let abString = abDetails.length > 0 ? abDetails.join(', ') : '';
+        if (rec.interventions?.ab_manage?.detail && rec.interventions.ab_manage.detail !== '-') {
+            abString += (abString ? ' + ' : '') + rec.interventions.ab_manage.detail;
+        }
+        if (!abString) abString = '-';
+        let isAbDone = (abDetails.length > 0 || (rec.interventions?.ab_manage?.detail && rec.interventions.ab_manage.detail !== '-') || rec.interventions?.ab_manage?.done);
+
         const html = `
             <div class="watermark-container" style="padding: 20px 30px; font-family: 'Sarabun', sans-serif; color: black; line-height: 1.4; position: relative;">
                 
@@ -1236,7 +1275,7 @@
 
                 <div style="border-bottom: 2px solid black; padding-bottom: 5px; margin-bottom: 10px; text-align: center; position: relative; z-index: 10;">
                     <div style="display: flex; justify-content: flex-end; align-items: flex-start;">
-                        <span style="font-size: 10px; color: #64748b;">รหัสเอกสาร: NKP-CPG-STK-01 (Master List)</span>
+                        <span style="font-size: 10px; color: #64748b;">รหัสเอกสาร: NKP-CPG-STK-01</span>
                     </div>
                     <h1 style="font-size: 19px; font-weight: bold; margin: 2px 0 0 0;">แบบบันทึกการดูแลผู้ป่วยฉุกเฉิน Stroke Fast Track</h1>
                     <p style="font-size: 12px; margin: 2px 0 0 0; color: #334155;">หน่วยปฎิบัติการแพทย์ฉุกเฉิน โรงพยาบาลนครปฐม</p>
@@ -1300,7 +1339,7 @@
                 <div style="margin-bottom: 8px; position: relative; z-index: 10;">
                     <h2 style="font-weight: bold; font-size: 14px; background-color: #f3f4f6; padding: 3px 10px; border-left: 4px solid #374151; margin-bottom: 4px;">4. การรักษาพยาบาล (Interventions)</h2>
                     <div style="padding-left: 5px; line-height: 1.4; font-size: 12px;">
-                        <p style="margin: 0;">${chk(rec.interventions?.ab_manage?.done)} <b>A+B manage:</b> ${rec.interventions?.ab_manage?.detail || '-'}</p>
+                        <p style="margin: 0;">${chk(isAbDone)} <b>A+B manage:</b> ${abString}</p>
                         <p style="margin: 0;">${chk(rec.interventions?.iv?.done)} <b>เก็บแลป Stroke FT bundle + ให้สารน้ำ:</b> NSS IV rate ${rec.interventions?.iv?.rate || '-'} ml/hr</p>
                         <p style="margin: 0;">${chk(rec.interventions?.other?.done)} <b>การรักษาอื่นๆ:</b> ${rec.interventions?.other?.detail || '-'}</p>
                         <p style="margin: 0;">${chk(rec.interventions?.consult?.done)} <b>การปรึกษา/คำสั่งอำนวยการจาก พอป.:</b> ${rec.interventions?.consult?.detail || '-'}</p>
