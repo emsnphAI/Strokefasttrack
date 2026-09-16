@@ -803,6 +803,8 @@
 
     // ================= 🔄 REAL-TIME FIRESTORE LISTENER =================
     // 👉 ฟังก์ชันสำหรับเริ่มดึงข้อมูล (เรียกใช้เมื่อ Login สำเร็จแล้ว)
+    // ================= 🔄 REAL-TIME FIRESTORE LISTENER =================
+    // 👉 ฟังก์ชันสำหรับเริ่มดึงข้อมูล (เรียกใช้เมื่อ Login สำเร็จแล้ว)
     function startListeningData() {
         if (unsubscribeSnapshot) return; // ป้องกันการดึงข้อมูลซ้ำ
 
@@ -855,10 +857,15 @@
                     dTotal++;
                     if (rec.isFastTrack) dStroke++;
                     if (rec.isLvo) dLvo++;
-                    if (rec.status === 'active') dActive++;
+                    // ❌ เอาเงื่อนไขนับ Active ออกจากตรงนี้ เพื่อไม่ให้ผูกติดกับคำว่า "วันนี้"
                 }
 
-                // 2. สรุปผลการรักษา (ER Outcomes) และยอด Activate รวม เป็น "รายเดือนปัจจุบัน"
+                // ✅ 2. ให้นับเคสที่ "กำลังดำเนินการ (Active)" ทั้งหมด ไม่ว่าจะเป็นของวันไหน
+                if (rec.status === 'active' && canView) {
+                    dActive++;
+                }
+
+                // 3. สรุปผลการรักษา (ER Outcomes) และยอด Activate รวม เป็น "รายเดือนปัจจุบัน"
                 if (isCurrentMonth && canView) {
                     if (rec.status === 'active' || rec.status === 'completed') {
                         monthActivatedCount++;
@@ -893,6 +900,7 @@
                         </div>
                     `;
 
+                    // หากเป็น Active Case ให้เพิ่มการ์ดและปุ่มจบงานไปที่หน้า Dashboard ด้วย
                     if(rec.status === 'active') {
                         const locStatus = rec.locationShared ? `<span class="text-green-400 text-[11px] font-medium"><i class="fas fa-map-marker-alt animate-bounce mr-1"></i> แชร์พิกัดแล้ว</span>` : `<span class="text-slate-500 text-[11px] italic">รอกู้ชีพแชร์พิกัด...</span>`;
                         
@@ -969,6 +977,7 @@
                 document.getElementById('out-refused').innerText = outs.refused;
                 document.getElementById('out-dead').innerText = outs.dead;
 
+                // ตัวล้างหน้าจอเวลากลายเป็น 0 (แก้ไขให้สัมพันธ์กับเคสทั้งหมดที่ Active แล้ว)
                 if(dActive === 0) activeList.innerHTML = '<p class="text-center text-[11px] text-slate-500 py-6 italic">ไม่มีเคสที่กำลังดำเนินการ</p>';
             }
         });
